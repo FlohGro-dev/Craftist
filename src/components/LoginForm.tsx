@@ -2,7 +2,7 @@ import React from "react";
 import { Input } from "@chakra-ui/input";
 import { Button } from "@chakra-ui/button";
 import { Container } from "@chakra-ui/layout";
-import { useLoginCallback, API_TOKEN_KEY } from "../todoistApiWrapper";
+import { useLoginCallback } from "../todoistApiWrapper";
 import { Alert } from "@chakra-ui/alert";
 import { ScaleFade } from "@chakra-ui/transition";
 
