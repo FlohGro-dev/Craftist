@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
-import { CalendarIcon, LinkIcon } from "@chakra-ui/icons";
+import { CalendarIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
