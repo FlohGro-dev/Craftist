@@ -1,0 +1,41 @@
+body {
+  background-color: white;
+}
+
+body.dark {
+  background-color: #222222;
+}
+
+.btn {
+  background-color: #dfdfdf;
+  border: none;
+  color: #484848;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn.dark {
+  background-color: #464646;
+  color: #cfcfcf;
+}
+
+.btn:hover {
+  background-color: #c6c6c6;
+}
+
+.btn.dark:hover {
+  background-color: #3c3c3c;
+}
+
+.btn:active {
+  background-color: #b8b8b8;
+}
+
+.btn.dark:active {
+  background-color: #303030;
+}
