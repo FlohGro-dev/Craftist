@@ -6,7 +6,8 @@ Please read through the instructions, especially the [installation](#installatio
 If you have any problems with the current features or you have other feature request, you can open an issue in this repository or contact me on Twitter, the Craft developer forum or in the Craft slack community (search for "FlohGro").
 
 If this eXtension is valuable for and you like to thank me you can
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="flohgro" data-color="#5F7FFF" data-emoji="🍕"  data-font="Cookie" data-text="Buy me a pizza" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
+
+<a href="https://www.buymeacoffee.com/flohgro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 30px !important;width: 109px !important;" ></a>
 
 ## Features
 
