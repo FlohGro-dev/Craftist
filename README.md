@@ -7,7 +7,7 @@ If you have any problems with the current features or you have other feature req
 
 If this eXtension is valuable for and you like to thank me you can
 
-<a href="https://www.buymeacoffee.com/flohgro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 30px !important;width: 109px !important;" ></a>
+<a href="https://www.buymeacoffee.com/flohgro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 220px !important;" ></a>
 
 ## Features
 
@@ -50,3 +50,7 @@ If you want to built the eXtension by yourself (and e.g. make some custom modifi
 Simply run `npm install` and than `npm run build` to generate the .craftX file which can be installed.
 
 To learn more about Craft eXtensions visit the [Craft X developer portal](https://developer.craft.do).
+
+## Thanks
+
+Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
