@@ -12,30 +12,24 @@ const ImportProjectListButton: React.FC = () => {
   const toast = useToast();
   const getProjectList = TodoistWrapper.useGetProjects();
   const [isLoading, setIsLoading] = React.useState(false);
-  let blocksToAdd:CraftBlockInsert[] = [];
+  let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = () => {
     setIsLoading(true);
     let projects = getProjectList();
     projects.then((projects) => {
-      if(!projects.length){return;}
-return Promise.all(
-  projects
-  .map((project) => {
-    var urlsForBlock = new Map([
-[ project.name,"todoist://project?id=" + project.id ],
-        [ "(Webview)",project.url ]
-     ]);
+      if (!projects.length) { return; }
+      return Promise.all(
+        projects
+          .map((project) => {
+            let mdContent = craft.markdown.markdownToCraftBlocks("- [" + project.name + "](todoist://project?id=" + project.id + ") [(Webview)](" + project.url + ")");
+            blocksToAdd = blocksToAdd.concat(mdContent);
 
-
-     let blockToAdd = CraftBlockInteractor.createExternalLinkBlockFromStringAndUrlMap(urlsForBlock);
-     blockToAdd.listStyle = craft.blockFactory.defaultListStyle("bullet");
-blocksToAdd.push(blockToAdd);
-  })
-)
+          })
+      )
     })
-    .then(() => {
-      craft.dataApi.addBlocks(blocksToAdd);
-    })
+      .then(() => {
+        craft.dataApi.addBlocks(blocksToAdd);
+      })
       .finally(() => {
         setIsLoading(false);
         toast({
