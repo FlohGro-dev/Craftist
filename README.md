@@ -26,6 +26,7 @@ The following features are currently supported by Craftist:
     - if the task is completed anywhere (Todoist or craft) complete it on the other platform
     - if the task is cancelled in craft and open in todoist, close it in todoist
   - this will work for every todo item which was linked to a Todoist Task by this eXtension
+  - note: this will **not** work properly for repeating tasks.
 - import project list
   - this will import the list of your Todoist projects
   - the name of the project will be a direct link to the project in the app (as mentioned this does currently not work on macOS)

@@ -140,7 +140,7 @@ export function createExternalLinkBlockFromStringAndUrl(blockText:string, blockU
 export function createExternalLinkBlockFromStringAndUrlMap(urlsToUse:Map<string,string>,separator=" ",description=""){
 
   let block:CraftTextBlockInsert;
-  let textRun:CraftTextRun[] = []
+  let textRun:CraftTextRun[] = [];
 
   if(description != ""){
     textRun.push({text: description})
