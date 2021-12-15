@@ -3,21 +3,26 @@ import * as ReactDOM from 'react-dom'
 import * as Recoil from "recoil";
 import * as TodoistWrapper from "./todoistApiWrapper";
 //import { AppendButton, LoginForm, TodayPane } from "./components";
-import { LoginForm, LogoutButton, ImportTodaysTasksButton, ImportProjectListButton, CrosslinkTasksButton, SyncTaskStatesButton } from "./components";
-import { ChakraProvider, ThemeConfig, ConfigColorMode } from "@chakra-ui/react";
+import { LoginForm, LogoutButton, ImportTodaysTasksButton, ImportProjectListButton, CrosslinkTasksButton, SyncTaskStatesButton, CreateTasksFromSelectionButton, ImportAllTasksButton } from "./components";
+import { ChakraProvider, ThemeConfig, ConfigColorMode, useColorMode, Badge, Center } from "@chakra-ui/react";
 import { Container, Stack, Box, Flex } from "@chakra-ui/layout";
 import { extendTheme } from "@chakra-ui/react";
 import { Divider } from '@chakra-ui/react'
 import { Skeleton } from "@chakra-ui/skeleton";
+import { CraftEnv } from "./types"
+import { DevicePlatform } from "@craftdocs/craft-extension-api";
 // import craftXIconSrc from "./craftx-icon.png"
 // import { TodoistApi } from '@doist/todoist-api-typescript'
 // import { CraftBlockInsert, CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
 
 const config: ThemeConfig = {
-  initialColorMode: getCraftColorMode(),
-  useSystemColorMode: false,
+//  initialColorMode: getCraftColorMode(),
+  //initialColorMode: useCraftEnv().isDarkMode ? 'dark':'light',
+  initialColorMode: 'light',
+  useSystemColorMode: true,
 }
 
+//const { colorMode, toggleColorMode } = useColorMode();
 
 const theme = extendTheme({ config,
     fontSizes: {
@@ -25,6 +30,18 @@ const theme = extendTheme({ config,
       sm: "11px",
       lg: "15px",
     },
+    colors: {
+    transparent: 'transparent',
+    black: '#000',
+    white: '#fff',
+    gray: {
+      50: '#f7fafc',
+      // ...
+      900: '#171923',
+
+    },
+    // ...
+  },
  });
 
 
@@ -48,11 +65,18 @@ const Content: React.FC = () => {
           </Stack>
         }
       >
-      <ImportTodaysTasksButton />
+      <Badge>Create / Link</Badge>
+      <CreateTasksFromSelectionButton />
       <CrosslinkTasksButton />
+      <Badge>Sync</Badge>
       <SyncTaskStatesButton />
+      <Badge>Import</Badge>
+      <ImportTodaysTasksButton />
+      <ImportAllTasksButton />
       <ImportProjectListButton />
-      <Divider colorScheme={getCraftColorMode()} />
+      <Center height='50px'>
+        <Divider size="5px" />
+      </Center>
       <LogoutButton />
       </React.Suspense>
     </Box>
@@ -62,16 +86,21 @@ const Content: React.FC = () => {
 const App: React.FC = () => {
   let [token, setToken] = Recoil.useRecoilState(TodoistWrapper.apiToken);
   const isLogin = !!token;
+  const craftEnv = useCraftEnv();
+
   React.useEffect(() => {
-    // craft.storageApi
-    //   .get(States.API_TOKEN_KEY)
-    //   .then((resp) => resp.data ?? "")
-    //   .then((token) => {
-    //     setToken(token);
-    //   });
     const k = window.localStorage.getItem(TodoistWrapper.API_TOKEN_KEY) ?? "";
     setToken(k);
   }, [setToken]);
+
+  React.useEffect(() => {
+    if (craftEnv.isDarkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, [craftEnv.isDarkMode]);
+
   if (!isLogin) {
     return <LoginForm />;
   }
@@ -128,6 +157,22 @@ function getCraftColorMode() {
   return colorMode;
 }
 
+function useCraftEnv(): CraftEnv {
+  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [platform, setPlatform] = React.useState<DevicePlatform>("Web");
+
+  React.useEffect(() => {
+    craft.env.setListener(env => {
+      setIsDarkMode(env.colorScheme === "dark")
+      setPlatform(env.platform)
+    });
+  }, []);
+
+  return {
+    isDarkMode,
+    platform
+  };
+}
 
 
 export function initApp() {

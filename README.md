@@ -13,20 +13,35 @@ If this eXtension is valuable for and you like to thank me you can
 
 The following features are currently supported by Craftist:
 
-- import todays tasks
-  - this will import the tasks due today from your todoist account
-  - the tasks will be imported as todo items and contain links to the tasks in todoist (a direct link to the task in the app (doesn't work on macOS) and a link to the Webview of the task)
-- crosslink open tasks
-  - this will create crosslinked tasks between every (unchecked) todo item in the current document and Todoist
-  - the tasks in Todoist will directly link back to the todo item in Craft
-  - cancelled or done todo items in the craft document will be ignored
+### Create / Link Tasks
+
+- create Tasks from Selection
+  - this will create tasks from the selected blocks
+  - if the blocks are not already a todo item in craft they will be converted
+  - crosslink open tasks
+    - this will create crosslinked tasks between every (unchecked) todo item in the current document and Todoist
+    - the tasks in Todoist will directly link back to the todo item in Craft
+    - cancelled or done todo items in the craft document will be ignored
+
+### Sync Task States
+
 - sync task states
   - this will sync the states of linked Tasks to todoist
   - the states will be changed with the following scheme:
     - if the task is completed anywhere (Todoist or craft) complete it on the other platform
     - if the task is cancelled in craft and open in todoist, close it in todoist
   - this will work for every todo item which was linked to a Todoist Task by this eXtension
-  - note: this will **not** work properly for repeating tasks.
+  - note: this will **not** work properly for repeating tasks thats why it is currently disabled
+  - if a task couldn't be retrieved it will be marked as done in Craft since it is was probably deleted
+
+### Import Tasks / Project List
+
+- import todays tasks
+  - this will import the tasks due today from your todoist account
+  - the tasks will be imported as todo items and contain links to the tasks in todoist (a direct link to the task in the app (doesn't work on macOS) and a link to the Webview of the task)
+- import all tasks
+  - this will import all tasks from your todoist account (which could be a lot)
+  - it's planned to improve this action (e.g. grouping by project) if you'd like to have this feature please comment on the related issue.
 - import project list
   - this will import the list of your Todoist projects
   - the name of the project will be a direct link to the project in the app (as mentioned this does currently not work on macOS)

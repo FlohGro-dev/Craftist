@@ -46,16 +46,16 @@ export const useLoginCallback = () =>
     };
   });
 
-  export const useLogoutCallback = () =>
-    Recoil.useRecoilCallback(({ reset }) => {
-      return async () => {
-//        reset(projects);
-        reset(apiToken);
-        reset(client);
-        await craft.storageApi.delete(API_TOKEN_KEY);
-        window.localStorage.removeItem(API_TOKEN_KEY);
-        };
-    });
+export const useLogoutCallback = () =>
+  Recoil.useRecoilCallback(({ reset }) => {
+    return async () => {
+      //        reset(projects);
+      reset(apiToken);
+      reset(client);
+      await craft.storageApi.delete(API_TOKEN_KEY);
+      window.localStorage.removeItem(API_TOKEN_KEY);
+    };
+  });
 
 export const useAddTask = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
@@ -77,60 +77,98 @@ export const useAddTask = () => {
 
 export const useCheckIfTaskIsCompleted = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
-return async (params: {
-  id: number}) => {
-    const cli = await snapshot.getPromise(client);
-    if (!cli) {
-      throw new Error("No client");
-    }
-    const response = await cli.getTask(params.id);
-    return response.completed
-  };
+    return async (params: {
+      id: number
+    }) => {
+      const cli = await snapshot.getPromise(client);
+      if (!cli) {
+        throw new Error("No client");
+      }
+      const response = await cli.getTask(params.id);
+      return response.completed
+    };
 
-});
+  });
+};
+
+
+export const useCheckIfTaskIsRecurring = ()  => {
+  return Recoil.useRecoilCallback(({ snapshot }) => {
+    return async (params: {
+      id: number
+    }) => {
+      const cli = await snapshot.getPromise(client);
+      if (!cli) {
+        throw new Error("No client");
+      }
+      const response = await cli.getTask(params.id);
+      if(response.due?.recurring == true){
+        return true;
+      }
+      else {
+        return false;
+      }
+    };
+
+  });
 };
 
 
 export const useSetTaskComplete = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
-return async (params: {
-  id: number}) => {
-    const cli = await snapshot.getPromise(client);
-    if (!cli) {
-      throw new Error("No client");
-    }
-    const response = await cli.closeTask(params.id);
-    return response
-  };
+    return async (params: {
+      id: number
+    }) => {
+      const cli = await snapshot.getPromise(client);
+      if (!cli) {
+        throw new Error("No client");
+      }
+      const response = await cli.closeTask(params.id);
+      return response
+    };
 
-});
+  });
 };
 
 export const useGetTodaysTasks = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
-return async () => {
-    const cli = await snapshot.getPromise(client);
-    if (!cli) {
-      throw new Error("No client");
-    }
-    const response = await cli.getTasks({ "filter": "today" });
-    return response
-  };
+    return async () => {
+      const cli = await snapshot.getPromise(client);
+      if (!cli) {
+        throw new Error("No client");
+      }
+      const response = await cli.getTasks({ "filter": "today" });
+      return response
+    };
 
-});
+  });
+};
+
+export const useGetAllTasks = () => {
+  return Recoil.useRecoilCallback(({ snapshot }) => {
+    return async () => {
+      const cli = await snapshot.getPromise(client);
+      if (!cli) {
+        throw new Error("No client");
+      }
+      const response = await cli.getTasks({});
+      return response
+    };
+
+  });
 };
 
 
 export const useGetProjects = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
-return async () => {
-    const cli = await snapshot.getPromise(client);
-    if (!cli) {
-      throw new Error("No client");
-    }
-    const response = await cli.getProjects();
-    return response
-  };
+    return async () => {
+      const cli = await snapshot.getPromise(client);
+      if (!cli) {
+        throw new Error("No client");
+      }
+      const response = await cli.getProjects();
+      return response
+    };
 
-});
+  });
 };

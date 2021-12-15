@@ -104,6 +104,14 @@ export async function appendCraftTextRunToBlock(textToAppend: CraftTextRun[], bl
   }
 }
 
+export async function prependCraftTextRunToBlock(textToPrepend: CraftTextRun[], block: CraftTextBlock) {
+  block.content = textToPrepend.concat(block.content);
+  const result = await craft.dataApi.updateBlocks([block])
+  if (result.status !== "success") {
+    throw new Error(result.message)
+  }
+}
+
 export function blockContainsString(compareString: string, block: CraftTextBlock){
   let blockText: string = block.content.map((c) => c.text).join("");
   if(blockText.includes(compareString)){
@@ -158,4 +166,9 @@ export function createExternalLinkBlockFromStringAndUrlMap(urlsToUse:Map<string,
   )
 
   return block
+}
+
+export function getParentDocumentMdLinkOfBlock(block:CraftBlock){
+  // to be implemented
+  return ""
 }

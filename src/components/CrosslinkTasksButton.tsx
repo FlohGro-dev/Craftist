@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
-import { LinkIcon, SmallAddIcon } from "@chakra-ui/icons";
+import { LinkIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
@@ -25,7 +25,7 @@ const CrosslinkTasksButton: React.FC = () => {
             (block): block is CraftTextBlock => block.type === "textBlock"
           )
           .map((block) => {
-            const documentTitle = "";
+            const documentTitle = CraftBlockInteractor.getParentDocumentMdLinkOfBlock(block);
             //const description = `craftdocs://open?spaceId=${block.spaceId}&blockId=${block.id}`;
             const mdLink = CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(block);
             // check if task is already crosslinked

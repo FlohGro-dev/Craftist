@@ -1,20 +1,56 @@
 body {
   background-color: white;
+  font-family: 'Roboto', sans-serif;
+  margin: 0px;
 }
 
 body.dark {
   background-color: #222222;
+  color: white;
+}
+
+
+header {
+  min-height: 44px;
+  max-height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-dark {
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.4);
+  background-color: #222222;
+}
+
+.header-light {
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.2);
+  background-color: #f3f3f3;
+}
+
+header .title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+main {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  margin: 0px 4px;
+  overflow-y: auto;
 }
 
 .btn {
   background-color: #dfdfdf;
   border: none;
   color: #484848;
-  padding: 15px 32px;
+  padding: 8px 16px;
+  margin: 0px 4px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 11px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -38,4 +74,8 @@ body.dark {
 
 .btn.dark:active {
   background-color: #303030;
+}
+
+.toc-btn {
+  margin-bottom: 8px;
 }
