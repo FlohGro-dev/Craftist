@@ -96,7 +96,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
           render: () => (
             <Center>
               <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                Imported All Tasks
+                Created Task(s) from selected blocks
             </Box>
             </Center>
           ),
