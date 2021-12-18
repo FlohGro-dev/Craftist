@@ -18,10 +18,13 @@ The following features are currently supported by Craftist:
 - create Tasks from Selection
   - this will create tasks from the selected blocks
   - if the blocks are not already a todo item in craft they will be converted
-  - crosslink open tasks
-    - this will create crosslinked tasks between every (unchecked) todo item in the current document and Todoist
-    - the tasks in Todoist will directly link back to the todo item in Craft
-    - cancelled or done todo items in the craft document will be ignored
+
+![create tasks demo](https://www.loom.com/share/3220504dbae449ffa61a1390c2c27820)
+
+- crosslink open tasks
+  - this will create crosslinked tasks between every (unchecked) todo item in the current document and Todoist
+  - the tasks in Todoist will directly link back to the todo item in Craft
+  - cancelled or done todo items in the craft document will be ignored
 
 ### Sync Task States
 
