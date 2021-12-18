@@ -19,12 +19,20 @@ The following features are currently supported by Craftist:
   - this will create tasks from the selected blocks
   - if the blocks are not already a todo item in craft they will be converted
 
-![create tasks demo](https://www.loom.com/share/3220504dbae449ffa61a1390c2c27820)
+<a href="https://www.loom.com/share/3220504dbae449ffa61a1390c2c27820">
+    <p>Craftist: Create Tasks from Selection - Watch Video</p>
+    <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/3220504dbae449ffa61a1390c2c27820-with-play.gif">
+  </a>
 
 - crosslink open tasks
   - this will create crosslinked tasks between every (unchecked) todo item in the current document and Todoist
   - the tasks in Todoist will directly link back to the todo item in Craft
   - cancelled or done todo items in the craft document will be ignored
+
+<a href="https://www.loom.com/share/c88d0eb516594631a37b17b8b9b47416">
+    <p>Craftist: Crosslink Open Tasks - Watch Video</p>
+    <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/c88d0eb516594631a37b17b8b9b47416-with-play.gif">
+  </a>
 
 ### Sync Task States
 
@@ -36,6 +44,11 @@ The following features are currently supported by Craftist:
   - this will work for every todo item which was linked to a Todoist Task by this eXtension
   - note: this will **not** work properly for repeating tasks thats why it is currently disabled
   - if a task couldn't be retrieved it will be marked as done in Craft since it is was probably deleted
+
+<a href="https://www.loom.com/share/d220d3bd9e254b47b8b7bbfa397f3b7c">
+    <p>Craftist: Sync Task States - Watch Video</p>
+    <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/d220d3bd9e254b47b8b7bbfa397f3b7c-with-play.gif">
+  </a>
 
 ### Import Tasks / Project List
 
@@ -49,6 +62,11 @@ The following features are currently supported by Craftist:
   - this will import the list of your Todoist projects
   - the name of the project will be a direct link to the project in the app (as mentioned this does currently not work on macOS)
   - after the project name you will see a link to the Webview of the project
+
+<a href="https://www.loom.com/share/e1e24450e0724596b87d4cf6bb310d24">
+    <p>Craftist: Import Tasks / Projects - Watch Video</p>
+    <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/e1e24450e0724596b87d4cf6bb310d24-with-play.gif">
+  </a>
 
 ## Login
 
