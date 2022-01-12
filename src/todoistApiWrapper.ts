@@ -173,4 +173,21 @@ export const useGetProjects = () => {
   });
 };
 
-export const todoistProjectLinkUrl = "todoist://project?id=" 
+export const todoistProjectLinkUrl = "todoist://project?id="
+
+export const projects = Recoil.atom<Project[]>({
+  key: "projects",
+  default: Recoil.selector({
+    key: "projects:default",
+    get: ({ get }) => {
+      const cli = get(client);
+      if (!cli) return [];
+      return cli.getProjects();
+    },
+  }),
+});
+
+export const projectsDict = Recoil.selector({
+  key: "projects:dict",
+  get: ({ get }) => Object.fromEntries(get(projects).map((p) => [p.id, p])),
+});

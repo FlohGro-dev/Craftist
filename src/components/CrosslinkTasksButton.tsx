@@ -81,7 +81,7 @@ const CrosslinkTasksButton: React.FC = () => {
             (block): block is CraftTextBlock => block.type === "textBlock"
           )
           .map((block) => {
-            const documentTitle = pageTitle;
+            const documentTitle = "Craft Document: " + CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(pageBlock);
             //const description = `craftdocs://open?spaceId=${block.spaceId}&blockId=${block.id}`;
             const mdLink = CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(block);
             // check if task is already crosslinked

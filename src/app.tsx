@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom'
 import * as Recoil from "recoil";
 import * as TodoistWrapper from "./todoistApiWrapper";
 //import { AppendButton, LoginForm, TodayPane } from "./components";
-import { LoginForm, LogoutButton, ImportTodaysTasksButton, ImportProjectListButton, CrosslinkTasksButton, SyncTaskStatesButton, CreateTasksFromSelectionButton, ImportAllTasksButton } from "./components";
+import { LoginForm, LogoutButton, ImportTodaysTasksButton, ImportProjectListButton, CrosslinkTasksButton, SyncTaskStatesButton, CreateTasksFromSelectionButton, ImportAllTasksButton, LinkToExistingProjectButton } from "./components";
 import { ChakraProvider, ThemeConfig, ConfigColorMode, useColorMode, Badge, Center } from "@chakra-ui/react";
 import { Container, Stack, Box, Flex } from "@chakra-ui/layout";
 import { extendTheme } from "@chakra-ui/react";
@@ -68,6 +68,7 @@ const Content: React.FC = () => {
       <Badge>Create / Link</Badge>
       <CreateTasksFromSelectionButton />
       <CrosslinkTasksButton />
+      <LinkToExistingProjectButton />
       <Badge>Sync</Badge>
       <SyncTaskStatesButton />
       <Badge>Import</Badge>

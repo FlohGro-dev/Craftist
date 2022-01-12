@@ -75,6 +75,7 @@ const pageBlock = getPageResult.data
 // Concatenate the text runs together to get the page title
 const pageTitle = pageBlock.content.map(x => x.text).join()
 
+
     // retrieve selection and add tasks
 
 
@@ -105,7 +106,7 @@ const pageTitle = pageBlock.content.map(x => x.text).join()
               (block): block is CraftTextBlock => block.type === "textBlock"
             )
             .map((block) => {
-              const documentTitle = pageTitle;
+              const documentTitle = "Craft Document: " + CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(pageBlock);
               const mdLink = CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(block);
 
               if (CraftBlockInteractor.blockContainsString("Todoist Task", block)) {

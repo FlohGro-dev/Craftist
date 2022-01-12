@@ -91,3 +91,9 @@ To learn more about Craft eXtensions visit the [Craft X developer portal](https:
 ## Thanks
 
 Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
+
+## Changelog
+
+- Created / Linked Tasks will now contain a Link in the Task Description to the Craft Document itself
+- new Button added: "Link Note to Project" which will prepend a link to an existing project in Todoist to the current document
+- Creating / Crosslinking tasks will now create tasks in the linked project (if the note is linked) - if the note is linked to multiple projects in todoist the tasks will be created in the inbox
