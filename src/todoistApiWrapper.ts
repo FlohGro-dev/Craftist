@@ -172,3 +172,5 @@ export const useGetProjects = () => {
 
   });
 };
+
+export const todoistProjectLinkUrl = "todoist://project?id=" 

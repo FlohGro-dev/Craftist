@@ -15,9 +15,69 @@ import { Box, Center } from "@chakra-ui/react";
 const CreateTasksFromSelectionButton: React.FC = () => {
   const toast = useToast();
   const add = TodoistWrapper.useAddTask();
+  const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
   const [isLoading, setIsLoading] = React.useState(false);
-  const onClick = () => {
+  const onClick = async () => {
     setIsLoading(true);
+
+    // check if document is linked to a todoist project
+    let foundProjectIDs:string[] = [];
+    let linkedProjectId:number;
+
+    let linkedProjectBlocksPromise = CraftBlockInteractor.checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls(todoistProjectUrl);
+    linkedProjectBlocksPromise.catch(() => {
+      toast({
+        status: "error",
+        position: "bottom",
+        title: "couldn't check if document is linked to a project",
+        duration: 1000,
+      });
+    })
+    .then((urls) => {
+      if(urls){
+        return Promise.all(
+          urls
+            .map((url) => {
+                if(url.includes(todoistProjectUrl)){
+                  foundProjectIDs.push(url.replace(todoistProjectUrl,""));
+                }
+            })
+        )
+      }
+    })
+    .finally(() => {
+      if(foundProjectIDs.length > 0){
+        if(foundProjectIDs.every( (val, _i, arr) => val === arr[0] )){
+          // all ids are equal - thats valid
+          linkedProjectId = parseInt(foundProjectIDs[0]);
+                  }
+                  else{
+                    // not all ids are equal - this is not valid!
+                        toast({
+                          status: "error",
+                          position: "bottom",
+                          title: "linkedProjectIds are not all equal",
+                          duration: 1000,
+                        });
+                  }
+      }
+    })
+
+
+// get page for document linking
+const getPageResult = await craft.dataApi.getCurrentPage();
+
+if (getPageResult.status !== "success") {
+    throw new Error(getPageResult.message)
+}
+
+const pageBlock = getPageResult.data
+// Concatenate the text runs together to get the page title
+const pageTitle = pageBlock.content.map(x => x.text).join()
+
+    // retrieve selection and add tasks
+
+
     craft.editorApi
       .getSelection()
       .then((resp) => {
@@ -45,7 +105,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
               (block): block is CraftTextBlock => block.type === "textBlock"
             )
             .map((block) => {
-              const documentTitle = CraftBlockInteractor.getParentDocumentMdLinkOfBlock(block);
+              const documentTitle = pageTitle;
               const mdLink = CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(block);
 
               if (CraftBlockInteractor.blockContainsString("Todoist Task", block)) {
@@ -54,7 +114,8 @@ const CreateTasksFromSelectionButton: React.FC = () => {
 
                 add({
                   description: documentTitle,
-                  content: mdLink
+                  content: mdLink,
+                  projectId: linkedProjectId
                 })
                   .then(async function(task) {
                     // append task link to block

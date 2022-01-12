@@ -112,9 +112,9 @@ export async function prependCraftTextRunToBlock(textToPrepend: CraftTextRun[], 
   }
 }
 
-export function blockContainsString(compareString: string, block: CraftTextBlock){
+export function blockContainsString(compareString: string, block: CraftTextBlock) {
   let blockText: string = block.content.map((c) => c.text).join("");
-  if(blockText.includes(compareString)){
+  if (blockText.includes(compareString)) {
     return true;
   } else {
     return false;
@@ -123,41 +123,41 @@ export function blockContainsString(compareString: string, block: CraftTextBlock
 
 }
 
-export function getBlockContentAsString(block: CraftTextBlock){
+export function getBlockContentAsString(block: CraftTextBlock) {
   let blockText: string = block.content.map((c) => c.text).join("");
   return blockText;
 }
 
-export function getExternalUrlsFromBlock(block: CraftTextBlock){
-  let urls:string[] = [];
-  block.content.forEach(function(contentItem){
-    if(contentItem.link?.type == "url"){
+export function getExternalUrlsFromBlock(block: CraftTextBlock) {
+  let urls: string[] = [];
+  block.content.forEach(function(contentItem) {
+    if (contentItem.link ?.type == "url") {
       urls.push(contentItem.link.url);
     }
   }
-)
+  )
   return urls;
 }
 
-export function createExternalLinkBlockFromStringAndUrl(blockText:string, blockUrl:string){
+export function createExternalLinkBlockFromStringAndUrl(blockText: string, blockUrl: string) {
   return craft.blockFactory.textBlock({
     content: [{ text: blockText, link: { type: "url", url: blockUrl } }]
   })
 }
 
-export function createExternalLinkBlockFromStringAndUrlMap(urlsToUse:Map<string,string>,separator=" ",description=""){
+export function createExternalLinkBlockFromStringAndUrlMap(urlsToUse: Map<string, string>, separator = " ", description = "") {
 
-  let block:CraftTextBlockInsert;
-  let textRun:CraftTextRun[] = [];
+  let block: CraftTextBlockInsert;
+  let textRun: CraftTextRun[] = [];
 
-  if(description != ""){
-    textRun.push({text: description})
-    textRun.push({text: separator})
+  if (description != "") {
+    textRun.push({ text: description })
+    textRun.push({ text: separator })
   }
 
   for (let [text, url] of urlsToUse.entries()) {
     textRun.push({ text: text, link: { type: "url", url: url } })
-    textRun.push({text: separator})
+    textRun.push({ text: separator })
   }
 
   block = craft.blockFactory.textBlock({
@@ -168,7 +168,56 @@ export function createExternalLinkBlockFromStringAndUrlMap(urlsToUse:Map<string,
   return block
 }
 
-export function getParentDocumentMdLinkOfBlock(block:CraftBlock){
+export async function checkIfPageContainsStringInAnyBlockAndReturnFoundBlocks(searchString: string) {
+  let foundBlocks: CraftTextBlock[] = [];
+  const getPageResult = await craft.dataApi.getCurrentPage();
+
+  if (getPageResult.status !== "success") {
+    throw new Error(getPageResult.message)
+  }
+  const pageBlock = getPageResult.data
+
+  pageBlock.subblocks.forEach(function(subBlock) {
+    if (subBlock.type == "textBlock") {
+      let content = getBlockContentAsString(subBlock);
+      if (content.includes(searchString)) {
+        foundBlocks.push(subBlock);
+      }
+    }
+  }
+  )
+  craft.dataApi.addBlocks(foundBlocks);
+
+  return foundBlocks;
+}
+
+export async function checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls(searchString: string) {
+  let foundUrls: string[] = [];
+
+  const getPageResult = await craft.dataApi.getCurrentPage();
+
+  if (getPageResult.status !== "success") {
+    throw new Error(getPageResult.message)
+  }
+  const pageBlock = getPageResult.data
+
+  pageBlock.subblocks.forEach(function(subBlock) {
+    if (subBlock.type == "textBlock") {
+      let blockUrls = getExternalUrlsFromBlock(subBlock);
+      for (let url of blockUrls) {
+        if (url.includes(searchString)) {
+          foundUrls.push(url);
+        }
+      }
+    }
+
+  })
+
+
+return foundUrls;
+}
+
+export function getParentDocumentMdLinkOfBlock(block: CraftBlock) {
   // to be implemented
   return ""
 }
