@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
-import { LinkIcon, PlusSquareIcon } from "@chakra-ui/icons";
+import { PlusSquareIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
@@ -21,8 +21,8 @@ const CreateTasksFromSelectionButton: React.FC = () => {
     setIsLoading(true);
 
     // check if document is linked to a todoist project
-    let foundProjectIDs:string[] = [];
-    let linkedProjectId:number;
+    let foundProjectIDs: string[] = [];
+    let linkedProjectId: number;
 
     let linkedProjectBlocksPromise = CraftBlockInteractor.checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls(todoistProjectUrl);
     linkedProjectBlocksPromise.catch(() => {
@@ -33,47 +33,47 @@ const CreateTasksFromSelectionButton: React.FC = () => {
         duration: 1000,
       });
     })
-    .then((urls) => {
-      if(urls){
-        return Promise.all(
-          urls
-            .map((url) => {
-                if(url.includes(todoistProjectUrl)){
-                  foundProjectIDs.push(url.replace(todoistProjectUrl,""));
+      .then((urls) => {
+        if (urls) {
+          return Promise.all(
+            urls
+              .map((url) => {
+                if (url.includes(todoistProjectUrl)) {
+                  foundProjectIDs.push(url.replace(todoistProjectUrl, ""));
                 }
-            })
-        )
-      }
-    })
-    .finally(() => {
-      if(foundProjectIDs.length > 0){
-        if(foundProjectIDs.every( (val, _i, arr) => val === arr[0] )){
-          // all ids are equal - thats valid
-          linkedProjectId = parseInt(foundProjectIDs[0]);
-                  }
-                  else{
-                    // not all ids are equal - this is not valid!
-                        toast({
-                          status: "error",
-                          position: "bottom",
-                          title: "linkedProjectIds are not all equal",
-                          duration: 1000,
-                        });
-                  }
-      }
-    })
+              })
+          )
+        }
+      })
+      .finally(() => {
+        if (foundProjectIDs.length > 0) {
+          if (foundProjectIDs.every((val, _i, arr) => val === arr[0])) {
+            // all ids are equal - thats valid
+            linkedProjectId = parseInt(foundProjectIDs[0]);
+          }
+          else {
+            // not all ids are equal - this is not valid!
+            toast({
+              status: "error",
+              position: "bottom",
+              title: "linkedProjectIds are not all equal",
+              duration: 1000,
+            });
+          }
+        }
+      })
 
 
-// get page for document linking
-const getPageResult = await craft.dataApi.getCurrentPage();
+    // get page for document linking
+    const getPageResult = await craft.dataApi.getCurrentPage();
 
-if (getPageResult.status !== "success") {
-    throw new Error(getPageResult.message)
-}
+    if (getPageResult.status !== "success") {
+      throw new Error(getPageResult.message)
+    }
 
-const pageBlock = getPageResult.data
-// Concatenate the text runs together to get the page title
-const pageTitle = pageBlock.content.map(x => x.text).join()
+    const pageBlock = getPageResult.data
+    // Concatenate the text runs together to get the page title
+    const pageTitle = pageBlock.content.map(x => x.text).join()
 
 
     // retrieve selection and add tasks
@@ -137,12 +137,14 @@ const pageTitle = pageBlock.content.map(x => x.text).join()
 
                     block.content = block.content.concat(blockToAppend);
                     //block.listStyle.type = "todo";
-                    block.listStyle = { type: "todo",
-                                        state: "unchecked" };
+                    block.listStyle = {
+                      type: "todo",
+                      state: "unchecked"
+                    };
                     const result = await craft.dataApi.updateBlocks([block])
                     if (result.status !== "success") {
                       throw new Error(result.message)
-                   }
+                    }
                     // //block.listStyle.type = "todo";
                     // CraftBlockInteractor.appendCraftTextRunToBlock(blockToAppend, block);
                     // CraftBlockInteractor.prependCraftTextRunToBlock(blockToPrepend, block);

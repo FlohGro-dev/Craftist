@@ -158,6 +158,22 @@ export const useGetAllTasks = () => {
   });
 };
 
+export const useGetTasksFromProject = () => {
+  return Recoil.useRecoilCallback(({ snapshot }) => {
+    return async (params: {
+      projectId: number
+    }) => {
+      const cli = await snapshot.getPromise(client);
+      if (!cli) {
+        throw new Error("No client");
+      }
+      const response = await cli.getTasks(params);
+      return response
+    };
+
+  });
+};
+
 
 export const useGetProjects = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {

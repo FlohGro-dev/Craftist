@@ -94,6 +94,9 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
 
-- Created / Linked Tasks will now contain a Link in the Task Description to the Craft Document itself
-- new Button added: "Link Note to Project" which will prepend a link to an existing project in Todoist to the current document
-- Creating / Crosslinking tasks will now create tasks in the linked project (if the note is linked) - if the note is linked to multiple projects in todoist the tasks will be created in the inbox
+### v0.3
+
+- **new:** "Link Note to Project" Button / Feature which will prepend a link to an existing project in Todoist to the current document
+- **new:** "Import Tasks from linked Project" Button / Feature which will import all Tasks from the linked Project and add them as Blocks to the end of the document
+- **change:** Creating / Crosslinking tasks will now create tasks in the linked project (if the note is linked) - if the note is linked to multiple projects in todoist the tasks will be created in the inbox
+- **change:** Created / Linked Tasks will now contain a Link in the Task Description to the Craft Document itself
