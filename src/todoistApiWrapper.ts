@@ -1,5 +1,5 @@
 import * as Recoil from "recoil";
-import { TodoistApi, Project, Task } from "@doist/todoist-api-typescript";
+import { TodoistApi, Project } from "@doist/todoist-api-typescript";
 
 
 export const API_TOKEN_KEY = "TODOIST_API_TOKEN";

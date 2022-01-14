@@ -4,7 +4,7 @@ import { UpDownIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
-import { CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
+import { CraftTextBlock } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
 
 const SyncTaskStatesButton: React.FC = () => {

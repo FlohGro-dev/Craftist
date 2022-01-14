@@ -1,4 +1,4 @@
-import { CraftBlockInsert, CraftBlock, CraftTextBlock, CraftTextRun, CraftTextBlockInsert } from "@craftdocs/craft-extension-api";
+import { CraftBlock, CraftTextBlock, CraftTextRun, CraftTextBlockInsert } from "@craftdocs/craft-extension-api";
 
 export async function getAllTodoItemsFromCurrentPage() {
   let todoBlocks: CraftTextBlock[] = [];
