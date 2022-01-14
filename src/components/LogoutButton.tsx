@@ -1,8 +1,7 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
-import { ArrowForwardIcon, SmallAddIcon } from "@chakra-ui/icons";
+import { ArrowForwardIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
-import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
 
 const LogoutButton: React.FC = () => {

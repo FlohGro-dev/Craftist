@@ -1,8 +1,7 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
-import { CalendarIcon } from "@chakra-ui/icons";
+import { DownloadIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
-import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
@@ -46,7 +45,7 @@ const ImportProjectListButton: React.FC = () => {
   }
   return (
     <Button
-      leftIcon={<CalendarIcon />}
+      leftIcon={<DownloadIcon />}
       colorScheme='red'
       onClick={onClick}
       width="100%"
