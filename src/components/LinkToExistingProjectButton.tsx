@@ -3,7 +3,7 @@ import { Button } from "@chakra-ui/button";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import { useToast } from "@chakra-ui/toast";
-import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
+import { Box, Center, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import { useRecoilValue } from "recoil";
 
@@ -11,11 +11,8 @@ const LinkToExistingProjectButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
   const projectList = useRecoilValue(TodoistWrapper.projects);
-  const [isLoading, setIsLoading] = React.useState(false);
-  let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = async (projectName:string, projectId:number, projectUrl:string) => {
-    setIsLoading(true);
-
+    let blocksToAdd: CraftBlockInsert[] = [];
     const getPageResult = await craft.dataApi.getCurrentPage();
 
     if (getPageResult.status !== "success") {
@@ -28,45 +25,20 @@ const LinkToExistingProjectButton: React.FC = () => {
 
     const loc = craft.location.indexLocation(pageBlock.id, 0);
 
-// The resulting loc object:
-// {
-//   type: "indexLocation",
-//.  pageId: <pageId>,
-//   index: 3,
-// }
+  craft.dataApi.addBlocks(blocksToAdd, loc)
+    .finally(() => {
+      toast({
+        position: "bottom",
+        render: () => (
+          <Center>
+            <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+              Linked Note to Project
+          </Box>
+          </Center>
+        ),
+      })
+    })
 
-// loc can be used in the dataApi.addBlocks call
-
-  craft.dataApi.addBlocks(blocksToAdd, loc);
-
-    // let projects = getProjectList();
-    // projects.then((projects) => {
-    //   if (!projects.length) { return; }
-    //   return Promise.all(
-    //     projects
-    //       .map((project) => {
-    //         let mdContent = craft.markdown.markdownToCraftBlocks("- [" + project.name + "](todoist://project?id=" + project.id + ") [(Webview)](" + project.url + ")");
-    //         blocksToAdd = blocksToAdd.concat(mdContent);
-    //
-    //       })
-    //   )
-    // })
-    //   .then(() => {
-    //     craft.dataApi.addBlocks(blocksToAdd);
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //     toast({
-    //       position: "bottom",
-    //       render: () => (
-    //         <Center>
-    //           <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-    //             Imported Project List
-    //         </Box>
-    //         </Center>
-    //       ),
-    //     })
-    //   });
   }
   return (
     <Menu isLazy >
