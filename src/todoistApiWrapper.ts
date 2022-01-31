@@ -191,6 +191,8 @@ export const useGetProjects = () => {
 
 export const todoistProjectLinkUrl = "todoist://project?id="
 
+export const todoistProjectWebUrl = "https://todoist.com/showProject?id="
+
 export const projects = Recoil.atom<Project[]>({
   key: "projects",
   default: Recoil.selector({

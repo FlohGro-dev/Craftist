@@ -16,6 +16,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
   const toast = useToast();
   const add = TodoistWrapper.useAddTask();
   const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
+  const todoistProjectWebUrl = TodoistWrapper.todoistProjectWebUrl;
   const [isLoading, setIsLoading] = React.useState(false);
   const onClick = async () => {
     setIsLoading(true);
@@ -24,6 +25,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
     let foundProjectIDs: string[] = [];
     let linkedProjectId: number;
 
+    let linkForUnsharedProjectFound = false;
     let linkedProjectBlocksPromise = CraftBlockInteractor.checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls(todoistProjectUrl);
     linkedProjectBlocksPromise.catch(() => {
       toast({
@@ -50,6 +52,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
           if (foundProjectIDs.every((val, _i, arr) => val === arr[0])) {
             // all ids are equal - thats valid
             linkedProjectId = parseInt(foundProjectIDs[0]);
+            linkForUnsharedProjectFound = true;
           }
           else {
             // not all ids are equal - this is not valid!
@@ -62,6 +65,54 @@ const CreateTasksFromSelectionButton: React.FC = () => {
           }
         }
       })
+
+      if(!linkForUnsharedProjectFound){
+        let linkedProjectBlocksPromise = CraftBlockInteractor.checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls(todoistProjectWebUrl);
+        linkedProjectBlocksPromise.catch(() => {
+          toast({
+            status: "error",
+            position: "bottom",
+            title: "couldn't check if document is linked to a project",
+            duration: 1000,
+          });
+        })
+          .then((urls) => {
+            if (urls) {
+              return Promise.all(
+                urls
+                  .map((url) => {
+                    if (url.includes(todoistProjectUrl)) {
+                      const regex = /(https:\/\/todoist\.com\/showProject\?id=)(\d*)(\&sync_id=\d*)/gm;
+                      const str = `https://todoist.com/showProject?id=2283097982&sync_id=9287051`;
+                      const subst = `$3`;
+
+                      // The substituted value will be contained in the result variable
+                      const result = str.replace(regex, subst);
+                      foundProjectIDs.push(result);
+                    }
+                  })
+              )
+            }
+          })
+          .finally(() => {
+            if (foundProjectIDs.length > 0) {
+              if (foundProjectIDs.every((val, _i, arr) => val === arr[0])) {
+                // all ids are equal - thats valid
+                linkedProjectId = parseInt(foundProjectIDs[0]);
+                linkForUnsharedProjectFound = true;
+              }
+              else {
+                // not all ids are equal - this is not valid!
+                toast({
+                  status: "error",
+                  position: "bottom",
+                  title: "linkedProjectIds are not all equal",
+                  duration: 1000,
+                });
+              }
+            }
+          })
+      }
 
 
     // get page for document linking
