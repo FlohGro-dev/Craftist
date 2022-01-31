@@ -90,6 +90,7 @@ To learn more about Craft eXtensions visit the [Craft X developer portal](https:
 
 ## Thanks
 
+Thanks to @curtismchale for covering Craftist in a [YouTube Video Demo](https://www.youtube.com/watch?v=IxONW0W9QPY) and [Blogpost](https://curtismchale.ca/2022/01/31/connect-todoist-with-craft/) lately.
 Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
