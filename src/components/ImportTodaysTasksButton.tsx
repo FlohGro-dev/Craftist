@@ -14,6 +14,46 @@ const ImportTodaysTasksButton: React.FC = () => {
   const onClick = async () => {
     setIsLoading(true);
     let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
+    let todaysTasks = await getTodaysTasks();
+
+
+    let projectGroupedTasks: Map<number,number[]> = new Map([]);
+
+
+
+    // Structure:
+    // Project
+    //  Section?
+    //    Task
+    //      Task?
+    //        ...
+
+
+    type NestedTask = {
+      [taskId: number]: number | NestedTask
+    }
+    type ProjectGroupedTask = {
+      [projectId: number]: NestedTask
+    }
+
+    let groupedTasks = new Map<NestedTask,NestedTask>();
+
+    todaysTasks.forEach((task) => {
+      // map to projects;
+      let projectItem = projectGroupedTasks.get(task.projectId);
+      if(projectItem != undefined){
+        // project already exists, just add the taskId
+        projectItem.push(task.id);
+      } else {
+        projectGroupedTasks.set(task.projectId,[task.id]);
+      }
+    })
+
+
+    let mdContent = craft.markdown.markdownToCraftBlocks("ize of the map: " + projectGroupedTasks.size);
+    blocksToAdd = blocksToAdd.concat(mdContent);
+
+
 
     let tasks = getTodaysTasks();
     tasks.then((tasks) => {
