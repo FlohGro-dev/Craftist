@@ -217,6 +217,67 @@ export async function checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls
 return foundUrls;
 }
 
+export async function checkIfPageContainsTodoistTaskId(taskId: number) {
+  let blockFound:boolean = false;
+  const getPageResult = await craft.dataApi.getCurrentPage();
+
+  if (getPageResult.status !== "success") {
+    throw new Error(getPageResult.message)
+  }
+  const pageBlock = getPageResult.data
+
+  pageBlock.subblocks.forEach(function(subBlock) {
+    if (subBlock.type == "textBlock") {
+      let content = getBlockContentAsString(subBlock);
+      if (content.includes(taskId.toString())) {
+        blockFound = true;
+        return true;
+      }
+      else {
+        blockFound = false;
+      }
+    }
+  }
+  )
+  return blockFound;
+}
+
+export async function getCurrentTodoistTaskIdsOfTasksOnPage() {
+  let taskIds: number[] = [];
+
+  const todoistLinkSchemeMobile = "todoist://task?id=";
+  const todoistLinkSchemeWeb = "https://todoist.com/showTask?id=";
+
+
+  const getPageResult = await craft.dataApi.getCurrentPage();
+
+  if (getPageResult.status !== "success") {
+    throw new Error(getPageResult.message)
+  }
+  const pageBlock = getPageResult.data
+
+  pageBlock.subblocks.forEach(function(subBlock) {
+    if (subBlock.type == "textBlock") {
+      let blockUrls = getExternalUrlsFromBlock(subBlock)
+
+      // may produce duplicates in an array but doesnt really matter.
+      for (let url of blockUrls) {
+        if (url.includes(todoistLinkSchemeMobile)) {
+          taskIds.push(Number(url.replace(todoistLinkSchemeMobile, "")));
+          break;
+        } else if (url.includes(todoistLinkSchemeWeb)) {
+          taskIds.push(Number(url.replace(todoistLinkSchemeWeb, "")));
+          break;
+        }
+      }
+    }
+  }
+  )
+
+  return taskIds;
+}
+
+
 export function getParentDocumentMdLinkOfBlock(block: CraftBlock) {
   // to be implemented
   return ""

@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@chakra-ui/button";
 import { CalendarIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
+import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
@@ -10,16 +11,20 @@ const ImportTodaysTasksButton: React.FC = () => {
   const getTodaysTasks = TodoistWrapper.useGetTodaysTasks();
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
-  const onClick = () => {
+  const onClick = async () => {
     setIsLoading(true);
+    let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
+
     let tasks = getTodaysTasks();
     tasks.then((tasks) => {
       if (!tasks.length) { return; }
       return Promise.all(
         tasks
           .map((task) => {
-            let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")");
-            blocksToAdd = blocksToAdd.concat(mdContent);
+            if(!existingTaskIds.includes(task.id)){
+              let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")");
+              blocksToAdd = blocksToAdd.concat(mdContent);
+            }
           })
       )
     })

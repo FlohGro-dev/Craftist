@@ -14,9 +14,10 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
   const getTasksFromProject = TodoistWrapper.useGetTasksFromProject();
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
-  const onClick = () => {
+  const onClick = async () => {
     setIsLoading(true);
 
+    let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
     // check if document is linked to a todoist project
     let foundProjectIDs: string[] = [];
     let linkedProjectId: number = -1;
@@ -54,8 +55,10 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
               return Promise.all(
                 tasks
                   .map((task) => {
-                    let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")");
-                    blocksToAdd = blocksToAdd.concat(mdContent);
+                    if(!existingTaskIds.includes(task.id)){
+                      let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")");
+                      blocksToAdd = blocksToAdd.concat(mdContent);
+                    }
                   })
               )
             })
