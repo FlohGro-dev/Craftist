@@ -137,7 +137,7 @@ export const useGetTodaysTasks = () => {
       if (!cli) {
         throw new Error("No client");
       }
-      const response = await cli.getTasks({ "filter": "today" });
+      const response = await cli.getTasks({ "filter": "today | overdue" });
       return response
     };
 
