@@ -1,5 +1,5 @@
 import * as Recoil from "recoil";
-import { TodoistApi, Project } from "@doist/todoist-api-typescript";
+import { TodoistApi, Project, Task } from "@doist/todoist-api-typescript";
 
 
 export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
@@ -207,3 +207,7 @@ export const projectsDict = Recoil.selector({
   key: "projects:dict",
   get: ({ get }) => Object.fromEntries(get(projects).map((p) => [p.id, p])),
 });
+
+
+
+export type todoistTaskType = Task

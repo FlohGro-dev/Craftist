@@ -6,52 +6,51 @@ import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
+import { useRecoilValue } from "recoil";
+
 const ImportTodaysTasksButton: React.FC = () => {
   const toast = useToast();
+  const projectList = useRecoilValue(TodoistWrapper.projects);
   const getTodaysTasks = TodoistWrapper.useGetTodaysTasks();
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = async () => {
     setIsLoading(true);
     let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
-    let todaysTasks = await getTodaysTasks();
+    const todaysTasks = await getTodaysTasks();
 
-
-    let projectGroupedTasks: Map<number,number[]> = new Map([]);
-
-
-
-    // Structure:
-    // Project
-    //  Section?
-    //    Task
-    //      Task?
-    //        ...
-
-
-    type NestedTask = {
-      [taskId: number]: number | NestedTask
-    }
-    type ProjectGroupedTask = {
-      [projectId: number]: NestedTask
-    }
-
-    let groupedTasks = new Map<NestedTask,NestedTask>();
+    let projectToTasksMap: Map<number,TodoistWrapper.todoistTaskType[]> = new Map([]);
 
     todaysTasks.forEach((task) => {
       // map to projects;
-      let projectItem = projectGroupedTasks.get(task.projectId);
+      let projectItem = projectToTasksMap.get(task.projectId);
       if(projectItem != undefined){
         // project already exists, just add the taskId
-        projectItem.push(task.id);
+        projectItem.push(task);
       } else {
-        projectGroupedTasks.set(task.projectId,[task.id]);
+        projectToTasksMap.set(task.projectId,[task]);
       }
     })
 
 
-    let mdContent = craft.markdown.markdownToCraftBlocks("ize of the map: " + projectGroupedTasks.size);
-    blocksToAdd = blocksToAdd.concat(mdContent);
+
+
+    projectToTasksMap.forEach((projectTasks, projectId) =>{
+      // get projectName
+      // (block): block is CraftTextBlock => block.type === "textBlock"
+      projectList
+        .filter((project) =>  project.id === projectId)
+        .map((project) => {
+          let mdContent = craft.markdown.markdownToCraftBlocks("+ " + projectId + " / " + project.name);
+          blocksToAdd = blocksToAdd.concat(mdContent);
+        })
+
+      projectTasks.map((task) => {
+        let mdContent = craft.markdown.markdownToCraftBlocks("- " + task.content);
+        blocksToAdd = blocksToAdd.concat(mdContent);
+      })
+    })
+
 
 
 
