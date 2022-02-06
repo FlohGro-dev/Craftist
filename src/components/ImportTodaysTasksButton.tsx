@@ -68,24 +68,24 @@ const ImportTodaysTasksButton: React.FC = () => {
     setIsLoading(true);
     let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
-        const todaysTasks = await getTodaysTasks();
+    const todaysTasks = await getTodaysTasks();
 
-        blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,todaysTasks, true, existingTaskIds))
+    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, todaysTasks, true, existingTaskIds))
 
 
 
-craft.dataApi.addBlocks(blocksToAdd);
-setIsLoading(false);
-toast({
-  position: "bottom",
-  render: () => (
-    <Center>
-      <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-        Imported Todays Tasks
+    craft.dataApi.addBlocks(blocksToAdd);
+    setIsLoading(false);
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+            Imported Todays Tasks
     </Box>
-    </Center>
-  ),
-})
+        </Center>
+      ),
+    })
 
 
     // let tasks = getTodaysTasks();

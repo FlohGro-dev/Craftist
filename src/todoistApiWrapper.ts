@@ -261,7 +261,7 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
 }
 
-export function createGroupedBlocksFromFlatTaskArray(projectList:Project[],flatTaskArray:Task[],ignoreExistingTasks = false, existingTaskIds:number[] = []):CraftBlockInsert[] {
+export function createGroupedBlocksFromFlatTaskArray(projectList:Project[],flatTaskArray:Task[],ignoreExistingTasks = false, existingTaskIds:number[] = [], groupTasksToProjectBlock = true):CraftBlockInsert[] {
 
  let blocksToAdd: CraftBlockInsert[] = [];
 
@@ -328,15 +328,18 @@ export function createGroupedBlocksFromFlatTaskArray(projectList:Project[],flatT
 
     let projectBlockToAdd:CraftBlockInsert[] = [];
     let taskBlocksToAdd:CraftBlockInsert[] = [];
-
+    let indentationLevelForTasks = 0;
+    if(groupTasksToProjectBlock){
+      indentationLevelForTasks = 1;
       projectList
         .filter((project) => project.id === projectId)
         .map((project) => {
           projectBlockToAdd = craft.markdown.markdownToCraftBlocks("+ " + project.name);
         })
+      }
 
       projectTasks.map((task) => {
-        taskBlocksToAdd = taskBlocksToAdd.concat(createBlocksFromNestedTasks([task], 1, ignoreExistingTasks, existingTaskIds))
+        taskBlocksToAdd = taskBlocksToAdd.concat(createBlocksFromNestedTasks([task], indentationLevelForTasks, ignoreExistingTasks, existingTaskIds))
       })
 
       if(taskBlocksToAdd.length > 0){
