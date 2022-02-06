@@ -8,6 +8,56 @@ import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import { useRecoilValue } from "recoil";
 
+
+
+// interface NestedTask {
+//   task: TodoistWrapper.todoistTaskType;
+//   //  subtasks: NestedTask[]
+//   children?: NestedTask[];
+// }
+//
+//
+// function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask | undefined {
+//   if (nestedTask.task.id == parentTaskId) {
+//     return nestedTask;
+//   } else if (nestedTask.children != undefined) {
+//     let result = undefined;
+//     for (let i = 0; result == undefined && i < nestedTask.children.length; i++) {
+//       result = getParentTask(nestedTask.children[i], parentTaskId);
+//     }
+//     return result;
+//   }
+//   return undefined
+// }
+//
+//
+// function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number) {
+//   let blocksToAdd: CraftBlockInsert[] = [];
+//
+//   tasks.forEach((curTask) => {
+//     let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + curTask.task.content);
+//
+//     mdContent.forEach((block) => {
+//       block.indentationLevel = indentationLevel;
+//     })
+//
+//
+//     blocksToAdd = blocksToAdd.concat(mdContent);
+//
+//     if (curTask.children != undefined) {
+//       blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1));
+//     }
+//     // indentationLevel = indentationLevel + 1;
+//
+//   })
+//
+//   return blocksToAdd;
+//
+// }
+
+
+
+
 const ImportTodaysTasksButton: React.FC = () => {
   const toast = useToast();
   const projectList = useRecoilValue(TodoistWrapper.projects);
@@ -17,39 +67,13 @@ const ImportTodaysTasksButton: React.FC = () => {
   const onClick = async () => {
     setIsLoading(true);
     let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
-    const todaysTasks = await getTodaysTasks();
 
-    let projectToTasksMap: Map<number,TodoistWrapper.todoistTaskType[]> = new Map([]);
+        const todaysTasks = await getTodaysTasks();
 
-    todaysTasks.forEach((task) => {
-      // map to projects;
-      let projectItem = projectToTasksMap.get(task.projectId);
-      if(projectItem != undefined){
-        // project already exists, just add the taskId
-        projectItem.push(task);
-      } else {
-        projectToTasksMap.set(task.projectId,[task]);
-      }
-    })
+        blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,todaysTasks, true, existingTaskIds))
 
 
 
-
-    projectToTasksMap.forEach((projectTasks, projectId) =>{
-      // get projectName
-      // (block): block is CraftTextBlock => block.type === "textBlock"
-      projectList
-        .filter((project) =>  project.id === projectId)
-        .map((project) => {
-          let mdContent = craft.markdown.markdownToCraftBlocks("+ " + projectId + " / " + project.name);
-          blocksToAdd = blocksToAdd.concat(mdContent);
-        })
-
-      projectTasks.map((task) => {
-        let mdContent = craft.markdown.markdownToCraftBlocks("- " + task.content);
-        blocksToAdd = blocksToAdd.concat(mdContent);
-      })
-    })
 
 
 
@@ -60,7 +84,7 @@ const ImportTodaysTasksButton: React.FC = () => {
       return Promise.all(
         tasks
           .map((task) => {
-            if(!existingTaskIds.includes(task.id)){
+            if (!existingTaskIds.includes(task.id)) {
               let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")");
               blocksToAdd = blocksToAdd.concat(mdContent);
             }

@@ -7,7 +7,6 @@ import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
 
 const ImportProjectListButton: React.FC = () => {
-  // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
   const getProjectList = TodoistWrapper.useGetProjects();
   const [isLoading, setIsLoading] = React.useState(false);
