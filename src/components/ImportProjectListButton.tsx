@@ -5,14 +5,35 @@ import * as TodoistWrapper from "../todoistApiWrapper";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
+import { getSettingsMobileUrlUsage, getSettingsWebUrlUsage } from "../settingsUtils";
 
 const ImportProjectListButton: React.FC = () => {
   const toast = useToast();
   const getProjectList = TodoistWrapper.useGetProjects();
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
-  const onClick = () => {
+  const onClick = async () => {
     setIsLoading(true);
+
+    // get settings for link usage in task / project Links
+    let useMobileUrls:boolean;
+    let useWebUrls:boolean;
+
+    let mobileUrlSettings = await getSettingsMobileUrlUsage();
+    let webUrlSettings = await getSettingsWebUrlUsage();
+
+    if(mobileUrlSettings == "true" || mobileUrlSettings == "error"){
+      useMobileUrls = true;
+    } else {
+      useMobileUrls = false;
+    }
+    if(webUrlSettings == "true" || webUrlSettings == "error"){
+      useWebUrls = true;
+    } else {
+      useWebUrls = false;
+    }
+
+
     let projects = getProjectList();
     projects.then((projects) => {
       if (!projects.length) { return; }
@@ -20,7 +41,8 @@ const ImportProjectListButton: React.FC = () => {
         projects
           .sort((a, b) => ((a.order ?? 0) < (b.order ?? 0) ? -1 : 1))
           .map((project) => {
-            let mdContent = craft.markdown.markdownToCraftBlocks("- [" + project.name + "](todoist://project?id=" + project.id + ") [(Webview)](" + project.url + ")");
+
+            let mdContent = craft.markdown.markdownToCraftBlocks(TodoistWrapper.createProjectMdString(project, "- ", useMobileUrls, useWebUrls));
             blocksToAdd = blocksToAdd.concat(mdContent);
 
           })
