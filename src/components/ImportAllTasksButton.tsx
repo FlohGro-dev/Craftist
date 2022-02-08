@@ -23,7 +23,7 @@ const ImportAllTasksButton: React.FC = () => {
 
 
     const taskList = await getAllTasks();
-    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], TodoistWrapper.taskGroupingOptions.projectAndSection))
+    blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], TodoistWrapper.taskGroupingOptions.projectAndSection))
     craft.dataApi.addBlocks(blocksToAdd);
 
     setIsLoading(false);

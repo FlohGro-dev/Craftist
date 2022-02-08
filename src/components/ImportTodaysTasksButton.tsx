@@ -71,9 +71,7 @@ const ImportTodaysTasksButton: React.FC = () => {
 
     const todaysTasks = await getTodaysTasks();
 
-    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.projectAndSection , TodoistWrapper.tasksSortByOptions.priority))
-
-
+    blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.projectAndSection, TodoistWrapper.tasksSortByOptions.priority))
 
     craft.dataApi.addBlocks(blocksToAdd);
     setIsLoading(false);
@@ -83,41 +81,11 @@ const ImportTodaysTasksButton: React.FC = () => {
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
             Imported Todays Tasks
-    </Box>
+          </Box>
         </Center>
       ),
     })
 
-
-    // let tasks = getTodaysTasks();
-    // tasks.then((tasks) => {
-    //   if (!tasks.length) { return; }
-    //   return Promise.all(
-    //     tasks
-    //       .map((task) => {
-    //         if (!existingTaskIds.includes(task.id)) {
-    //           let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")");
-    //           blocksToAdd = blocksToAdd.concat(mdContent);
-    //         }
-    //       })
-    //   )
-    // })
-    //   .then(() => {
-    //     craft.dataApi.addBlocks(blocksToAdd);
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //     toast({
-    //       position: "bottom",
-    //       render: () => (
-    //         <Center>
-    //           <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-    //             Imported Todays Tasks
-    //         </Box>
-    //         </Center>
-    //       ),
-    //     })
-    //   });
   }
   return (
     <Button
