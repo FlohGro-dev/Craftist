@@ -57,7 +57,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
 
             let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
-            blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, taskList, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.sectionOnly))
+            blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, taskList, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.sectionOnly))
 
 
 
@@ -77,18 +77,25 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
 
           }
           else {
+            setIsLoading(false);
             // not all ids are equal - this is not valid!
             toast({
-              status: "error",
               position: "bottom",
-              title: "linkedProjectIds are not all equal",
-              duration: 1000,
+              duration: 3000,
+              render: () => (
+                <Center>
+                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                    linkedProjectIds are not all equal please remove links to other projects
+              </Box>
+                </Center>
+              ),
             });
           }
         } else {
           setIsLoading(false);
           toast({
             position: "bottom",
+            duration: 3000,
             render: () => (
               <Center>
                 <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>

@@ -8,8 +8,8 @@ export { default as CreateTasksFromSelectionButton } from "./CreateTasksFromSele
 export { default as ImportAllTasksButton } from "./ImportAllTasksButton"
 export { default as LinkToExistingProjectButton } from "./LinkToExistingProjectButton"
 export { default as ImportTasksFromLinkedProjectButton } from "./ImportTasksFromLinkedProjectButton"
+export { default as SettingsMenu } from "./SettingsMenu"
 
-// export { default as  } from "./"
 // export { default as  } from "./"
 // export { default as  } from "./"
 // export { default as  } from "./"

@@ -1,6 +1,7 @@
 import * as Recoil from "recoil";
 import { TodoistApi, Project, Task, Section } from "@doist/todoist-api-typescript";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
+import { getSettingsDueDateUsage, getSettingsMobileUrlUsage, getSettingsWebUrlUsage } from "./settingsUtils";
 
 
 export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
@@ -261,7 +262,7 @@ function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask
 }
 
 
-function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, sortBy: tasksSortByOptions = tasksSortByOptions.order) {
+function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, sortBy: tasksSortByOptions = tasksSortByOptions.order, includeAppUrl = true, includeWebUrl = true, includeDueDates = true) {
   let blocksToAdd: CraftBlockInsert[] = [];
 
 
@@ -279,7 +280,7 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
   tasks.forEach((curTask) => {
 
-    let mdContent = craft.markdown.markdownToCraftBlocks(createTaskMdString(curTask.task, "- [ ] ", true, true, true));
+    let mdContent = craft.markdown.markdownToCraftBlocks(createTaskMdString(curTask.task, "- [ ] ", includeAppUrl, includeWebUrl, includeDueDates));
 
     mdContent.forEach((block) => {
       block.indentationLevel = indentationLevel;
@@ -289,7 +290,7 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
 
     if (curTask.children != undefined) {
-      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1));
+      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1, sortBy,includeAppUrl, includeWebUrl, includeDueDates));
     }
 
   })
@@ -310,7 +311,7 @@ export enum taskGroupingOptions {
   sectionOnly
 }
 
-function createProjectMdString(project: Project, mdPrefix: string = "+ ", includeAppUrl = true, includeWebUrl = true): string {
+export function createProjectMdString(project: Project, mdPrefix: string = "+ ", includeAppUrl = true, includeWebUrl = true): string {
   let mdString = mdPrefix;
 
   if (includeAppUrl && includeWebUrl) {
@@ -373,10 +374,34 @@ function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", includeAppU
   return mdString;
 }
 
-export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: number[] = [], taskGrouping: taskGroupingOptions, sortBy: tasksSortByOptions = tasksSortByOptions.order): CraftBlockInsert[] {
+export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: number[] = [], taskGrouping: taskGroupingOptions, sortBy: tasksSortByOptions = tasksSortByOptions.order): Promise<CraftBlockInsert[]> {
 
   let blocksToAdd: CraftBlockInsert[] = [];
 
+  // get settings for link usage in task / project Links
+  let useMobileUrls:boolean;
+  let useWebUrls:boolean;
+  let useDueDates:boolean;
+
+  let mobileUrlSettings = await getSettingsMobileUrlUsage();
+  let webUrlSettings = await getSettingsWebUrlUsage();
+  let dueDatesSettings = await getSettingsDueDateUsage();
+
+  if(mobileUrlSettings == "true" || mobileUrlSettings == "error"){
+    useMobileUrls = true;
+  } else {
+    useMobileUrls = false;
+  }
+  if(webUrlSettings == "true" || webUrlSettings == "error"){
+    useWebUrls = true;
+  } else {
+    useWebUrls = false;
+  }
+  if(dueDatesSettings == "true" || dueDatesSettings == "error"){
+    useDueDates = true;
+  } else {
+    useDueDates = false;
+  }
 
 
   let nestedTasks: NestedTask[] = [];
@@ -505,7 +530,7 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
       // add the project name as foldable block
       // todo add function which creates a markdown link for the project and use here
 
-      curBlocksToAdd = curBlocksToAdd.concat(craft.markdown.markdownToCraftBlocks(createProjectMdString(curProSecTaskNest.project, "+ ", true, true)));
+      curBlocksToAdd = curBlocksToAdd.concat(craft.markdown.markdownToCraftBlocks(createProjectMdString(curProSecTaskNest.project, "+ ", useMobileUrls, useWebUrls)));
     }
 
     // now we have to add all tasks without a section in that project
@@ -514,7 +539,7 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
         blockIndentLevel = 1;
       }
       curProSecTaskNest.tasks.map(curTask => {
-        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy))
+        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, useMobileUrls, useWebUrls, useDueDates))
       })
     }
     // now we need to loop through all sections of that project and add the tasks of these sections
@@ -545,7 +570,7 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
             blockIndentLevel = 1;
           }
           curSecTaskNest.tasks.map(curTask => {
-            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy))
+            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, useMobileUrls, useWebUrls, useDueDates))
           })
         }
       })
