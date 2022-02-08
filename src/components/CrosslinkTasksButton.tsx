@@ -67,8 +67,6 @@ const CrosslinkTasksButton: React.FC = () => {
     }
 
     const pageBlock = getPageResult.data
-    // Concatenate the text runs together to get the page title
-    const pageTitle = pageBlock.content.map(x => x.text).join()
 
     let openTasks = CraftBlockInteractor.getUncheckedTodoItemsFromCurrentPage();
     openTasks.then((blocks) => {
