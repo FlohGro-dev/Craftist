@@ -95,6 +95,21 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
 
+### v0.4
+
+- **new:** TASK GROUPING - now all imported tasks are grouped by their parent task / project / section
+	- if you import tasks from a linked project the tasks will just be grouped in their sections (this can be changed later with settings)
+- **new:** imported Tasks will contain the due date of the task which is linked to the correct daily note
+- **new:** Settings Menu to change some basic settings:
+	- Enable / Disable Mobile Url (for tasks and projects)
+	- Enable / Disable Webview Url (for tasks and projects)
+	- Enable / Disable Due Dates for imported tasks
+	- *note: these settings are stored locally but must be set again after you reinstalled the eXtension (at least from my testing results)*
+- **change:** „import project List“ now uses correct order of projects
+- **fixed:** „import todays tasks“ button now also imports overdue tasks
+- **fixed:** tasks won't get imported twice when they are already present in the document
+
+
 ### v0.3
 
 - **new:** "Link Note to Project" Button / Feature which will prepend a link to an existing project in Todoist to the current document
