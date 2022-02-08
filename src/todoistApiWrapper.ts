@@ -1,7 +1,6 @@
 import * as Recoil from "recoil";
 import { TodoistApi, Project, Task, Section } from "@doist/todoist-api-typescript";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
-import { useRecoilValue } from "recoil";
 
 
 export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
@@ -248,14 +247,6 @@ interface ProjectSectionTaskNest {
   tasks?: NestedTask[]
 }
 
-interface ProjectSection {
-  // project: Project;
-  // section?: Section;
-  projectId: number;
-  sectionId: number;
-}
-
-
 function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask | undefined {
   if (nestedTask.task.id == parentTaskId) {
     return nestedTask;
@@ -270,7 +261,7 @@ function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask
 }
 
 
-function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, ignoreExistingTasks = false, existingTaskIds: number[] = [], sortBy: tasksSortByOptions = tasksSortByOptions.order) {
+function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, sortBy: tasksSortByOptions = tasksSortByOptions.order) {
   let blocksToAdd: CraftBlockInsert[] = [];
 
 
@@ -287,7 +278,7 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
   tasks.sort((a, b) => ((a.task.sectionId ?? 0) < (b.task.sectionId ?? 0) ? -1 : 1))
 
   tasks.forEach((curTask) => {
-    if (!ignoreExistingTasks || !existingTaskIds.includes(curTask.task.id)) {
+
 
 
       let dueString = "";
@@ -303,10 +294,10 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
       })
 
       blocksToAdd = blocksToAdd.concat(mdContent);
-    }
+
 
     if (curTask.children != undefined) {
-      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1, ignoreExistingTasks, existingTaskIds));
+      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1));
     }
 
   })
@@ -321,17 +312,30 @@ export enum tasksSortByOptions {
   content
 }
 
-export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: number[] = [], groupTasksToProjectBlock = true, groupTasksToSectionBlock = true, sortBy: tasksSortByOptions = tasksSortByOptions.order): CraftBlockInsert[] {
+export enum taskGroupingOptions {
+  projectAndSection,
+  projectOnly,
+  sectionOnly
+}
+
+export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: number[] = [], taskGrouping:taskGroupingOptions, sortBy: tasksSortByOptions = tasksSortByOptions.order): CraftBlockInsert[] {
 
   let blocksToAdd: CraftBlockInsert[] = [];
+
+
 
   let nestedTasks: NestedTask[] = [];
 
   let unnestedChildTasks: Task[] = [];
 
-
   let projectIds: Set<number> = new Set([]);
   let sectionIds: Set<number> = new Set([]);
+
+  if (ignoreExistingTasks){// || !existingTaskIds.includes(curTask.task.id)){
+    flatTaskArray = flatTaskArray.filter(curTask => !existingTaskIds.includes(curTask.id))
+  }
+
+
 
   flatTaskArray.map(task => {
     projectIds.add(task.projectId);
@@ -343,19 +347,6 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
       unnestedChildTasks.push(task);
     }
   })
-
-  // not needed since integrated in .map() above
-  // flatTaskArray.forEach((curTask) => {
-  //   // if (curTask.parentId == undefined) {
-  //   //   // task has no parentId and therefore is a parent task
-  //   //   nestedTasks.push({ task: curTask });
-  //   // } else {
-  //   //   unnestedChildTasks.push(curTask);
-  //   // }
-  // })
-
-  // let projects:Set<Project> = new Set ([]);
-  // let sections:Set<Section> = new Set([]);
 
   let projects: Project[] = []
   let sections: Section[] = []
@@ -453,34 +444,36 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
 
   proSecTaskNest.map(curProSecTaskNest => {
     let curBlocksToAdd: CraftBlockInsert[] = [];
+    let projectBlocksToAdd: CraftBlockInsert[] = [];
     let sectionBlockToAdd: CraftBlockInsert[] = [];
     let blockIndentLevel = 0;
 
-    if (groupTasksToProjectBlock) {
+    if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly){
       // add the project name as foldable block
       // todo add function which creates a markdown link for the project and use here
+      projectBlocksToAdd = craft.markdown.markdownToCraftBlocks("+ " + curProSecTaskNest.project.name)
       curBlocksToAdd = curBlocksToAdd.concat(craft.markdown.markdownToCraftBlocks("+ " + curProSecTaskNest.project.name));
     }
 
     // now we have to add all tasks without a section in that project
     if (curProSecTaskNest.tasks && curProSecTaskNest.tasks.length > 0) {
-      if (groupTasksToProjectBlock) {
+      if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly) {
         blockIndentLevel = 1;
       }
       curProSecTaskNest.tasks.map(curTask => {
-        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, ignoreExistingTasks, existingTaskIds, sortBy))
+        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy))
       })
     }
     // now we need to loop through all sections of that project and add the tasks of these sections
     if (curProSecTaskNest.sectionTasks && curProSecTaskNest.sectionTasks.length > 0) {
       // loop through all available sectionTasks Nests.
       curProSecTaskNest.sectionTasks.map(curSecTaskNest => {
-        if(groupTasksToProjectBlock){
+        if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly){
           blockIndentLevel = 1;
         } else {
           blockIndentLevel = 0;
         }
-        if (groupTasksToSectionBlock) {
+        if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.sectionOnly) {
           sectionBlockToAdd = craft.markdown.markdownToCraftBlocks("+ " + curSecTaskNest.section.name);
           sectionBlockToAdd.forEach((block) => {
             // adapt the section indentation level to one higher than the tasks level
@@ -493,13 +486,13 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
 
         // now we have to add the tasks of that section - the check is not necessary but needed for type safety
         if (curSecTaskNest.tasks && curSecTaskNest.tasks.length > 0) {
-          if(groupTasksToProjectBlock && groupTasksToSectionBlock){
+          if(taskGrouping == taskGroupingOptions.projectAndSection){
             blockIndentLevel = 2;
-          } else if (groupTasksToProjectBlock || groupTasksToSectionBlock){
+          } else if (taskGrouping == taskGroupingOptions.sectionOnly || taskGrouping == taskGroupingOptions.projectOnly){
             blockIndentLevel = 1;
           }
           curSecTaskNest.tasks.map(curTask => {
-            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, ignoreExistingTasks, existingTaskIds, sortBy))
+            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy))
           })
         }
 
@@ -510,131 +503,6 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
 
 
   })
-
-  // let projectSectionTaskMap : Map<ProjectSection,NestedTask[]> = new Map([]);
-  // nestedTasks.forEach((curTask) => {
-  //   let curProjectSection:ProjectSection = {
-  //     projectId: curTask.task.projectId,
-  //     sectionId: curTask.task.sectionId
-  //   }
-  //
-  //   let mapItem = projectSectionTaskMap.get(curProjectSection);
-  //   if(mapItem != undefined){
-  //     // project <> section combination already exists, just add the task
-  //     mapItem.push(curTask)
-  //   } else {
-  //     // project <> section combination is not existing, create map item
-  //     projectSectionTaskMap.set(curProjectSection, [curTask]);
-  //   }
-  //
-  // });
-
-
-
-
-
-  let projectToTasksMap: Map<number, NestedTask[]> = new Map([]);
-
-  nestedTasks.forEach((curTask) => {
-    let projectItem = projectToTasksMap.get(curTask.task.projectId);
-    if (projectItem != undefined) {
-      // project already exists, just add the taskId
-      projectItem.push(curTask);
-    } else {
-      projectToTasksMap.set(curTask.task.projectId, [curTask]);
-    }
-  })
-
-  // test from yesterday
-  // projects.map(project => {
-  //
-  //   let debug = craft.markdown.markdownToCraftBlocks("> debug: in project.map(): " + project.name)
-  //   blocksToAdd = blocksToAdd.concat(debug)
-  //
-  //   let projectBlockToAdd: CraftBlockInsert[] = [];
-  //   let sectionBlockToAdd: CraftBlockInsert[] = [];
-  //   let taskBlocksToAdd: CraftBlockInsert[] = [];
-  //   let indentationLevelForTasks = 0;
-  //
-  //   projectList
-  //     .filter((curProject) => curProject.id === project.id)
-  //     .map((project) => {
-  //       projectBlockToAdd = craft.markdown.markdownToCraftBlocks("+ " + project.name);
-  //
-  //       sections
-  //         .filter(section => section.projectId == project.id)
-  //         .map((curSection) => {
-  //           sectionBlockToAdd = craft.markdown.markdownToCraftBlocks("+ " + curSection.name);
-  //           sectionBlockToAdd.forEach((block) => {
-  //             block.indentationLevel = indentationLevelForTasks + 1;
-  //           })
-  //           nestedTasks
-  //             .filter(curTask => curTask.task.sectionId == curSection.id)
-  //             .map(curTask => {
-  //               taskBlocksToAdd = taskBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], sectionList, indentationLevelForTasks + 2, ignoreExistingTasks, existingTaskIds, sortBy))
-  //             })
-  //         })
-  //
-  //     })
-  //
-  //   if (taskBlocksToAdd.length > 0) {
-  //     blocksToAdd = blocksToAdd.concat(projectBlockToAdd).concat(sectionBlockToAdd).concat(taskBlocksToAdd);
-  //   }
-  //
-  // })
-
-  // projectToTasksMap.forEach((projectTasks, projectId) => {
-  //   // get projectName
-  //   // (block): block is CraftTextBlock => block.type === "textBlock"
-  //
-  //
-  //   let projectBlockToAdd: CraftBlockInsert[] = [];
-  //   let sectionBlockToAdd: CraftBlockInsert[] = [];
-  //   let taskBlocksToAdd: CraftBlockInsert[] = [];
-  //   let indentationLevelForTasks = 0;
-  //
-  //   if (groupTasksToProjectBlock) {
-  //     indentationLevelForTasks = 1;
-  //
-  //
-  //
-  //     projectList
-  //       .filter((project) => project.id === projectId)
-  //       .map((project) => {
-  //         projectBlockToAdd = craft.markdown.markdownToCraftBlocks("+ " + project.name);
-  //         let sectionsOfProject = projectSectionMapping.get(project.id);
-  //         if(sectionsOfProject){
-  //           sectionsOfProject.map((curSection) => {
-  //             sectionBlockToAdd = craft.markdown.markdownToCraftBlocks("+ " + curSection.name);
-  //             sectionBlockToAdd.forEach((block) => {
-  //               block.indentationLevel = indentationLevelForTasks + 1;
-  //             })
-  //             projectTasks
-  //               .filter(curTask => curTask.task.sectionId == curSection.id)
-  //               .map(sectionTasks => {
-  //                   taskBlocksToAdd = taskBlocksToAdd.concat(createBlocksFromNestedTasks([sectionTasks], sectionList, indentationLevelForTasks, ignoreExistingTasks, existingTaskIds, sortBy))
-  //               })
-  //           })
-  //         }
-  //       })
-  //
-  //
-  //   }
-  //
-  //   projectTasks.map((task) => {
-  //     taskBlocksToAdd = taskBlocksToAdd.concat(createBlocksFromNestedTasks([task], sectionList, indentationLevelForTasks, ignoreExistingTasks, existingTaskIds, sortBy))
-  //   })
-  //
-  //   if (taskBlocksToAdd.length > 0) {
-  //   //  blocksToAdd = blocksToAdd.concat(projectBlockToAdd).concat(taskBlocksToAdd);
-  //   }
-  // })
-
-  // sectionList.forEach((section) => {
-  //   let mdContent = craft.markdown.markdownToCraftBlocks("- " + "*" + section.id + ":* " + section.name + " from project: " + section.projectId);
-  //         blocksToAdd = blocksToAdd.concat(mdContent);
-  // })
-
   return blocksToAdd;
 
 

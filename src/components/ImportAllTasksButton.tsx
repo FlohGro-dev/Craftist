@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@chakra-ui/button";
 import { DownloadIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
-import * as CraftBlockInteractor from "../craftBlockInteractor";
+
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
@@ -23,7 +23,7 @@ const ImportAllTasksButton: React.FC = () => {
 
 
     const taskList = await getAllTasks();
-    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], true, true))
+    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], TodoistWrapper.taskGroupingOptions.projectAndSection))
     craft.dataApi.addBlocks(blocksToAdd);
 
     setIsLoading(false);

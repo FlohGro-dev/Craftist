@@ -57,7 +57,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
 
             let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
-            blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, taskList, true, existingTaskIds, false, true))
+            blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, taskList, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.sectionOnly))
 
 
 

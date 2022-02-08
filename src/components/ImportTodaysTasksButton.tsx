@@ -71,7 +71,7 @@ const ImportTodaysTasksButton: React.FC = () => {
 
     const todaysTasks = await getTodaysTasks();
 
-    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, true, true, TodoistWrapper.tasksSortByOptions.priority))
+    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.projectAndSection , TodoistWrapper.tasksSortByOptions.priority))
 
 
 
