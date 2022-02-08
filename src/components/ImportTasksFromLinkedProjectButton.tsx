@@ -6,18 +6,20 @@ import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
+import { useRecoilValue } from "recoil";
 
 const ImportTasksFromLinkedProjectButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
   const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
   const getTasksFromProject = TodoistWrapper.useGetTasksFromProject();
+  const projectList = useRecoilValue(TodoistWrapper.projects);
+  const sectionList = useRecoilValue(TodoistWrapper.sections);
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = async () => {
     setIsLoading(true);
 
-    let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
     // check if document is linked to a todoist project
     let foundProjectIDs: string[] = [];
     let linkedProjectId: number = -1;
@@ -43,41 +45,35 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
           )
         }
       })
-      .finally(() => {
+      .finally(async () => {
         if (foundProjectIDs.length > 0) {
           if (foundProjectIDs.every((val, _i, arr) => val === arr[0])) {
             // all ids are equal - thats valid
             linkedProjectId = parseInt(foundProjectIDs[0]);
 
-            let tasks = getTasksFromProject({ projectId: linkedProjectId });
-            tasks.then((tasks) => {
-              if (!tasks.length) { return; }
-              return Promise.all(
-                tasks
-                  .map((task) => {
-                    if(!existingTaskIds.includes(task.id)){
-                      let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")");
-                      blocksToAdd = blocksToAdd.concat(mdContent);
-                    }
-                  })
-              )
+            let taskList = await getTasksFromProject({ projectId: linkedProjectId });
+
+            taskList.sort()
+
+            let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
+
+            blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, taskList, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.sectionOnly))
+
+
+
+            craft.dataApi.addBlocks(blocksToAdd);
+
+            setIsLoading(false);
+            toast({
+              position: "bottom",
+              render: () => (
+                <Center>
+                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+                    Imported Tasks from project
+              </Box>
+                </Center>
+              ),
             })
-              .then(() => {
-                craft.dataApi.addBlocks(blocksToAdd);
-              })
-              .finally(() => {
-                setIsLoading(false);
-                toast({
-                  position: "bottom",
-                  render: () => (
-                    <Center>
-                      <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                        Imported Tasks from project
-                  </Box>
-                    </Center>
-                  ),
-                })
-              });
 
           }
           else {

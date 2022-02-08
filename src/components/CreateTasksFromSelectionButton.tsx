@@ -72,13 +72,8 @@ const CreateTasksFromSelectionButton: React.FC = () => {
     }
 
     const pageBlock = getPageResult.data
-    // Concatenate the text runs together to get the page title
-    const pageTitle = pageBlock.content.map(x => x.text).join()
-
 
     // retrieve selection and add tasks
-
-
     craft.editorApi
       .getSelection()
       .then((resp) => {
