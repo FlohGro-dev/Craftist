@@ -363,7 +363,8 @@ function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", includeAppU
       // check if its a due time
       if (task.due.datetime) {
         // task has an explicit time set
-        dueString = dueString + " " + task.due.datetime;
+        let dueDate = new Date(task.due.datetime)
+        dueString = dueString + " at " + dueDate.toLocaleTimeString();
       }
       mdString = mdString + " " + dueString;
     }
