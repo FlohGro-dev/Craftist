@@ -279,21 +279,13 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
   tasks.forEach((curTask) => {
 
+    let mdContent = craft.markdown.markdownToCraftBlocks(createTaskMdString(curTask.task, "- [ ] ", true, true, true));
 
+    mdContent.forEach((block) => {
+      block.indentationLevel = indentationLevel;
+    })
 
-      let dueString = "";
-      // currently commented out
-      // if(curTask.task.due){
-      //   dueString = " due: " + curTask.task.due.date;
-      // }
-
-      let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + curTask.task.content + " [Todoist Task](todoist://task?id=" + curTask.task.id + ") [(Webview)](" + curTask.task.url + ")" + dueString);
-
-      mdContent.forEach((block) => {
-        block.indentationLevel = indentationLevel;
-      })
-
-      blocksToAdd = blocksToAdd.concat(mdContent);
+    blocksToAdd = blocksToAdd.concat(mdContent);
 
 
     if (curTask.children != undefined) {
@@ -318,7 +310,69 @@ export enum taskGroupingOptions {
   sectionOnly
 }
 
-export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: number[] = [], taskGrouping:taskGroupingOptions, sortBy: tasksSortByOptions = tasksSortByOptions.order): CraftBlockInsert[] {
+function createProjectMdString(project: Project, mdPrefix: string = "+ ", includeAppUrl = true, includeWebUrl = true): string {
+  let mdString = mdPrefix;
+
+  if (includeAppUrl && includeWebUrl) {
+    // both urls requested, need to separate them
+    mdString = mdString + "[" + project.name + "](todoist://project?id=" + project.id + ") [(Webview)](" + project.url + ")"
+  } else if (includeAppUrl && !includeWebUrl) {
+    // only App Url shall be included, just add it as direct url on the project name
+    mdString = mdString + "[" + project.name + "](todoist://project?id=" + project.id + ")";
+  } else if (includeWebUrl && !includeAppUrl) {
+    // only Web Url shall be included, just add it as direct url on the project name
+    mdString = mdString + "[" + project.name + "](" + project.url + ")";
+  } else {
+    // no url shall be included just add the name
+    mdString = mdString + project.name;
+  }
+  return mdString;
+}
+
+function createSectionMdString(section: Section, mdPrefix: string = "+ "): string {
+  let mdString = mdPrefix;
+
+  // section does not have a URL scheme / web link therefore just add the name - could be extended to include the link to the project but this is not that benefitial
+  mdString = mdString + section.name;
+  return mdString;
+}
+
+function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", includeAppUrl = true, includeWebUrl = true, includeDueDateLink = true): string {
+  let mdString = mdPrefix;
+  if (includeAppUrl && includeWebUrl) {
+    // both urls requested, need to separate them
+    mdString = mdString + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")";
+  } else if (includeAppUrl && !includeWebUrl) {
+    // only App Url shall be included, just add it as direct url on the project name
+    mdString = mdString + task.content + " [Todoist Task](todoist://task?id=" + task.id + ")";
+  } else if (includeWebUrl && !includeAppUrl) {
+    // only Web Url shall be included, just add it as direct url on the project name
+    mdString = mdString + task.content + " [Todoist Task](" + task.url + ")";
+  } else {
+    // no url shall be included just add the name
+    mdString = mdString + task.content;
+  }
+
+  if (includeDueDateLink) {
+    let dueString = "";
+    if (task.due) {
+      // task has a due date
+      let dueDateYMD = task.due.date.split("-")
+      dueString = "[" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + "](day://" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + ")"
+
+      // check if its a due time
+      if (task.due.datetime) {
+        // task has an explicit time set
+        dueString = dueString + " " + task.due.datetime;
+      }
+      mdString = mdString + " " + dueString;
+    }
+  }
+
+  return mdString;
+}
+
+export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: number[] = [], taskGrouping: taskGroupingOptions, sortBy: tasksSortByOptions = tasksSortByOptions.order): CraftBlockInsert[] {
 
   let blocksToAdd: CraftBlockInsert[] = [];
 
@@ -331,11 +385,10 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
   let projectIds: Set<number> = new Set([]);
   let sectionIds: Set<number> = new Set([]);
 
-  if (ignoreExistingTasks){// || !existingTaskIds.includes(curTask.task.id)){
+  // if existing tasks shall be ignored - remove the tasks from the flat array so they don't will be processed
+  if (ignoreExistingTasks) {
     flatTaskArray = flatTaskArray.filter(curTask => !existingTaskIds.includes(curTask.id))
   }
-
-
 
   flatTaskArray.map(task => {
     projectIds.add(task.projectId);
@@ -444,20 +497,19 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
 
   proSecTaskNest.map(curProSecTaskNest => {
     let curBlocksToAdd: CraftBlockInsert[] = [];
-    let projectBlocksToAdd: CraftBlockInsert[] = [];
     let sectionBlockToAdd: CraftBlockInsert[] = [];
     let blockIndentLevel = 0;
 
-    if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly){
+    if (taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly) {
       // add the project name as foldable block
       // todo add function which creates a markdown link for the project and use here
-      projectBlocksToAdd = craft.markdown.markdownToCraftBlocks("+ " + curProSecTaskNest.project.name)
-      curBlocksToAdd = curBlocksToAdd.concat(craft.markdown.markdownToCraftBlocks("+ " + curProSecTaskNest.project.name));
+
+      curBlocksToAdd = curBlocksToAdd.concat(craft.markdown.markdownToCraftBlocks(createProjectMdString(curProSecTaskNest.project, "+ ", true, true)));
     }
 
     // now we have to add all tasks without a section in that project
     if (curProSecTaskNest.tasks && curProSecTaskNest.tasks.length > 0) {
-      if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly) {
+      if (taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly) {
         blockIndentLevel = 1;
       }
       curProSecTaskNest.tasks.map(curTask => {
@@ -468,13 +520,13 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
     if (curProSecTaskNest.sectionTasks && curProSecTaskNest.sectionTasks.length > 0) {
       // loop through all available sectionTasks Nests.
       curProSecTaskNest.sectionTasks.map(curSecTaskNest => {
-        if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly){
+        if (taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.projectOnly) {
           blockIndentLevel = 1;
         } else {
           blockIndentLevel = 0;
         }
-        if(taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.sectionOnly) {
-          sectionBlockToAdd = craft.markdown.markdownToCraftBlocks("+ " + curSecTaskNest.section.name);
+        if (taskGrouping == taskGroupingOptions.projectAndSection || taskGrouping == taskGroupingOptions.sectionOnly) {
+          sectionBlockToAdd = craft.markdown.markdownToCraftBlocks(createSectionMdString(curSecTaskNest.section, "+ "));
           sectionBlockToAdd.forEach((block) => {
             // adapt the section indentation level to one higher than the tasks level
             block.indentationLevel = blockIndentLevel;
@@ -486,24 +538,18 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
 
         // now we have to add the tasks of that section - the check is not necessary but needed for type safety
         if (curSecTaskNest.tasks && curSecTaskNest.tasks.length > 0) {
-          if(taskGrouping == taskGroupingOptions.projectAndSection){
+          if (taskGrouping == taskGroupingOptions.projectAndSection) {
             blockIndentLevel = 2;
-          } else if (taskGrouping == taskGroupingOptions.sectionOnly || taskGrouping == taskGroupingOptions.projectOnly){
+          } else if (taskGrouping == taskGroupingOptions.sectionOnly || taskGrouping == taskGroupingOptions.projectOnly) {
             blockIndentLevel = 1;
           }
           curSecTaskNest.tasks.map(curTask => {
             curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy))
           })
         }
-
-
       })
     }
     blocksToAdd = blocksToAdd.concat(curBlocksToAdd);
-
-
   })
   return blocksToAdd;
-
-
 }
