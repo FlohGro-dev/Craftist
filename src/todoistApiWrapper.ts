@@ -415,6 +415,7 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
       .map(section => sections.push(section))
   })
 
+  // map all child tasks to their parent tasks
   while (unnestedChildTasks.length > 0) {
     unnestedChildTasks.forEach((curTask, index) => {
 
@@ -447,7 +448,6 @@ export function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sec
 
 
   let proSecTaskNest: ProjectSectionTaskNest[] = [];
-
   let secTaskNest: SectionTaskNest[] = [];
 
   let tasksToMap = nestedTasks;
