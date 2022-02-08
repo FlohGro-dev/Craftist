@@ -14,12 +14,12 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
   const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
   const getTasksFromProject = TodoistWrapper.useGetTasksFromProject();
   const projectList = useRecoilValue(TodoistWrapper.projects);
+  const sectionList = useRecoilValue(TodoistWrapper.sections);
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = async () => {
     setIsLoading(true);
 
-    let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
     // check if document is linked to a todoist project
     let foundProjectIDs: string[] = [];
     let linkedProjectId: number = -1;
@@ -53,9 +53,11 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
 
             let taskList = await getTasksFromProject({ projectId: linkedProjectId });
 
+            taskList.sort()
+
             let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
-            blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, taskList, true, existingTaskIds, false))
+            blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, taskList, true, existingTaskIds, false, true))
 
 
 

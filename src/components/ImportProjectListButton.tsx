@@ -18,6 +18,7 @@ const ImportProjectListButton: React.FC = () => {
       if (!projects.length) { return; }
       return Promise.all(
         projects
+          .sort((a, b) => ((a.order ?? 0) < (b.order ?? 0) ? -1 : 1))
           .map((project) => {
             let mdContent = craft.markdown.markdownToCraftBlocks("- [" + project.name + "](todoist://project?id=" + project.id + ") [(Webview)](" + project.url + ")");
             blocksToAdd = blocksToAdd.concat(mdContent);

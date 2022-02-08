@@ -12,7 +12,7 @@ const ImportAllTasksButton: React.FC = () => {
 
   const getAllTasks = TodoistWrapper.useGetAllTasks();
   const projectList = useRecoilValue(TodoistWrapper.projects);
-
+  const sectionList = useRecoilValue(TodoistWrapper.sections);
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = async () => {
@@ -23,7 +23,7 @@ const ImportAllTasksButton: React.FC = () => {
 
 
     const taskList = await getAllTasks();
-    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,taskList, false))
+    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], true, true))
     craft.dataApi.addBlocks(blocksToAdd);
 
     setIsLoading(false);

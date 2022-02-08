@@ -60,7 +60,8 @@ import { useRecoilValue } from "recoil";
 
 const ImportTodaysTasksButton: React.FC = () => {
   const toast = useToast();
-  const projectList = useRecoilValue(TodoistWrapper.projects);
+  const projectList = useRecoilValue(TodoistWrapper.projects)
+  const sectionList = useRecoilValue(TodoistWrapper.sections);
   const getTodaysTasks = TodoistWrapper.useGetTodaysTasks();
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
@@ -70,7 +71,7 @@ const ImportTodaysTasksButton: React.FC = () => {
 
     const todaysTasks = await getTodaysTasks();
 
-    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, todaysTasks, true, existingTaskIds))
+    blocksToAdd = blocksToAdd.concat(TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, true, true, TodoistWrapper.tasksSortByOptions.priority))
 
 
 
