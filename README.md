@@ -54,10 +54,11 @@ The following features are currently supported by Craftist:
 
 - import todays tasks
   - this will import the tasks due today from your todoist account
-  - the tasks will be imported as todo items and contain links to the tasks in todoist (a direct link to the task in the app (doesn't work on macOS) and a link to the Webview of the task)
+  - the tasks will be imported as todo items and contain links to the tasks in todoist
 - import all tasks
   - this will import all tasks from your todoist account (which could be a lot)
   - it's planned to improve this action (e.g. grouping by project) if you'd like to have this feature please comment on the related issue.
+- the imported tasks will be nested by project, section and parent task if available
 - import project list
   - this will import the list of your Todoist projects
   - the name of the project will be a direct link to the project in the app (as mentioned this does currently not work on macOS)
@@ -67,6 +68,12 @@ The following features are currently supported by Craftist:
     <p>Craftist: Import Tasks / Projects - Watch Video</p>
     <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/e1e24450e0724596b87d4cf6bb310d24-with-play.gif">
   </a>
+  
+### Settings
+
+- a small settings menu enables the following adjustable settings to your needs
+  -  the link type(s) which should be created for each task
+  -  if you want to import the due date for each task (if it has one)
 
 ## Login
 
@@ -91,6 +98,7 @@ To learn more about Craft eXtensions visit the [Craft X developer portal](https:
 ## Thanks
 
 Thanks to @curtismchale for covering Craftist in a [YouTube Video Demo](https://www.youtube.com/watch?v=IxONW0W9QPY) and [Blogpost](https://curtismchale.ca/2022/01/31/connect-todoist-with-craft/) lately.
+
 Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
