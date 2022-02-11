@@ -1,6 +1,6 @@
 # Craftist
 
-Welcome to the repository of my Todoist integration for Craft.
+Welcome to the repository of my Todoist eXtension for Craft.
 Please read through the instructions, especially the [installation](#installation) and [login](#login) chapter.
 
 If you have any problems with the current features or you have other feature request, you can open an issue in this repository or contact me on Twitter, the Craft developer forum or in the Craft slack community (search for "FlohGro").
