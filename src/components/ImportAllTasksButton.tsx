@@ -21,22 +21,36 @@ const ImportAllTasksButton: React.FC = () => {
 // disabled for import all tasks
 //    let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
+    try {
+      const taskList = await getAllTasks()
 
-    const taskList = await getAllTasks();
-    blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], TodoistWrapper.taskGroupingOptions.projectAndSection))
-    craft.dataApi.addBlocks(blocksToAdd);
+          blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], TodoistWrapper.taskGroupingOptions.projectAndSection))
+          craft.dataApi.addBlocks(blocksToAdd);
 
-    setIsLoading(false);
-    toast({
-      position: "bottom",
-      render: () => (
-        <Center>
-          <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-            Imported All Tasks
-        </Box>
-        </Center>
-      ),
-    })
+          setIsLoading(false);
+          toast({
+            position: "bottom",
+            render: () => (
+              <Center>
+                <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+                  Imported All Tasks
+              </Box>
+              </Center>
+            ),
+          })
+    } catch(error) {
+      toast({
+        position: "bottom",
+        render: () => (
+          <Center>
+            <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+              Failed importing Tasks - please try to login again
+          </Box>
+          </Center>
+        ),
+      })
+      setIsLoading(false);
+    }
   }
   return (
     <Button

@@ -3,7 +3,7 @@
   "name": "Craftist",
   "fileName": "craftist-eXtension",
   "author" : "FlohGro",
-  "author-email" : "team@craft.do",
+  "author-email" : "hi@flohgro.com",
   "description" : "Todoist Integration for Craft",
   "api": "0.1.0",
   "main": "index.html"

@@ -51,6 +51,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
             // all ids are equal - thats valid
             linkedProjectId = parseInt(foundProjectIDs[0]);
 
+            try{
             let taskList = await getTasksFromProject({ projectId: linkedProjectId });
 
             taskList.sort()
@@ -74,6 +75,19 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
                 </Center>
               ),
             })
+          } catch (error) {
+            toast({
+              position: "bottom",
+              render: () => (
+                <Center>
+                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                    Failed importing Tasks - please try to login again
+                </Box>
+                </Center>
+              ),
+            })
+            setIsLoading(false);
+          }
 
           }
           else {

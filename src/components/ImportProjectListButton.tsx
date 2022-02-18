@@ -34,24 +34,15 @@ const ImportProjectListButton: React.FC = () => {
     }
 
 
-    let projects = getProjectList();
-    projects.then((projects) => {
-      if (!projects.length) { return; }
-      return Promise.all(
-        projects
-          .sort((a, b) => ((a.order ?? 0) < (b.order ?? 0) ? -1 : 1))
-          .map((project) => {
+    try {
+      let projects = await getProjectList()
+      projects = projects.sort((a, b) => ((a.order ?? 0) < (b.order ?? 0) ? -1 : 1));
+      projects.map((project) => {
 
-            let mdContent = craft.markdown.markdownToCraftBlocks(TodoistWrapper.createProjectMdString(project, "- ", useMobileUrls, useWebUrls));
-            blocksToAdd = blocksToAdd.concat(mdContent);
-
-          })
-      )
-    })
-      .then(() => {
-        craft.dataApi.addBlocks(blocksToAdd);
+        let mdContent = craft.markdown.markdownToCraftBlocks(TodoistWrapper.createProjectMdString(project, "- ", useMobileUrls, useWebUrls));
+        blocksToAdd = blocksToAdd.concat(mdContent);
       })
-      .finally(() => {
+        craft.dataApi.addBlocks(blocksToAdd);
         setIsLoading(false);
         toast({
           position: "bottom",
@@ -63,7 +54,19 @@ const ImportProjectListButton: React.FC = () => {
             </Center>
           ),
         })
-      });
+    } catch(error) {
+      toast({
+        position: "bottom",
+        render: () => (
+          <Center>
+            <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+              Failed importing project list - please try to login again
+          </Box>
+          </Center>
+        ),
+      })
+      setIsLoading(false);
+    }
   }
   return (
     <Button
@@ -78,5 +81,6 @@ const ImportProjectListButton: React.FC = () => {
       </Button>
   );
 }
+
 
 export default ImportProjectListButton;

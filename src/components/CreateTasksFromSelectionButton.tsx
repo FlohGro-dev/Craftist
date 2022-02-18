@@ -86,9 +86,14 @@ const CreateTasksFromSelectionButton: React.FC = () => {
         toast({
           status: "error",
           position: "bottom",
-          title: "No Blocks selected",
-          duration: 1000,
-        });
+          render: () => (
+            <Center>
+              <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                No Blocks selected
+            </Box>
+            </Center>
+          ),
+        })
         return [] as CraftBlock[];
       })
       .then((blocks) => {
@@ -139,27 +144,32 @@ const CreateTasksFromSelectionButton: React.FC = () => {
                     const result = await craft.dataApi.updateBlocks([block])
                     if (result.status !== "success") {
                       throw new Error(result.message)
+                    } else {
+                      
                     }
                     // //block.listStyle.type = "todo";
                     // CraftBlockInteractor.appendCraftTextRunToBlock(blockToAppend, block);
                     // CraftBlockInteractor.prependCraftTextRunToBlock(blockToPrepend, block);
-                  });
+                  })
+                  .catch(() => {
+                    //ERROR
+                    toast({
+                      position: "bottom",
+                      render: () => (
+                        <Center>
+                          <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                            Failed adding Task - please try to login again
+                        </Box>
+                        </Center>
+                      ),
+                    })
+                  })
               }
             })
         )
       })
       .finally(() => {
         setIsLoading(false);
-        toast({
-          position: "bottom",
-          render: () => (
-            <Center>
-              <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                Created Task(s) from selected blocks
-            </Box>
-            </Center>
-          ),
-        })
       });
   }
   return (

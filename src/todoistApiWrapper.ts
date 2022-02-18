@@ -43,7 +43,7 @@ export const useLoginCallback = () =>
         set(apiToken, token);
         set(client, cli);
         await craft.storageApi.put(API_TOKEN_KEY, token);
-        window.localStorage.setItem(API_TOKEN_KEY, token);
+        //window.localStorage.setItem(API_TOKEN_KEY, token);
       });
     };
   });
@@ -51,13 +51,39 @@ export const useLoginCallback = () =>
 export const useLogoutCallback = () =>
   Recoil.useRecoilCallback(({ reset }) => {
     return async () => {
-      //        reset(projects);
+      reset(projects);
       reset(apiToken);
       reset(client);
       await craft.storageApi.delete(API_TOKEN_KEY);
-      window.localStorage.removeItem(API_TOKEN_KEY);
+      //window.localStorage.removeItem(API_TOKEN_KEY);
     };
   });
+
+  export const useCheckApiTokenConfigured = () => {
+    return Recoil.useRecoilCallback(({ snapshot }) => {
+      return async () => {
+        const cli = await snapshot.getPromise(client);
+        if (!cli) {
+          return false;
+        } else {
+          return true;
+        }
+      };
+    });
+  };
+
+  export const readStoredApiTokenToVariable = () => {
+    return Recoil.useRecoilCallback(({ set }) => {
+    return async () => {
+      let storedToken = await craft.storageApi.get(API_TOKEN_KEY);
+      if(storedToken.status != "error" && storedToken.data != ""){
+        // there is a token stored
+        set(apiToken, storedToken.data);
+      }
+    }
+  });
+  }
+
 
 export const useAddTask = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {

@@ -1,16 +1,15 @@
 import * as React from "react"
 import * as ReactDOM from 'react-dom'
 import * as Recoil from "recoil";
-import * as TodoistWrapper from "./todoistApiWrapper";
-//import { AppendButton, LoginForm, TodayPane } from "./components";
-import { LoginForm, LogoutButton, ImportTodaysTasksButton, ImportProjectListButton, CrosslinkTasksButton, SyncTaskStatesButton, CreateTasksFromSelectionButton, ImportAllTasksButton, LinkToExistingProjectButton, ImportTasksFromLinkedProjectButton, SettingsMenu } from "./components";
-import { ChakraProvider, ThemeConfig, Badge, Center } from "@chakra-ui/react";
-import { Container, Stack, Box, Flex } from "@chakra-ui/layout";
+import { ImportTodaysTasksButton, ImportProjectListButton, CrosslinkTasksButton, SyncTaskStatesButton, CreateTasksFromSelectionButton, ImportAllTasksButton, LinkToExistingProjectButton, ImportTasksFromLinkedProjectButton, SettingsMenu, LoginLogoutButton } from "./components";
+import { ChakraProvider, ThemeConfig, Badge, Center, Spinner, VStack } from "@chakra-ui/react";
+import { Container, Box, Flex } from "@chakra-ui/layout";
 import { extendTheme } from "@chakra-ui/react";
 import { Divider } from '@chakra-ui/react'
 import { Skeleton } from "@chakra-ui/skeleton";
 import { CraftEnv } from "./types"
 import { DevicePlatform } from "@craftdocs/craft-extension-api";
+import { readStoredApiTokenToVariable, } from "./todoistApiWrapper";
 // import craftXIconSrc from "./craftx-icon.png"
 // import { TodoistApi } from '@doist/todoist-api-typescript'
 // import { CraftBlockInsert, CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
@@ -44,7 +43,6 @@ const theme = extendTheme({ config,
   },
  });
 
-
 const Content: React.FC = () => {
   return (
     <Box>
@@ -60,9 +58,17 @@ const Content: React.FC = () => {
       </Flex>
       <React.Suspense
         fallback={
-          <Stack>
-            <Skeleton width="100%" height="300px" />
-          </Stack>
+          <VStack align="center"
+          >
+          <Spinner
+            thickness='3px'
+            speed='1.0s'
+            emptyColor='gray.200'
+            color='red.200'
+            size='xl'
+          />
+
+          </VStack>
         }
       >
       <Badge>Create / Link</Badge>
@@ -80,21 +86,21 @@ const Content: React.FC = () => {
         <Divider size="5px" />
       </Center>
       <SettingsMenu />
-      <LogoutButton />
+      <LoginLogoutButton />
       </React.Suspense>
     </Box>
   );
 };
 
 const App: React.FC = () => {
-  let [token, setToken] = Recoil.useRecoilState(TodoistWrapper.apiToken);
-  const isLogin = !!token;
+  //let [token] = Recoil.useRecoilState(TodoistWrapper.apiToken);
+  // let [isConfigured, setIsConfigured] = Recoil.useRecoilState(TodoistWrapper.tokenIsConfigured)
+  // const isLogin = !!isConfigured;
   const craftEnv = useCraftEnv();
-
-  React.useEffect(() => {
-    const k = window.localStorage.getItem(TodoistWrapper.API_TOKEN_KEY) ?? "";
-    setToken(k);
-  }, [setToken]);
+  const readTokenIntoVar = readStoredApiTokenToVariable();
+  readTokenIntoVar();
+  // const checkLogin = getStoredApiToken();
+  // const login = useLoginCallback();
 
   React.useEffect(() => {
     if (craftEnv.isDarkMode) {
@@ -104,9 +110,49 @@ const App: React.FC = () => {
     }
   }, [craftEnv.isDarkMode]);
 
-  if (!isLogin) {
-    return <LoginForm />;
-  }
+
+  // checkLogin()
+  //   .then((storedToken) => {
+  //     login(storedToken);
+  //   })
+  //   .catch(() => {
+  //     return <LoginForm />;
+  //   })
+  //   .finally(() => {
+  //     return <Content />;
+  //   })
+
+//let isLoggedIn:boolean = false;
+//React.useEffect(() => {
+ // let isConfiguredWrapped = TodoistWrapper.useCheckApiTokenConfigured()
+ // async function t(){
+ //   let temp = await isConfiguredWrapped()
+ //   if(temp){
+ //     setIsConfigured("true");
+ //   }
+ // }
+ // t();
+//}, [setIsConfigured]);
+  // React.useEffect(() => {
+    //let isConfigured = TodoistWrapper.useCheckApiTokenConfigured()
+    //let b = isConfigured()
+  //   b.then(function(val){
+  //     isLoggedIn = val;
+  //   })
+  // async function t(){
+  // isLoggedIn = await isConfigured()
+  // }
+  // t();
+    // const k = window.localStorage.getItem(TodoistWrapper.API_TOKEN_KEY) ?? "";
+    //
+    // setToken(k);
+  // }, [setToken]);
+  //}, []);
+
+
+  // if (!isSubmitted) {
+  //   return <LoginForm />;
+  // }
   return <Content />;
 };
 
@@ -143,23 +189,6 @@ const Wrapper: React.FC = () => {
   );
 };
 
-// function getCraftColorMode() {
-//   let colorMode: ConfigColorMode = `light`
-//     craft.env.setListener((env) => {
-//       switch (env.colorScheme) {
-//         case "dark":
-//         colorMode = `dark`;
-//           break;
-//         case "light":
-//         colorMode = `light`
-//           break;
-//       }
-//
-//     }
-//   )
-//   return colorMode;
-// }
-
 function useCraftEnv(): CraftEnv {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
   const [platform, setPlatform] = React.useState<DevicePlatform>("Web");
@@ -178,7 +207,7 @@ function useCraftEnv(): CraftEnv {
 }
 
 
-export function initApp() {
+export async function initApp() {
   ReactDOM.render(
     <Wrapper />
     ,
