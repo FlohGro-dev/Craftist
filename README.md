@@ -68,7 +68,7 @@ The following features are currently supported by Craftist:
     <p>Craftist: Import Tasks / Projects - Watch Video</p>
     <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/e1e24450e0724596b87d4cf6bb310d24-with-play.gif">
   </a>
-  
+
 ### Settings
 
 - a small settings menu enables the following adjustable settings to your needs
@@ -77,13 +77,14 @@ The following features are currently supported by Craftist:
 
 ## Login
 
-When you installed the Craftist eXtension and open it the first time you'll see a login form where you need to set your API-Token.
-Therefore you need to get the API token of your todoist account.
-To retrieve the token, open your Todoist account and go to the settings. Navigate into the integrations tab and scroll to the bottom. There you'll see a textfield titled "API-Token". Copy the API-Token with the button below or just be selecting and copying the text.
-Open the Craftist eXtension again and paste the copied API-Token and press the "Set Token" button.
+When you installed the Craftist eXtension (also when you update the eXtension) you hav to "login" into your Todoist account by providing your API-Token.
+Therefore you need to get the token of your Todoist account.
+To retrieve the token, open Todoist and go to the settings. Navigate into the integrations tab and scroll to the bottom. There you'll see a textfield titled "API-Token". Copy the API-Token with the button below or just be selecting and copying the text.
+Open the Craftist eXtension again and click on the "Login/Logout" button. Paste the copied API-Token into the text field and press the green "Set Token" button.
+The eXtension will then reload and you can close the UI to set the token by pressing the "x" in the upper right corner
 The Token will be stored in Craft so you'll only have to do this once.
 
-If you ever want to logout from your todoist account - use the "Logout" button which will reset the stored API-Token.
+If you ever want to logout from your todoist account - use the "Login/Logout" button and press "Delete Token" which will reset the stored API-Token.
 
 ## Installation
 
@@ -102,6 +103,12 @@ Thanks to @curtismchale for covering Craftist in a [YouTube Video Demo](https://
 Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
+
+### v0.5
+
+- **new/fixed:** **Craftist is now working in the web version of Craft**
+- **change:** slightly changed the login behavior - no separate login form anymore - now included in the "Login/Logout" button
+- **fixed:** cleanup of notification behavior when execution of operations succeeds / fails
 
 ### v0.4
 

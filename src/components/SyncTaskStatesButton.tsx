@@ -9,6 +9,7 @@ import { Box, Center } from "@chakra-ui/react";
 
 const SyncTaskStatesButton: React.FC = () => {
   const toast = useToast();
+  const tasksToSyncToastId = 'tasks-to-sync'
   const [isLoading, setIsLoading] = React.useState(false);
   const isTaskCompleted = TodoistWrapper.useCheckIfTaskIsCompleted();
   const isRecurringTask = TodoistWrapper.useCheckIfTaskIsRecurring();
@@ -18,6 +19,18 @@ const SyncTaskStatesButton: React.FC = () => {
     let todoBlocks = CraftBlockInteractor.getAllTodoItemsFromCurrentPage();
     todoBlocks.then((blocks) => {
       if (!blocks.length) {
+        setIsLoading(false);
+        toast({
+          id: tasksToSyncToastId,
+          position: "bottom",
+          render: () => (
+            <Center>
+              <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                No tasks to sync
+            </Box>
+            </Center>
+          ),
+        })
         return;
       }
       return Promise.all(blocks
@@ -38,7 +51,19 @@ const SyncTaskStatesButton: React.FC = () => {
             let getIsTaskStateCompleted = isTaskCompleted({
               id: Number(taskId)
             })
-
+              .catch(() => {
+                //ERROR
+                toast({
+                  position: "bottom",
+                  render: () => (
+                    <Center>
+                      <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                        Failed syncing states - please try to login again
+                  </Box>
+                    </Center>
+                  ),
+                })
+              })
             getIsTaskStateCompleted.then(async function(isCompleted) {
               let isRecurring = isRecurringTask({
                 id: Number(taskId)
@@ -103,6 +128,19 @@ const SyncTaskStatesButton: React.FC = () => {
               })
           } else {
             // nothing to be done - task is not crosslinked between todoist and craft (maybe link it right now?)
+            if (!toast.isActive(tasksToSyncToastId)) {
+            toast({
+              id: tasksToSyncToastId,
+              position: "bottom",
+              render: () => (
+                <Center>
+                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                    no crosslinked tasks to sync
+                </Box>
+                </Center>
+              ),
+            })
+          }
           }
 
         }
@@ -112,7 +150,9 @@ const SyncTaskStatesButton: React.FC = () => {
     })
       .finally(() => {
         setIsLoading(false);
+        if (!toast.isActive(tasksToSyncToastId)) {
         toast({
+          id: tasksToSyncToastId,
           position: "bottom",
           render: () => (
             <Center>
@@ -122,7 +162,8 @@ const SyncTaskStatesButton: React.FC = () => {
             </Center>
           ),
         })
-      });
+      }
+    })
   }
 
   return (

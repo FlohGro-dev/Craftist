@@ -10,6 +10,7 @@ import { Box, Center } from "@chakra-ui/react";
 const CrosslinkTasksButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
+  const errorToastId = 'error-toast'
   const add = TodoistWrapper.useAddTask();
   const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
   const [isLoading, setIsLoading] = React.useState(false);
@@ -50,11 +51,16 @@ const CrosslinkTasksButton: React.FC = () => {
                   else{
                     // not all ids are equal - this is not valid!
                         toast({
-                          status: "error",
                           position: "bottom",
-                          title: "linkedProjectIds are not all equal",
-                          duration: 1000,
-                        });
+                          render: () => (
+                            <Center>
+                              <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                                linked project Ids are not all equal - this is not valid
+                            </Box>
+                            </Center>
+                          ),
+                        })
+
                   }
       }
     })
@@ -71,6 +77,18 @@ const CrosslinkTasksButton: React.FC = () => {
     let openTasks = CraftBlockInteractor.getUncheckedTodoItemsFromCurrentPage();
     openTasks.then((blocks) => {
       if (!blocks.length) {
+        setIsLoading(false);
+        toast({
+          id: errorToastId,
+          position: "bottom",
+          render: () => (
+            <Center>
+              <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                no open tasks
+            </Box>
+            </Center>
+          ),
+        })
         return;
       }
       return Promise.all(
@@ -110,13 +128,32 @@ const CrosslinkTasksButton: React.FC = () => {
 
                 ];
                 CraftBlockInteractor.appendCraftTextRunToBlock(blockToAppend, block);
-              });
+              })
+              .catch(() => {
+                //ERROR
+                setIsLoading(false)
+                if (!toast.isActive(errorToastId)) {
+                  toast({
+                    id: errorToastId,
+                    position: "bottom",
+                    render: () => (
+                      <Center>
+                        <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                          Failed adding Task - please try to login again
+                      </Box>
+                      </Center>
+                    ),
+                  })
+                }
+              })
             }
           })
       )
     })
       .finally(() => {
+        //setIsLoading(false);
         setIsLoading(false);
+        if (!toast.isActive(errorToastId)) {
         toast({
           position: "bottom",
           render: () => (
@@ -126,7 +163,7 @@ const CrosslinkTasksButton: React.FC = () => {
             </Box>
             </Center>
           ),
-        })
+        })}
       });
   }
   return (

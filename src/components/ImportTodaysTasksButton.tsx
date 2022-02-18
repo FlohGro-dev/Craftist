@@ -69,6 +69,7 @@ const ImportTodaysTasksButton: React.FC = () => {
     setIsLoading(true);
     let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
+    try{
     const todaysTasks = await getTodaysTasks();
 
     blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.projectAndSection, TodoistWrapper.tasksSortByOptions.priority))
@@ -85,6 +86,19 @@ const ImportTodaysTasksButton: React.FC = () => {
         </Center>
       ),
     })
+  } catch (error) {
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+            Failed importing Tasks - please try to login again
+        </Box>
+        </Center>
+      ),
+    })
+    setIsLoading(false);
+  }
 
   }
   return (
