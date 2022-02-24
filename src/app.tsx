@@ -93,14 +93,9 @@ const Content: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  //let [token] = Recoil.useRecoilState(TodoistWrapper.apiToken);
-  // let [isConfigured, setIsConfigured] = Recoil.useRecoilState(TodoistWrapper.tokenIsConfigured)
-  // const isLogin = !!isConfigured;
   const craftEnv = useCraftEnv();
   const readTokenIntoVar = readStoredApiTokenToVariable();
   readTokenIntoVar();
-  // const checkLogin = getStoredApiToken();
-  // const login = useLoginCallback();
 
   React.useEffect(() => {
     if (craftEnv.isDarkMode) {
@@ -111,48 +106,6 @@ const App: React.FC = () => {
   }, [craftEnv.isDarkMode]);
 
 
-  // checkLogin()
-  //   .then((storedToken) => {
-  //     login(storedToken);
-  //   })
-  //   .catch(() => {
-  //     return <LoginForm />;
-  //   })
-  //   .finally(() => {
-  //     return <Content />;
-  //   })
-
-//let isLoggedIn:boolean = false;
-//React.useEffect(() => {
- // let isConfiguredWrapped = TodoistWrapper.useCheckApiTokenConfigured()
- // async function t(){
- //   let temp = await isConfiguredWrapped()
- //   if(temp){
- //     setIsConfigured("true");
- //   }
- // }
- // t();
-//}, [setIsConfigured]);
-  // React.useEffect(() => {
-    //let isConfigured = TodoistWrapper.useCheckApiTokenConfigured()
-    //let b = isConfigured()
-  //   b.then(function(val){
-  //     isLoggedIn = val;
-  //   })
-  // async function t(){
-  // isLoggedIn = await isConfigured()
-  // }
-  // t();
-    // const k = window.localStorage.getItem(TodoistWrapper.API_TOKEN_KEY) ?? "";
-    //
-    // setToken(k);
-  // }, [setToken]);
-  //}, []);
-
-
-  // if (!isSubmitted) {
-  //   return <LoginForm />;
-  // }
   return <Content />;
 };
 

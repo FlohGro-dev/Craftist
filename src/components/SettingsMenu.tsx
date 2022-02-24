@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
 import { SettingsIcon } from "@chakra-ui/icons";
-import { Box, Center, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuItemOption, MenuList, MenuOptionGroup, useToast } from "@chakra-ui/react";
-import { setSettingsDueDateUsage, setSettingsGroupTodaysTasksOption, setSettingsMobileUrlUsage, setSettingsWebUrlUsage } from "../settingsUtils";
+import { Box, Center, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, useToast } from "@chakra-ui/react";
+import { setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsMobileUrlUsage, setSettingsWebUrlUsage } from "../settingsUtils";
 
 const SettingsMenu: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
@@ -61,8 +61,36 @@ const SettingsMenu: React.FC = () => {
     })
   }
 
+  const onChangeProjectGrouping = async (value: string | string[]) => {
+    await setSettingsGroupProjectTasksOption(value.toString());
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Grouping for Today Tasks changed to: {value}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+  const onChangeAllTasksGrouping = async (value: string | string[]) => {
+    await setSettingsGroupAllTasksOption(value.toString());
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Grouping for Today Tasks changed to: {value}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
   return (
-    <Menu closeOnSelect={false} >
+    <Menu closeOnSelect={false}>
       {({ isOpen }) => (
         <>
           <MenuButton
@@ -88,7 +116,21 @@ const SettingsMenu: React.FC = () => {
               <MenuItemOption value='disabled'>disabled</MenuItemOption>
             </MenuOptionGroup>
             <MenuDivider />
-            <MenuOptionGroup defaultValue='none' title='Task Grouping for Import Todays Tasks' type='radio' onChange={(value) => onChangeTodayGrouping(value)}>
+            <MenuOptionGroup defaultValue='projectAndSection' title='Task Grouping for Import Todays Tasks' type='radio' onChange={(value) => onChangeTodayGrouping(value)}>
+              <MenuItemOption value='none'>no grouping</MenuItemOption>
+              <MenuItemOption value='projectAndSection'>group by project and section</MenuItemOption>
+              <MenuItemOption value='projectOnly'>group by project</MenuItemOption>
+              <MenuItemOption value='sectionOnly'>group by section</MenuItemOption>
+            </MenuOptionGroup>
+            <MenuDivider />
+            <MenuOptionGroup defaultValue='sectionOnly' title='Task Grouping for Import Project Tasks' type='radio' onChange={(value) => onChangeProjectGrouping(value)}>
+              <MenuItemOption value='none'>no grouping</MenuItemOption>
+              <MenuItemOption value='projectAndSection'>group by project and section</MenuItemOption>
+              <MenuItemOption value='projectOnly'>group by project</MenuItemOption>
+              <MenuItemOption value='sectionOnly'>group by section</MenuItemOption>
+            </MenuOptionGroup>
+            <MenuDivider />
+            <MenuOptionGroup defaultValue='projectAndSection' title='Task Grouping for All Tasks Import' type='radio' onChange={(value) => onChangeAllTasksGrouping(value)}>
               <MenuItemOption value='none'>no grouping</MenuItemOption>
               <MenuItemOption value='projectAndSection'>group by project and section</MenuItemOption>
               <MenuItemOption value='projectOnly'>group by project</MenuItemOption>

@@ -7,6 +7,7 @@ import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import { useRecoilValue } from "recoil";
+import { getSettingsGroupAllTasksOption } from "../settingsUtils";
 const ImportAllTasksButton: React.FC = () => {
   const toast = useToast();
 
@@ -23,8 +24,8 @@ const ImportAllTasksButton: React.FC = () => {
 
     try {
       const taskList = await getAllTasks()
-
-          blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], TodoistWrapper.taskGroupingOptions.projectAndSection))
+          let taskGroupingSettings = await getSettingsGroupAllTasksOption();
+          blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList,sectionList, taskList, false, [], taskGroupingSettings))
           craft.dataApi.addBlocks(blocksToAdd);
 
           setIsLoading(false);

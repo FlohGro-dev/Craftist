@@ -63,7 +63,6 @@ export async function getSettingsGroupTodaysTasksOption():Promise<taskGroupingOp
       case "sectionOnly": return taskGroupingOptions.sectionOnly;
       //case "label": return taskGroupingOptions.label;
       case "none": return taskGroupingOptions.none;
-
     }
   } else {
     return taskGroupingOptions.none;
@@ -72,9 +71,59 @@ export async function getSettingsGroupTodaysTasksOption():Promise<taskGroupingOp
   return taskGroupingOptions.none;
 }
 
+// project task grouping
+const useSettingsGroupProjectTasksOption:string = "useSettingsGroupProjectTasksOptionKey"
 
+export async function setSettingsGroupProjectTasksOption(groupByOption:string){
+  await craft.storageApi.put(useSettingsGroupProjectTasksOption,groupByOption);
+}
 
+export async function getSettingsGroupProjectTasksOption():Promise<taskGroupingOptions>{
+  let result = await craft.storageApi.get(useSettingsGroupProjectTasksOption);
+  if(result.status == "success"){
+    switch(result.data){
+      case "projectAndSection": return taskGroupingOptions.projectAndSection;
+      case "projectOnly": return taskGroupingOptions.projectOnly;
+      case "sectionOnly": return taskGroupingOptions.sectionOnly;
+      //case "label": return taskGroupingOptions.label;
+      case "none": return taskGroupingOptions.none;
+    }
+  } else {
+    return taskGroupingOptions.none;
+  }
+  // retrun to prevent errors.
+  return taskGroupingOptions.none;
+}
 
+// project task grouping
+const useSettingsGroupAllTasksOption:string = "useSettingsGroupAllTasksOptionKey"
+
+export async function setSettingsGroupAllTasksOption(groupByOption:string){
+  await craft.storageApi.put(useSettingsGroupAllTasksOption,groupByOption);
+}
+
+export async function getSettingsGroupAllTasksOption():Promise<taskGroupingOptions>{
+  let result = await craft.storageApi.get(useSettingsGroupAllTasksOption);
+  if(result.status == "success"){
+    switch(result.data){
+      case "projectAndSection": return taskGroupingOptions.projectAndSection;
+      case "projectOnly": return taskGroupingOptions.projectOnly;
+      case "sectionOnly": return taskGroupingOptions.sectionOnly;
+      //case "label": return taskGroupingOptions.label;
+      case "none": return taskGroupingOptions.none;
+    }
+  } else {
+    return taskGroupingOptions.none;
+  }
+  // retrun to prevent errors.
+  return taskGroupingOptions.none;
+}
+
+export const writeDefaultSettings = () => {
+  setSettingsGroupAllTasksOption("projectAndSection");
+  setSettingsGroupProjectTasksOption("sectionOnly");
+  setSettingsGroupTodaysTasksOption("projectAndSection")
+}
 
 // export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
 //
