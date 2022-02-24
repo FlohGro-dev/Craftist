@@ -334,7 +334,9 @@ export enum tasksSortByOptions {
 export enum taskGroupingOptions {
   projectAndSection,
   projectOnly,
-  sectionOnly
+  sectionOnly,
+  label,
+  none
 }
 
 export function createProjectMdString(project: Project, mdPrefix: string = "+ ", includeAppUrl = true, includeWebUrl = true): string {

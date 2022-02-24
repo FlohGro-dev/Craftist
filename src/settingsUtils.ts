@@ -1,5 +1,7 @@
 //import * as Recoil from "recoil";
 
+import { taskGroupingOptions } from "./todoistApiWrapper";
+
 const useSettingsLinkTypeMobileAppKey:string = "SettingsLinkTypeMobileAppKey"
 const useSettingsLinkTypeWebKey:string = "useSettingsLinkTypeWebKey"
 
@@ -43,6 +45,31 @@ export async function getSettingsDueDateUsage():Promise<string>{
   } else {
     return "error"
   }
+}
+
+// todays task grouping
+const useSettingsGroupTodaysTasksOption:string = "useSettingsGroupTodaysTasksOptionKey"
+
+export async function setSettingsGroupTodaysTasksOption(groupByOption:string){
+  await craft.storageApi.put(useSettingsGroupTodaysTasksOption,groupByOption);
+}
+
+export async function getSettingsGroupTodaysTasksOption():Promise<taskGroupingOptions>{
+  let result = await craft.storageApi.get(useSettingsGroupTodaysTasksOption);
+  if(result.status == "success"){
+    switch(result.data){
+      case "projectAndSection": return taskGroupingOptions.projectAndSection;
+      case "projectOnly": return taskGroupingOptions.projectOnly;
+      case "sectionOnly": return taskGroupingOptions.sectionOnly;
+      //case "label": return taskGroupingOptions.label;
+      case "none": return taskGroupingOptions.none;
+
+    }
+  } else {
+    return taskGroupingOptions.none;
+  }
+  // retrun to prevent errors.
+  return taskGroupingOptions.none;
 }
 
 

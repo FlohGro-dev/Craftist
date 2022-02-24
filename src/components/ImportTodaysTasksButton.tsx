@@ -7,56 +7,7 @@ import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import { useRecoilValue } from "recoil";
-
-
-
-// interface NestedTask {
-//   task: TodoistWrapper.todoistTaskType;
-//   //  subtasks: NestedTask[]
-//   children?: NestedTask[];
-// }
-//
-//
-// function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask | undefined {
-//   if (nestedTask.task.id == parentTaskId) {
-//     return nestedTask;
-//   } else if (nestedTask.children != undefined) {
-//     let result = undefined;
-//     for (let i = 0; result == undefined && i < nestedTask.children.length; i++) {
-//       result = getParentTask(nestedTask.children[i], parentTaskId);
-//     }
-//     return result;
-//   }
-//   return undefined
-// }
-//
-//
-// function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number) {
-//   let blocksToAdd: CraftBlockInsert[] = [];
-//
-//   tasks.forEach((curTask) => {
-//     let mdContent = craft.markdown.markdownToCraftBlocks("- [ ] " + curTask.task.content);
-//
-//     mdContent.forEach((block) => {
-//       block.indentationLevel = indentationLevel;
-//     })
-//
-//
-//     blocksToAdd = blocksToAdd.concat(mdContent);
-//
-//     if (curTask.children != undefined) {
-//       blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1));
-//     }
-//     // indentationLevel = indentationLevel + 1;
-//
-//   })
-//
-//   return blocksToAdd;
-//
-// }
-
-
-
+import { getSettingsGroupTodaysTasksOption } from "../settingsUtils";
 
 const ImportTodaysTasksButton: React.FC = () => {
   const toast = useToast();
@@ -72,7 +23,9 @@ const ImportTodaysTasksButton: React.FC = () => {
     try{
     const todaysTasks = await getTodaysTasks();
 
-    blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, TodoistWrapper.taskGroupingOptions.projectAndSection, TodoistWrapper.tasksSortByOptions.priority))
+    let taskGroupingSettings = await getSettingsGroupTodaysTasksOption();
+
+    blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, todaysTasks, true, existingTaskIds, taskGroupingSettings, TodoistWrapper.tasksSortByOptions.priority))
 
     craft.dataApi.addBlocks(blocksToAdd);
     setIsLoading(false);

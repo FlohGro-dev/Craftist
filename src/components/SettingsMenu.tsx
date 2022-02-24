@@ -1,53 +1,66 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
 import { SettingsIcon } from "@chakra-ui/icons";
-import { Box, Center, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, useToast } from "@chakra-ui/react";
-import { setSettingsDueDateUsage, setSettingsMobileUrlUsage, setSettingsWebUrlUsage } from "../settingsUtils";
+import { Box, Center, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuItemOption, MenuList, MenuOptionGroup, useToast } from "@chakra-ui/react";
+import { setSettingsDueDateUsage, setSettingsGroupTodaysTasksOption, setSettingsMobileUrlUsage, setSettingsWebUrlUsage } from "../settingsUtils";
 
 const SettingsMenu: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
-  const onClick = async (value: string) => {
-    let toastText = ""
 
-    switch (value) {
-      case "enableMobileUrls":
-        await setSettingsMobileUrlUsage(true);
-        toastText = "enabled mobile urls"
-        break;
-      case "disableMobileUrls":
-        await setSettingsMobileUrlUsage(false);
-        toastText = "disabled mobile urls"
-        break;
-      case "enableWebUrls":
-        await setSettingsWebUrlUsage(true);
-        toastText = "enabled web urls"
-        break;
-      case "disableWebUrls":
-        await setSettingsWebUrlUsage(false);
-        toastText = "disabled web urls"
-        break;
-      case "enableDueDates":
-        await setSettingsDueDateUsage(true);
-        toastText = "enabled due dates"
-        break;
-      case "disableDueDates":
-        await setSettingsDueDateUsage(false);
-        toastText = "disabled due dates"
-        break;
+  const onChangeLinks = async (value: string | string[]) => {
+
+    switch(value){
+      case 'webAndMobile': await setSettingsMobileUrlUsage(true); await setSettingsWebUrlUsage(true); break;
+      case 'webOnly': await setSettingsMobileUrlUsage(false); await setSettingsWebUrlUsage(true); break;
+      case 'mobileOnly': await setSettingsMobileUrlUsage(true); await setSettingsWebUrlUsage(false); break;
+      case 'none': await setSettingsMobileUrlUsage(false); await setSettingsWebUrlUsage(false); break;
     }
-
     toast({
       position: "bottom",
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            {toastText}
+            Task Links set to {value}
           </Box>
         </Center>
       ),
     })
   }
+
+  const onChangeDueDates = async (value: string | string[]) => {
+    if (value.toString() == "enabled") {
+      await setSettingsDueDateUsage(true);
+    } else {
+      await setSettingsDueDateUsage(false);
+    }
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Due dates {value}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+
+  const onChangeTodayGrouping = async (value: string | string[]) => {
+    await setSettingsGroupTodaysTasksOption(value.toString());
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Grouping for Today Tasks changed to: {value}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
   return (
     <Menu closeOnSelect={false} >
       {({ isOpen }) => (
@@ -62,25 +75,30 @@ const SettingsMenu: React.FC = () => {
             {isOpen ? 'Close Settings' : 'Settings'}
           </MenuButton >
           <MenuList>
-            <MenuGroup title='Mobile Links'>
-              <MenuItem value='enableMobileUrls' onClick={() => onClick("enableMobileUrls")}>Enable Mobile Links</MenuItem>
-              <MenuItem value='disableMobileUrls' onClick={() => onClick("disableMobileUrls")}>Disable Mobile Links</MenuItem>
-            </MenuGroup>
+            <MenuOptionGroup defaultValue='webAndMobile' title='Task Links' type='radio' onChange={(value) => onChangeLinks(value)}>
+              <MenuItemOption value='webAndMobile'>Web and Mobile links</MenuItemOption>
+              <MenuItemOption value='webOnly'>only Weblinks</MenuItemOption>
+              <MenuItemOption value='mobileOnly'>only Mobile links</MenuItemOption>
+              <MenuItemOption value='none'>no links (not recommended)</MenuItemOption>
+            </MenuOptionGroup>
             <MenuDivider />
-            <MenuGroup title='Webview Links'>
-              <MenuItem value='enableWebUrls' onClick={() => onClick("enableWebUrls")}>Enable Webview Links</MenuItem>
-              <MenuItem value='disableWebUrls' onClick={() => onClick("disableWebUrls")}>Disable Webview Links</MenuItem>
-            </MenuGroup>
             <MenuDivider />
-            <MenuGroup title='Due Dates'>
-              <MenuItem value='enableDueDates' onClick={() => onClick("enableDueDates")}>Enable Due Dates</MenuItem>
-              <MenuItem value='disableDueDates' onClick={() => onClick("disableDueDates")}>Disable Due Dates</MenuItem>
-            </MenuGroup>
+            <MenuOptionGroup defaultValue='enabled' title='Import Due Dates' type='radio' onChange={(value) => onChangeDueDates(value)}>
+              <MenuItemOption value='enabled'>enabled</MenuItemOption>
+              <MenuItemOption value='disabled'>disabled</MenuItemOption>
+            </MenuOptionGroup>
+            <MenuDivider />
+            <MenuOptionGroup defaultValue='none' title='Task Grouping for Import Todays Tasks' type='radio' onChange={(value) => onChangeTodayGrouping(value)}>
+              <MenuItemOption value='none'>no grouping</MenuItemOption>
+              <MenuItemOption value='projectAndSection'>group by project and section</MenuItemOption>
+              <MenuItemOption value='projectOnly'>group by project</MenuItemOption>
+              <MenuItemOption value='sectionOnly'>group by section</MenuItemOption>
+            </MenuOptionGroup>
           </MenuList>
         </>
       )}
     </Menu>
   );
 }
-
+//<MenuItemOption value='byLabel'>group by label</MenuItemOption>
 export default SettingsMenu;
