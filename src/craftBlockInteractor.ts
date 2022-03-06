@@ -1,4 +1,4 @@
-import { CraftBlock, CraftTextBlock, CraftTextRun, CraftTextBlockInsert, IndexLocation, AfterBlockLocation } from "@craftdocs/craft-extension-api";
+import { CraftTextBlock, CraftTextRun, CraftTextBlockInsert, AfterBlockLocation } from "@craftdocs/craft-extension-api";
 
 export async function getAllTodoItemsFromCurrentPage() {
   let todoBlocks: CraftTextBlock[] = [];
@@ -318,7 +318,19 @@ if (currentSelection.status !== "success") {
   }
 }
 
-export function getParentDocumentMdLinkOfBlock(block: CraftBlock) {
-  // to be implemented
-  return ""
+export function getIsoDateIfCurrentDocumentIsDailyNote(pageBlock:CraftTextBlock):string | undefined{
+
+  let firstBlockText = pageBlock.content[0].text
+
+
+  const regex = /(\d{4}).(\d{2}).(\d{2})$/gm;
+
+  if(firstBlockText.match(regex)){
+    const subst = `$1-$2-$3`;
+    // create iso Date from craft date format
+    const isoDate = firstBlockText.replace(regex, subst);
+    return isoDate;
+  } else {
+    return undefined
+  }
 }

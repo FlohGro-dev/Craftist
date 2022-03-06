@@ -4,7 +4,7 @@ import { UpDownIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
-import { CraftBlockInsert, CraftTextBlock } from "@craftdocs/craft-extension-api";
+import { CraftTextBlock } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
 import { isAnyTaskLinkEnabled, taskMetadataSettingsValues } from "../settingsUtils";
 import { useRecoilValue } from "recoil";
@@ -37,7 +37,6 @@ const SyncTaskStatesButton: React.FC = () => {
       })
       return;
     }
-
 
     let todoBlocks = await CraftBlockInteractor.getAllTodoItemsFromCurrentPage();
 
@@ -100,9 +99,9 @@ const SyncTaskStatesButton: React.FC = () => {
                 // its a recurring task - not easy to handle since currently no metadata can be attached
                 // ignore for now - workaround in planning
                 syncState = false;
-                if(taskMetadataSettingsValues.includes("dueDates")){
+                if (taskMetadataSettingsValues.includes("dueDates")) {
                   // if due dates are imported as metadata enable it since the due date will be updated in the sync
-                    syncState = true;
+                  syncState = true;
                 }
               } else {
                 // sync the state normally
@@ -152,18 +151,18 @@ const SyncTaskStatesButton: React.FC = () => {
               }
 
 
-            }).finally(async function(){
+            }).finally(async function() {
               // SYNC METADATA:
-              setTimeout(async function(){
-                  getTask({taskId: Number(taskId)})
-                    .catch(function(){
-                      // task is not retrievable - was marked as done in Todoist
-                    })
-                    .then(async function (task){
-                      if(task){
+              setTimeout(async function() {
+                getTask({ taskId: Number(taskId) })
+                  .catch(function() {
+                    // task is not retrievable - was marked as done in Todoist
+                  })
+                  .then(async function(task) {
+                    if (task) {
 
                       let prefix = "- [ ] "
-                      if(task.completed){
+                      if (task.completed) {
                         prefix = "- [x] "
                       }
 
@@ -171,25 +170,19 @@ const SyncTaskStatesButton: React.FC = () => {
 
                       let newBlock = craft.markdown.markdownToCraftBlocks(newContent);
                       const getPageResult = await craft.dataApi.getCurrentPage();
-                      if(getPageResult.status != "success"){
+                      if (getPageResult.status != "success") {
                         throw new Error("get page failed")
                       }
                       // prevent readding task as open since somehow the craft api doesn't render the done checkbox correct.
-                      if(!task.completed){
+                      if (!task.completed) {
                         const blockLocation = craft.location.afterBlockLocation(getPageResult.data.id, block.id);
-                        await craft.dataApi.addBlocks(newBlock,blockLocation);
+                        await craft.dataApi.addBlocks(newBlock, blockLocation);
                         await craft.dataApi.deleteBlocks([block.id]);
                       }
                     }
-                    })
+                  })
               }, 1000);
             })
-
-
-
-
-
-
 
         } else {
           // nothing to be done - task is not crosslinked between todoist and craft (maybe link it right now?)

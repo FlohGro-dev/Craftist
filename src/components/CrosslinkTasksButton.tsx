@@ -6,6 +6,7 @@ import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
 import { CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
+import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
 
 const CrosslinkTasksButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
@@ -74,6 +75,12 @@ const CrosslinkTasksButton: React.FC = () => {
 
     const pageBlock = getPageResult.data
 
+    let documentDate:string | undefined = undefined;
+
+    if(taskSetDueDatesBasedOnDailyNote == "enabled"){
+      documentDate = CraftBlockInteractor.getIsoDateIfCurrentDocumentIsDailyNote(pageBlock);
+    }
+
     let openTasks = CraftBlockInteractor.getUncheckedTodoItemsFromCurrentPage();
     openTasks.then((blocks) => {
       if (!blocks.length) {
@@ -108,7 +115,8 @@ const CrosslinkTasksButton: React.FC = () => {
             add({
               description: documentTitle,
               content: mdLink,
-              projectId: linkedProjectId
+              projectId: linkedProjectId,
+              due_date: documentDate
             })
               .then(async function(task) {
                 // append task link to block
