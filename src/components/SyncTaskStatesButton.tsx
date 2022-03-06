@@ -21,7 +21,7 @@ const SyncTaskStatesButton: React.FC = () => {
   const onClick = async () => {
     setIsLoading(true);
     // if no task links are enabled, return immediately and display a warning
-    const taskLinkEnabled: boolean = await isAnyTaskLinkEnabled();
+    const taskLinkEnabled: boolean = isAnyTaskLinkEnabled();
     if (!taskLinkEnabled) {
       setIsLoading(false);
       toast({

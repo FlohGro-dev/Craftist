@@ -1,7 +1,7 @@
 import * as Recoil from "recoil";
 import { TodoistApi, Project, Task, Section, Label } from "@doist/todoist-api-typescript";
 import { CraftBlockInsert, CraftTextRun } from "@craftdocs/craft-extension-api";
-import { getSettingsDescriptionUsage, getSettingsDueDateUsage, getSettingsLabelsUsage, getSettingsMobileUrlUsage, getSettingsWebUrlUsage, taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
+import { taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
 
 
 export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
@@ -309,7 +309,7 @@ function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask
 }
 
 
-function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, sortBy: tasksSortByOptions = tasksSortByOptions.order, includeAppUrl = true, includeWebUrl = true, includeDueDates = true, includeLabels = true, includeDescriptions = true, labelsList: Label[]) {
+function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, sortBy: tasksSortByOptions = tasksSortByOptions.order, labelsList: Label[]) {
   let blocksToAdd: CraftBlockInsert[] = [];
 
 
@@ -340,7 +340,7 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
 
     if (curTask.children != undefined) {
-      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1, sortBy, includeAppUrl, includeWebUrl, includeDueDates, includeLabels, includeDescriptions, labelsList));
+      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1, sortBy, labelsList));
     }
 
   })
@@ -360,7 +360,8 @@ export enum taskGroupingOptions {
   projectOnly,
   sectionOnly,
   label,
-  none
+  none,
+  error
 }
 
 export function createProjectMdString(project: Project, mdPrefix: string = "+ "): string {
@@ -423,44 +424,44 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
 
   let blocksToAdd: CraftBlockInsert[] = [];
 
-  // get settings for link usage in task / project Links
-  let useMobileUrls: boolean;
-  let useWebUrls: boolean;
-  let useDueDates: boolean;
-  let useLabels: boolean;
-  let useDescriptions: boolean;
-
-  let mobileUrlSettings = await getSettingsMobileUrlUsage();
-  let webUrlSettings = await getSettingsWebUrlUsage();
-  let dueDatesSettings = await getSettingsDueDateUsage();
-  let labelsSettings = await getSettingsLabelsUsage();
-  let descriptionSettings = await getSettingsDescriptionUsage();
-
-  if (mobileUrlSettings == "true" || mobileUrlSettings == "error") {
-    useMobileUrls = true;
-  } else {
-    useMobileUrls = false;
-  }
-  if (webUrlSettings == "true" || webUrlSettings == "error") {
-    useWebUrls = true;
-  } else {
-    useWebUrls = false;
-  }
-  if (dueDatesSettings == "true" || dueDatesSettings == "error") {
-    useDueDates = true;
-  } else {
-    useDueDates = false;
-  }
-  if (labelsSettings == "true" || labelsSettings == "error") {
-    useLabels = true;
-  } else {
-    useLabels = false;
-  }
-  if (descriptionSettings == "true" || descriptionSettings == "error") {
-    useDescriptions = true;
-  } else {
-    useDescriptions = false;
-  }
+  // // get settings for link usage in task / project Links
+  // let useMobileUrls: boolean;
+  // let useWebUrls: boolean;
+  // let useDueDates: boolean;
+  // let useLabels: boolean;
+  // let useDescriptions: boolean;
+  //
+  // let mobileUrlSettings = await getSettingsMobileUrlUsage();
+  // let webUrlSettings = await getSettingsWebUrlUsage();
+  // let dueDatesSettings = await getSettingsDueDateUsage();
+  // let labelsSettings = await getSettingsLabelsUsage();
+  // let descriptionSettings = await getSettingsDescriptionUsage();
+  //
+  // if (mobileUrlSettings == "true" || mobileUrlSettings == "error") {
+  //   useMobileUrls = true;
+  // } else {
+  //   useMobileUrls = false;
+  // }
+  // if (webUrlSettings == "true" || webUrlSettings == "error") {
+  //   useWebUrls = true;
+  // } else {
+  //   useWebUrls = false;
+  // }
+  // if (dueDatesSettings == "true" || dueDatesSettings == "error") {
+  //   useDueDates = true;
+  // } else {
+  //   useDueDates = false;
+  // }
+  // if (labelsSettings == "true" || labelsSettings == "error") {
+  //   useLabels = true;
+  // } else {
+  //   useLabels = false;
+  // }
+  // if (descriptionSettings == "true" || descriptionSettings == "error") {
+  //   useDescriptions = true;
+  // } else {
+  //   useDescriptions = false;
+  // }
 
 
   let nestedTasks: NestedTask[] = [];
@@ -617,7 +618,7 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
         blockIndentLevel = 1;
       }
       curProSecTaskNest.tasks.map(curTask => {
-        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, useMobileUrls, useWebUrls, useDueDates, useLabels, useDescriptions, labels))
+        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, labels))
       })
     }
     // now we need to loop through all sections of that project and add the tasks of these sections
@@ -648,7 +649,7 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
             blockIndentLevel = 1;
           }
           curSecTaskNest.tasks.map(curTask => {
-            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, useMobileUrls, useWebUrls, useDueDates, useLabels, useDescriptions, labels))
+            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, labels))
           })
         }
       })
@@ -712,8 +713,6 @@ export function getTaskMetadataInMarkdownFormat(task:Task, labelsList: Label[]):
       if (taskMetadataSettingsValues.includes("description")) {
         if (task.description.length > 0) {
           mdString = mdString + " description: *" + task.description + "*";
-        } else {
-          mdString = mdString + " description length 0: *" + task.description + "*";
         }
       }
   }
