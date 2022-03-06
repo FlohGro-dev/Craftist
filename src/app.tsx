@@ -10,6 +10,7 @@ import { Skeleton } from "@chakra-ui/skeleton";
 import { CraftEnv } from "./types"
 import { DevicePlatform } from "@craftdocs/craft-extension-api";
 import { readStoredApiTokenToVariable, } from "./todoistApiWrapper";
+import { writeDefaultSettings } from "./settingsUtils";
 // import craftXIconSrc from "./craftx-icon.png"
 // import { TodoistApi } from '@doist/todoist-api-typescript'
 // import { CraftBlockInsert, CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
@@ -96,6 +97,7 @@ const App: React.FC = () => {
   const craftEnv = useCraftEnv();
   const readTokenIntoVar = readStoredApiTokenToVariable();
   readTokenIntoVar();
+  writeDefaultSettings();
 
   React.useEffect(() => {
     if (craftEnv.isDarkMode) {

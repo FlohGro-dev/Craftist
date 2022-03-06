@@ -5,6 +5,6 @@
   "author" : "FlohGro",
   "author-email" : "hi@flohgro.com",
   "description" : "Todoist Integration for Craft",
-  "api": "0.1.0",
+  "api": "0.0.4",
   "main": "index.html"
 }

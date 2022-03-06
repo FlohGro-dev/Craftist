@@ -39,7 +39,7 @@ const ImportProjectListButton: React.FC = () => {
       projects = projects.sort((a, b) => ((a.order ?? 0) < (b.order ?? 0) ? -1 : 1));
       projects.map((project) => {
 
-        let mdContent = craft.markdown.markdownToCraftBlocks(TodoistWrapper.createProjectMdString(project, "- ", useMobileUrls, useWebUrls));
+        let mdContent = craft.markdown.markdownToCraftBlocks(TodoistWrapper.createProjectMdString(project, "- "));
         blocksToAdd = blocksToAdd.concat(mdContent);
       })
         craft.dataApi.addBlocks(blocksToAdd);

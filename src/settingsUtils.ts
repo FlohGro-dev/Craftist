@@ -2,14 +2,49 @@
 
 import { taskGroupingOptions } from "./todoistApiWrapper";
 
+
+export let taskMetadataSettingsValues:string[] = [];
+export let taskLinkSettingsValues:string[] = ["web","mobile"];
+export let taskGroupingTodayValues:string[] = ["sections","projects"];
+export let taskGroupingProjectValues:string[] = ["sections"];
+export let taskGroupingAllValues:string[] = ["sections","projects"];
+
+// const taskMetadataSettingsDefaultValues:string[] = [];
+// const taskLinkSettingsDefaultValues:string[] = ["web","mobile"];
+// const taskGroupingTodayDefaultValues:string[] = ["sections","projects"];
+// const taskGroupingProjectDefaultValues:string[] = ["sections"];
+// const taskGroupingAllDefaultValues:string[] = ["sections","projects"];
+
 const useSettingsLinkTypeMobileAppKey:string = "SettingsLinkTypeMobileAppKey"
 const useSettingsLinkTypeWebKey:string = "useSettingsLinkTypeWebKey"
 
 export async function setSettingsMobileUrlUsage(useMobileUrls:boolean){
+  const settingsString = "mobile"
+  const index = taskLinkSettingsValues.indexOf(settingsString, 0);
+  if(useMobileUrls){
+    if (index == -1) {
+    taskLinkSettingsValues.push(settingsString)
+  }
+  } else {
+    if (index > -1) {
+      taskLinkSettingsValues.splice(index, 1);
+    }
+  }
   await craft.storageApi.put(useSettingsLinkTypeMobileAppKey,String(useMobileUrls));
 }
 
 export async function setSettingsWebUrlUsage(useWebUrls:boolean){
+  const settingsString = "web"
+  const index = taskLinkSettingsValues.indexOf(settingsString, 0);
+  if(useWebUrls){
+    if (index == -1) {
+    taskLinkSettingsValues.push(settingsString)
+  }
+  } else {
+    if (index > -1) {
+      taskLinkSettingsValues.splice(index, 1);
+    }
+  }
   await craft.storageApi.put(useSettingsLinkTypeWebKey,String(useWebUrls));
 }
 
@@ -31,10 +66,46 @@ export async function getSettingsWebUrlUsage():Promise<string>{
   }
 }
 
+export async function isAnyTaskLinkEnabled():Promise<boolean>{
+  let webUrlSettings = await getSettingsWebUrlUsage();
+  let mobileUrlSettings = await getSettingsMobileUrlUsage();
+  let useMobileUrls: boolean;
+  let useWebUrls: boolean;
+  if (mobileUrlSettings == "true" || mobileUrlSettings == "error") {
+    useMobileUrls = true;
+  } else {
+    useMobileUrls = false;
+  }
+  if (webUrlSettings == "true" || webUrlSettings == "error") {
+    useWebUrls = true;
+  } else {
+    useWebUrls = false;
+  }
+
+  if(useWebUrls == false && useMobileUrls == false){
+    return false;
+  } else {
+    return true;
+  }
+
+
+}
+
 // due Dates
 const useSettingsDueDatesEnabledKey:string = "useSettingsDueDatesKey"
 
 export async function setSettingsDueDateUsage(useDueDates:boolean){
+  const settingsString = "dueDates"
+  const index = taskMetadataSettingsValues.indexOf(settingsString, 0);
+  if(useDueDates){
+    if (index == -1) {
+    taskMetadataSettingsValues.push(settingsString)
+  }
+  } else {
+    if (index > -1) {
+      taskMetadataSettingsValues.splice(index, 1);
+    }
+  }
   await craft.storageApi.put(useSettingsDueDatesEnabledKey,String(useDueDates));
 }
 
@@ -42,6 +113,60 @@ export async function getSettingsDueDateUsage():Promise<string>{
   let dueDatesEnabled = await craft.storageApi.get(useSettingsDueDatesEnabledKey);
   if(dueDatesEnabled.status == "success"){
     return dueDatesEnabled.data
+  } else {
+    return "error"
+  }
+}
+
+// labels
+const useSettingsLabelsEnabledKey:string = "useSettingsLabelsKey"
+
+export async function setSettingsLabelsUsage(useLabels:boolean){
+  const settingsString = "labels"
+  const index = taskMetadataSettingsValues.indexOf(settingsString, 0);
+  if(useLabels){
+    if (index == -1) {
+    taskMetadataSettingsValues.push(settingsString)
+  }
+  } else {
+    if (index > -1) {
+      taskMetadataSettingsValues.splice(index, 1);
+    }
+  }
+  await craft.storageApi.put(useSettingsLabelsEnabledKey,String(useLabels));
+}
+
+export async function getSettingsLabelsUsage():Promise<string>{
+  let labelsEnabled = await craft.storageApi.get(useSettingsLabelsEnabledKey);
+  if(labelsEnabled.status == "success"){
+    return labelsEnabled.data
+  } else {
+    return "error"
+  }
+}
+
+// descriptions
+const useSettingsDescriptionEnabledKey:string = "useSettingsDescriptionKey"
+
+export async function setSettingsDescriptionUsage(useDescriptions:boolean){
+  const settingsString = "description"
+  const index = taskMetadataSettingsValues.indexOf(settingsString, 0);
+  if(useDescriptions){
+    if (index == -1) {
+    taskMetadataSettingsValues.push(settingsString)
+  }
+  } else {
+    if (index > -1) {
+      taskMetadataSettingsValues.splice(index, 1);
+    }
+  }
+  await craft.storageApi.put(useSettingsDescriptionEnabledKey,String(useDescriptions));
+}
+
+export async function getSettingsDescriptionUsage():Promise<string>{
+  let descriptionsEnabled = await craft.storageApi.get(useSettingsDescriptionEnabledKey);
+  if(descriptionsEnabled.status == "success"){
+    return descriptionsEnabled.data
   } else {
     return "error"
   }
@@ -67,7 +192,7 @@ export async function getSettingsGroupTodaysTasksOption():Promise<taskGroupingOp
   } else {
     return taskGroupingOptions.none;
   }
-  // retrun to prevent errors.
+  // return to prevent errors.
   return taskGroupingOptions.none;
 }
 
@@ -91,7 +216,7 @@ export async function getSettingsGroupProjectTasksOption():Promise<taskGroupingO
   } else {
     return taskGroupingOptions.none;
   }
-  // retrun to prevent errors.
+  // return to prevent errors.
   return taskGroupingOptions.none;
 }
 
@@ -115,85 +240,57 @@ export async function getSettingsGroupAllTasksOption():Promise<taskGroupingOptio
   } else {
     return taskGroupingOptions.none;
   }
-  // retrun to prevent errors.
+  // return to prevent errors.
   return taskGroupingOptions.none;
 }
 
-export const writeDefaultSettings = () => {
-  setSettingsGroupAllTasksOption("projectAndSection");
-  setSettingsGroupProjectTasksOption("sectionOnly");
-  setSettingsGroupTodaysTasksOption("projectAndSection")
+async function checkIfSettingExists(key:string):Promise<boolean>{
+  let getSettingResult = await craft.storageApi.get(key);
+  if(getSettingResult.status == "success"){
+    return true
+  } else {
+    return false
+  }
 }
 
-// export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
-//
-// const globalScopeClient: { current?: TodoistApi } = { current: undefined };
-//
-// export const apiToken = Recoil.atom({
-//   key: "todoistApiToken",
-//   default: "",
-// });
-//
-// export const client = Recoil.atom<TodoistApi | undefined>({
-//   key: "client",
-//   default: Recoil.selector({
-//     key: "client:default",
-//     get: ({ get }) => {
-//       const token = get(apiToken);
-//       if (token) {
-//         globalScopeClient.current = new TodoistApi(token);
-//         return globalScopeClient.current;
-//       }
-//       return undefined;
-//     },
-//   }),
-//   effects_UNSTABLE: [
-//     ({ onSet }) => {
-//       onSet((newValue) => {
-//         globalScopeClient.current = newValue;
-//       });
-//     },
-//   ],
-// });
-//
-// export const useLoginCallback = () =>
-//   Recoil.useRecoilCallback(({ set }) => {
-//     return async (token: string) => {
-//       let cli = new TodoistApi(token);
-//       return cli.getProjects().then(async () => {
-//         set(apiToken, token);
-//         set(client, cli);
-//         await craft.storageApi.put(API_TOKEN_KEY, token);
-//         window.localStorage.setItem(API_TOKEN_KEY, token);
-//       });
-//     };
-//   });
-//
-// export const useLogoutCallback = () =>
-//   Recoil.useRecoilCallback(({ reset }) => {
-//     return async () => {
-//       //        reset(projects);
-//       reset(apiToken);
-//       reset(client);
-//       await craft.storageApi.delete(API_TOKEN_KEY);
-//       window.localStorage.removeItem(API_TOKEN_KEY);
-//     };
-//   });
-//
-// export const useAddTask = () => {
-//   return Recoil.useRecoilCallback(({ snapshot }) => {
-//     return async (params: {
-//       projectId?: number;
-//       content: string;
-//       description?: string;
-//     }) => {
-//       const cli = await snapshot.getPromise(client);
-//       if (!cli) {
-//         throw new Error("No client");
-//       }
-//       const resp = await cli.addTask(params);
-//       //set(taskFamily(resp.id), resp);
-//       return resp;
-//     };
-//   });
-// };
+export const writeDefaultSettings = async () => {
+  // shall only write defaults if no settings are present.
+  let mobileUrlSettings = await getSettingsMobileUrlUsage();
+  let webUrlSettings = await getSettingsWebUrlUsage();
+  let dueDatesSettings = await getSettingsDueDateUsage();
+  let labelsSettings = await getSettingsLabelsUsage();
+  let descriptionSettings = await getSettingsDescriptionUsage();
+
+  if (mobileUrlSettings == "error"){
+    // write default
+    setSettingsMobileUrlUsage(true);
+  }
+  if (webUrlSettings == "error"){
+    // write default
+    setSettingsWebUrlUsage(true);
+  }
+  if (dueDatesSettings == "error"){
+    // write default
+    setSettingsDueDateUsage(true);
+  }
+  if (labelsSettings == "error"){
+    // write default
+    setSettingsLabelsUsage(true);
+  }
+  if (descriptionSettings == "error"){
+    // write default
+    setSettingsDescriptionUsage(false);
+  }
+  if (!checkIfSettingExists(useSettingsGroupTodaysTasksOption)){
+    // write default
+    setSettingsGroupTodaysTasksOption("projectAndSection");
+  }
+  if (!checkIfSettingExists(useSettingsGroupProjectTasksOption)){
+    // write default
+    setSettingsGroupProjectTasksOption("sectionOnly");
+  }
+  if (!checkIfSettingExists(useSettingsGroupAllTasksOption)){
+    // write default
+    setSettingsGroupAllTasksOption("projectAndSection");
+  }
+}

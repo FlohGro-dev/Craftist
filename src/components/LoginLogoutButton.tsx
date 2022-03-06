@@ -104,17 +104,6 @@ const LoginLogoutButton: React.FC = () => {
         </ModalContent>
       </Modal>
     </>
-    // <Button
-    //   rightIcon={<ArrowForwardIcon />}
-    //   colorScheme='gray'
-    //   variant='solid'
-    //   onClick={onClick}
-    //   width="100%"
-    //   mb="2"
-    //   isLoading={isLoading}
-    // >
-    //   Logout
-    //   </Button>
   );
 }
 

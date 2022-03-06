@@ -276,7 +276,21 @@ export async function getCurrentTodoistTaskIdsOfTasksOnPage() {
 
   return taskIds;
 }
+const todoistTaskLinkMobileUrl = "todoist://task?id="
+const todoistTaskLinkWebUrl = "https://todoist.com/showTask?id="
 
+export function getTodoistTaskIdFromBlock(block: CraftTextBlock):string | undefined{
+  let blockUrls = getExternalUrlsFromBlock(block);
+
+  for (let url of blockUrls) {
+    if (url.includes(todoistTaskLinkMobileUrl)) {
+      return url.replace(todoistTaskLinkMobileUrl, "");
+    } else if (url.includes(todoistTaskLinkWebUrl)) {
+      return url.replace(todoistTaskLinkWebUrl, "");
+    }
+  }
+  return undefined
+}
 
 export function getParentDocumentMdLinkOfBlock(block: CraftBlock) {
   // to be implemented
