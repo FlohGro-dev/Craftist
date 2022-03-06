@@ -1,6 +1,6 @@
 import * as Recoil from "recoil";
 import { TodoistApi, Project, Task, Section, Label } from "@doist/todoist-api-typescript";
-import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
+import { CraftBlockInsert, CraftTextRun } from "@craftdocs/craft-extension-api";
 import { getSettingsDescriptionUsage, getSettingsDueDateUsage, getSettingsLabelsUsage, getSettingsMobileUrlUsage, getSettingsWebUrlUsage, taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
 
 
@@ -715,6 +715,60 @@ export function getTaskMetadataInMarkdownFormat(task:Task, labelsList: Label[]):
   }
 
   return mdString;
+}
 
+export function createBlockTextRunFromTask(task:Task):CraftTextRun[]{
+  let result:CraftTextRun[] = []
 
+  // cleanup task content (link to craft block should be removed)
+  const regex = /\[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
+  const subst = `$1`;
+
+  // The substituted value will be contained in the result variable
+  const strippedTaskContent = task.content.replace(regex, subst);
+  if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+    // both urls requested, need to separate them
+    result = [
+    {
+      text: strippedTaskContent + " "
+    },
+    {
+      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+    },
+    {
+      text: " "
+    },
+    {
+      text: "(Weblink)", link: { type: "url", url: task.url }
+    }
+    ]
+  } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+    // only App Url shall be included, just add it as direct url on the task name
+    result = [
+    {
+      text: strippedTaskContent + " "
+    },
+    {
+      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+    }
+    ]
+  } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+    // only Web Url shall be included, just add it as direct url on the task name
+    result = [
+    {
+      text: strippedTaskContent + " "
+    },
+    {
+      text: "Todoist Task", link: { type: "url", url: task.url }
+    }
+    ]
+  } else {
+    // no url shall be included just add the name
+    result = [
+    {
+      text: strippedTaskContent
+    }
+    ]
+  }
+  return result;
 }

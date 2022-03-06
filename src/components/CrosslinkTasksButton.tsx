@@ -112,22 +112,19 @@ const CrosslinkTasksButton: React.FC = () => {
             })
               .then(async function(task) {
                 // append task link to block
-                let blockToAppend: CraftTextRun[] = [
-                  {
-                    text: " "
-                  },
-                  {
-                    text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-                  },
-                  {
-                    text: " "
-                  },
-                  {
-                    text: "Weblink", link: { type: "url", url: task.url }
-                  }
+                let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task)
+                block.content = blockToAppend;
+                //block.listStyle.type = "todo";
+                block.listStyle = {
+                  type: "todo",
+                  state: "unchecked"
+                };
+                const result = await craft.dataApi.updateBlocks([block])
+                if (result.status !== "success") {
+                  throw new Error(result.message)
+                } else {
 
-                ];
-                CraftBlockInteractor.appendCraftTextRunToBlock(blockToAppend, block);
+                }
               })
               .catch(() => {
                 //ERROR
