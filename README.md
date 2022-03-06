@@ -111,7 +111,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
 
-### v0.6
+### v0.6 (unreleased)
 
 - **new/improved:** sync task improvements - recurring tasks are now enabled if due dates are included as metadata
 - **new:** metadata import - imported and synced tasks will now contain metadata from todoist (due dates, labels and descriptions) which you can enable / disable as you like
