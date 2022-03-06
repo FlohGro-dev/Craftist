@@ -127,6 +127,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **new:** option to set due dates for exported tasks to date of the daily notes (enabled by default)
 - **change:** craftdocs://open[..] urls (resulting from crosslinking) will be stripped from task contents since they don't work and just produce clutter.
 
+
 ### v0.5
 
 - **new/fixed:** **Craftist is now working in the web version of Craft**

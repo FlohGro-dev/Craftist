@@ -408,6 +408,7 @@ export function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", labe
     // only App Url shall be included, just add it as direct url on the project name
     mdString = mdString + strippedTaskContent + " [Todoist Task](todoist://task?id=" + task.id + ")";
   } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+
     // only Web Url shall be included, just add it as direct url on the project name
     mdString = mdString + strippedTaskContent + " [Todoist Task](" + task.url + ")";
   } else {

@@ -1,7 +1,6 @@
 
 import { taskGroupingOptions } from "./todoistApiWrapper";
 
-
 export let taskMetadataSettingsValues: string[] = [];
 export let taskLinkSettingsValues: string[] = [];
 export let taskGroupingTodayValues: string[] = [];
@@ -9,6 +8,7 @@ export let taskGroupingProjectValues: string[] = [];
 export let taskGroupingAllValues: string[] = [];
 export let taskImportAfterSelectedBlock: string = "";
 export let taskSetDueDatesBasedOnDailyNote: string = "";
+
 
 // const taskMetadataSettingsDefaultValues:string[] = [];
 // const taskLinkSettingsDefaultValues:string[] = ["web","mobile"];
@@ -503,7 +503,9 @@ export async function getSettingsGroupAllTasksOption(): Promise<taskGroupingOpti
 }
 
 // import task location
+
 const useSettingsImportAfterSelectedBlockOption: string = "useSettingsImportAfterSelectedBlockOptionKey"
+
 
 export async function setSettingsImportAfterSelectedBlockOption(enabled: boolean) {
   if (enabled) {
@@ -547,6 +549,30 @@ export async function getSettingsSetDueDateBasedOnDailyNoteOption(): Promise<str
     return "error"
   }
 }
+
+// set due dates based on daily notes settings
+
+//taskSetDueDatesBasedOnDailyNote
+const useSettingsSetDueDateBasedOnDailyNoteOption:string = "useSettingsSetDueDateBasedOnDailyNoteOptionKey"
+
+export async function setSettingsSetDueDateBasedOnDailyNoteOption(enabled:boolean){
+  if(enabled){
+      taskSetDueDatesBasedOnDailyNote = "enabled";
+  } else {
+    taskSetDueDatesBasedOnDailyNote = "disabled";
+  }
+  await craft.storageApi.put(useSettingsSetDueDateBasedOnDailyNoteOption,taskSetDueDatesBasedOnDailyNote);
+}
+
+export async function getSettingsSetDueDateBasedOnDailyNoteOption():Promise<string>{
+  let result = await craft.storageApi.get(useSettingsSetDueDateBasedOnDailyNoteOption);
+  if(result.status == "success"){
+    return result.data
+  } else {
+    return "error"
+  }
+}
+
 
 
 
