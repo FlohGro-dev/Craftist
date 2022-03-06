@@ -2,8 +2,9 @@
 
 Welcome to the repository of my Todoist eXtension for Craft.
 Please read through the instructions, especially the [installation](#installation) and [login](#login) chapter.
+Also make sure to check out the latest changes in the [changelog](#changelog) which will contain the latest feature updates
 
-If you have any problems with the current features or you have other feature request, you can open an issue in this repository or contact me on Twitter, the Craft developer forum or in the Craft slack community (search for "FlohGro").
+If you want to follow me for updates or get in touch you can follow me on [Twitter](https://twitter.com/FlohGro) or choose anything else to contact on my [website](https://flohgro.com/contactme/). Feel free to create issues in the repository for bugs you notice or features you'd like to see.
 
 If this eXtension is valuable for and you like to thank me you can
 
@@ -78,9 +79,13 @@ The following features are currently supported by Craftist:
 
 ### Settings
 
-- a small settings menu enables the following adjustable settings to your needs
-  -  the link type(s) which should be created for each task
-  -  if you want to import the due date for each task (if it has one)
+- the settings menu lets you configure the Craftist to your preferences.
+- following settings are possible:
+  - task links: the link type(s) which should be created for each task (attention: if you disable both, syncing task states is no longer possible)
+  - task metadata import: select the metadata which should be imported with your tasks
+  - task grouping: select how tasks should be grouped on import (by project, by section or both); available for all import features
+  - import location: you can decide if you want to import tasks below the current selected block or always at the end of a document
+  - due dates from daily notes: you can choose if created / crosslinked tasks shall receive the due date of the current open daily note (this will not add due dates if you create tasks from other documents)
 
 ## Login
 
@@ -120,6 +125,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **fixed:** creating tasks features now respect link settings
 - **new:** option to import tasks after the current selected block (enabled by default)
 - **new:** option to set due dates for exported tasks to date of the daily notes (enabled by default)
+- **change:** craftdocs://open[..] urls (resulting from crosslinking) will be stripped from task contents since they don't work and just produce clutter.
 
 ### v0.5
 
