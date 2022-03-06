@@ -7,6 +7,7 @@ import { useToast } from "@chakra-ui/toast";
 import { CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
 import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+
 // import { CraftEnv } from "../types"
 //
 // type CreateTasksFromSelectionButtonProperties = {
@@ -63,7 +64,6 @@ const CreateTasksFromSelectionButton: React.FC = () => {
           }
         }
       })
-
 
     // get page for document linking
     const getPageResult = await craft.dataApi.getCurrentPage();

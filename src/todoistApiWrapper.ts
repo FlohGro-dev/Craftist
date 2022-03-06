@@ -1,7 +1,7 @@
 import * as Recoil from "recoil";
 import { TodoistApi, Project, Task, Section, Label } from "@doist/todoist-api-typescript";
 import { CraftBlockInsert, CraftTextRun } from "@craftdocs/craft-extension-api";
-import { getSettingsDescriptionUsage, getSettingsDueDateUsage, getSettingsLabelsUsage, getSettingsMobileUrlUsage, getSettingsWebUrlUsage, taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
+import { taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
 
 
 export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
@@ -309,7 +309,7 @@ function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask
 }
 
 
-function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, sortBy: tasksSortByOptions = tasksSortByOptions.order, includeAppUrl = true, includeWebUrl = true, includeDueDates = true, includeLabels = true, includeDescriptions = true, labelsList: Label[]) {
+function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: number, sortBy: tasksSortByOptions = tasksSortByOptions.order, labelsList: Label[]) {
   let blocksToAdd: CraftBlockInsert[] = [];
 
 
@@ -340,7 +340,7 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
 
     if (curTask.children != undefined) {
-      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1, sortBy, includeAppUrl, includeWebUrl, includeDueDates, includeLabels, includeDescriptions, labelsList));
+      blocksToAdd = blocksToAdd.concat(createBlocksFromNestedTasks(curTask.children, indentationLevel + 1, sortBy, labelsList));
     }
 
   })
@@ -360,7 +360,8 @@ export enum taskGroupingOptions {
   projectOnly,
   sectionOnly,
   label,
-  none
+  none,
+  error
 }
 
 export function createProjectMdString(project: Project, mdPrefix: string = "+ "): string {
@@ -369,10 +370,10 @@ export function createProjectMdString(project: Project, mdPrefix: string = "+ ")
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // both urls requested, need to separate them
     mdString = mdString + "[" + project.name + "](todoist://project?id=" + project.id + ") [(Webview)](" + project.url + ")"
-  } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // only App Url shall be included, just add it as direct url on the project name
     mdString = mdString + "[" + project.name + "](todoist://project?id=" + project.id + ")";
-  } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
     // only Web Url shall be included, just add it as direct url on the project name
     mdString = mdString + "[" + project.name + "](" + project.url + ")";
   } else {
@@ -403,10 +404,11 @@ export function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", labe
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // both urls requested, need to separate them
     mdString = mdString + strippedTaskContent + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")";
-  } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // only App Url shall be included, just add it as direct url on the project name
     mdString = mdString + strippedTaskContent + " [Todoist Task](todoist://task?id=" + task.id + ")";
-  } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+
     // only Web Url shall be included, just add it as direct url on the project name
     mdString = mdString + strippedTaskContent + " [Todoist Task](" + task.url + ")";
   } else {
@@ -423,44 +425,44 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
 
   let blocksToAdd: CraftBlockInsert[] = [];
 
-  // get settings for link usage in task / project Links
-  let useMobileUrls: boolean;
-  let useWebUrls: boolean;
-  let useDueDates: boolean;
-  let useLabels: boolean;
-  let useDescriptions: boolean;
-
-  let mobileUrlSettings = await getSettingsMobileUrlUsage();
-  let webUrlSettings = await getSettingsWebUrlUsage();
-  let dueDatesSettings = await getSettingsDueDateUsage();
-  let labelsSettings = await getSettingsLabelsUsage();
-  let descriptionSettings = await getSettingsDescriptionUsage();
-
-  if (mobileUrlSettings == "true" || mobileUrlSettings == "error") {
-    useMobileUrls = true;
-  } else {
-    useMobileUrls = false;
-  }
-  if (webUrlSettings == "true" || webUrlSettings == "error") {
-    useWebUrls = true;
-  } else {
-    useWebUrls = false;
-  }
-  if (dueDatesSettings == "true" || dueDatesSettings == "error") {
-    useDueDates = true;
-  } else {
-    useDueDates = false;
-  }
-  if (labelsSettings == "true" || labelsSettings == "error") {
-    useLabels = true;
-  } else {
-    useLabels = false;
-  }
-  if (descriptionSettings == "true" || descriptionSettings == "error") {
-    useDescriptions = true;
-  } else {
-    useDescriptions = false;
-  }
+  // // get settings for link usage in task / project Links
+  // let useMobileUrls: boolean;
+  // let useWebUrls: boolean;
+  // let useDueDates: boolean;
+  // let useLabels: boolean;
+  // let useDescriptions: boolean;
+  //
+  // let mobileUrlSettings = await getSettingsMobileUrlUsage();
+  // let webUrlSettings = await getSettingsWebUrlUsage();
+  // let dueDatesSettings = await getSettingsDueDateUsage();
+  // let labelsSettings = await getSettingsLabelsUsage();
+  // let descriptionSettings = await getSettingsDescriptionUsage();
+  //
+  // if (mobileUrlSettings == "true" || mobileUrlSettings == "error") {
+  //   useMobileUrls = true;
+  // } else {
+  //   useMobileUrls = false;
+  // }
+  // if (webUrlSettings == "true" || webUrlSettings == "error") {
+  //   useWebUrls = true;
+  // } else {
+  //   useWebUrls = false;
+  // }
+  // if (dueDatesSettings == "true" || dueDatesSettings == "error") {
+  //   useDueDates = true;
+  // } else {
+  //   useDueDates = false;
+  // }
+  // if (labelsSettings == "true" || labelsSettings == "error") {
+  //   useLabels = true;
+  // } else {
+  //   useLabels = false;
+  // }
+  // if (descriptionSettings == "true" || descriptionSettings == "error") {
+  //   useDescriptions = true;
+  // } else {
+  //   useDescriptions = false;
+  // }
 
 
   let nestedTasks: NestedTask[] = [];
@@ -617,7 +619,7 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
         blockIndentLevel = 1;
       }
       curProSecTaskNest.tasks.map(curTask => {
-        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, useMobileUrls, useWebUrls, useDueDates, useLabels, useDescriptions, labels))
+        curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, labels))
       })
     }
     // now we need to loop through all sections of that project and add the tasks of these sections
@@ -648,7 +650,7 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
             blockIndentLevel = 1;
           }
           curSecTaskNest.tasks.map(curTask => {
-            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, useMobileUrls, useWebUrls, useDueDates, useLabels, useDescriptions, labels))
+            curBlocksToAdd = curBlocksToAdd.concat(createBlocksFromNestedTasks([curTask], blockIndentLevel, sortBy, labels))
           })
         }
       })
@@ -677,56 +679,61 @@ export const useGetTask = () => {
   });
 };
 
-export function getTaskMetadataInMarkdownFormat(task:Task, labelsList: Label[]):string{
-  let mdString:string = "";
+export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[]): string {
+  let mdString: string = "";
   if (taskMetadataSettingsValues.length > 0) {
-      if (taskMetadataSettingsValues.includes("dueDates")) {
-        let dueString = "";
-        if (task.due) {
-          // task has a due date
-          let dueDateYMD = task.due.date.split("-")
-          dueString = "[" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + "](day://" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + ")"
+    if (taskMetadataSettingsValues.includes("dueDates")) {
+      let dueString = "";
+      if (task.due) {
+        // task has a due date
+        let dueDateYMD = task.due.date.split("-")
+        dueString = "[" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + "](day://" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + ")"
 
-          // check if its a due time
-          if (task.due.datetime) {
-            // task has an explicit time set
-            let dueDate = new Date(task.due.datetime)
-            dueString = dueString + " at " + dueDate.toLocaleTimeString();
-          }
-          mdString = mdString + " " + dueString;
+        // check if its a due time
+        if (task.due.datetime) {
+          // task has an explicit time set
+          let dueDate = new Date(task.due.datetime)
+          dueString = dueString + " at " + dueDate.toLocaleTimeString();
+        }
+        mdString = mdString + " " + dueString;
 
-          if (task.due.recurring){
-            mdString = mdString + " *(recurring)*"
-          }
+        if (task.due.recurring) {
+          mdString = mdString + " *(recurring)*"
         }
       }
+    }
 
-      if (taskMetadataSettingsValues.includes("labels")) {
-        if (task.labelIds.length > 0) {
-          task.labelIds.forEach((labelId) => {
-            labelsList.filter((label) => label.id == labelId)
-              .map((label) => { mdString = mdString + " ::@" + label.name + "::"; })
-          })
-        }
+    if (taskMetadataSettingsValues.includes("labels")) {
+      if (task.labelIds.length > 0) {
+        task.labelIds.forEach((labelId) => {
+          labelsList.filter((label) => label.id == labelId)
+            .map((label) => { mdString = mdString + " ::@" + label.name + "::"; })
+        })
       }
-      if (taskMetadataSettingsValues.includes("description")) {
-        if (task.description.length > 0) {
-          mdString = mdString + " description: *" + task.description + "*";
-        } else {
-          mdString = mdString + " description length 0: *" + task.description + "*";
-        }
+    }
+    if (taskMetadataSettingsValues.includes("description")) {
+      // strip link to document from description:
+      const regex = /Craft Document: \[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
+
+      const subst = ``;
+
+      // The substituted value will be contained in the result variable
+      const strippedDescription = task.description.replace(regex, subst);
+      if (strippedDescription.length > 0) {
+        mdString = mdString + " description: *" + strippedDescription + "*";
       }
+    }
   }
 
-  if(mdString.length > 0){
-      mdString = " // " + mdString;
+  if (mdString.length > 0) {
+    mdString = " // " + mdString;
   }
 
   return mdString;
 }
 
-export function createBlockTextRunFromTask(task:Task):CraftTextRun[]{
-  let result:CraftTextRun[] = []
+export function createBlockTextRunFromTask(task: Task): CraftTextRun[] {
+  let result: CraftTextRun[] = []
 
   // cleanup task content (link to craft block should be removed)
   const regex = /\[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
@@ -737,45 +744,45 @@ export function createBlockTextRunFromTask(task:Task):CraftTextRun[]{
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // both urls requested, need to separate them
     result = [
-    {
-      text: strippedTaskContent + " "
-    },
-    {
-      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-    },
-    {
-      text: " "
-    },
-    {
-      text: "(Weblink)", link: { type: "url", url: task.url }
-    }
+      {
+        text: strippedTaskContent + " "
+      },
+      {
+        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+      },
+      {
+        text: " "
+      },
+      {
+        text: "(Weblink)", link: { type: "url", url: task.url }
+      }
     ]
-  } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // only App Url shall be included, just add it as direct url on the task name
     result = [
-    {
-      text: strippedTaskContent + " "
-    },
-    {
-      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-    }
+      {
+        text: strippedTaskContent + " "
+      },
+      {
+        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+      }
     ]
-  } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
     // only Web Url shall be included, just add it as direct url on the task name
     result = [
-    {
-      text: strippedTaskContent + " "
-    },
-    {
-      text: "Todoist Task", link: { type: "url", url: task.url }
-    }
+      {
+        text: strippedTaskContent + " "
+      },
+      {
+        text: "Todoist Task", link: { type: "url", url: task.url }
+      }
     ]
   } else {
     // no url shall be included just add the name
     result = [
-    {
-      text: strippedTaskContent
-    }
+      {
+        text: strippedTaskContent
+      }
     ]
   }
   return result;

@@ -21,7 +21,7 @@ const SyncTaskStatesButton: React.FC = () => {
   const onClick = async () => {
     setIsLoading(true);
     // if no task links are enabled, return immediately and display a warning
-    const taskLinkEnabled: boolean = await isAnyTaskLinkEnabled();
+    const taskLinkEnabled: boolean = isAnyTaskLinkEnabled();
     if (!taskLinkEnabled) {
       setIsLoading(false);
       toast({
@@ -176,6 +176,9 @@ const SyncTaskStatesButton: React.FC = () => {
                       // prevent readding task as open since somehow the craft api doesn't render the done checkbox correct.
                       if (!task.completed) {
                         const blockLocation = craft.location.afterBlockLocation(getPageResult.data.id, block.id);
+                        newBlock.forEach((nBlock) => {
+                          nBlock.indentationLevel = block.indentationLevel;
+                        })
                         await craft.dataApi.addBlocks(newBlock, blockLocation);
                         await craft.dataApi.deleteBlocks([block.id]);
                       }

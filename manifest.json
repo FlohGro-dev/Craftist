@@ -1,10 +1,10 @@
 {
-  "id": "do.craft.flohgro.craftist",
   "name": "Craftist",
   "fileName": "craftist-eXtension",
   "author" : "FlohGro",
   "author-email" : "hi@flohgro.com",
   "description" : "Todoist Integration for Craft",
+  "id": "do.craft.flohgro.craftist",
   "api": "0.0.4",
   "main": "index.html"
 }
