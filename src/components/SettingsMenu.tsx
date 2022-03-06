@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
 import { SettingsIcon } from "@chakra-ui/icons";
-import { Box, Center, Checkbox, CheckboxGroup, Divider, FormControl, HStack, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, StackDivider, useDisclosure, useToast, VStack } from "@chakra-ui/react";
-import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsImportAfterSelectedBlockOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskImportAfterSelectedBlock, taskLinkSettingsValues, taskMetadataSettingsValues } from "../settingsUtils";
+import { Box, Center, Checkbox, CheckboxGroup, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, StackDivider, useDisclosure, useToast } from "@chakra-ui/react";
+import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsImportAfterSelectedBlockOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsSetDueDateBasedOnDailyNoteOption, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskImportAfterSelectedBlock, taskLinkSettingsValues, taskMetadataSettingsValues, taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
 
 
 
@@ -336,6 +336,20 @@ const SettingsMenu: React.FC = () => {
     })
   }
 
+  const onChangeEnableSetDueDateBasedOnDailyNote = async (enable:boolean) => {
+    await setSettingsSetDueDateBasedOnDailyNoteOption(enable)
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Due Dates based on Daily Notes {enable ? "enabled":"disabled"}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
 
   return (
     <>
@@ -394,6 +408,12 @@ const SettingsMenu: React.FC = () => {
               <Stack spacing={[1, 5]} direction={['column', 'row']}>
               <Radio value='enabled' onChange={() => onChangeEnableImportAfterSelectedBlocks(true)}>enabled</Radio>
               <Radio value='disabled' onChange={() => onChangeEnableImportAfterSelectedBlocks(false)}>disabled</Radio>
+              </Stack>
+              </RadioGroup>
+              <RadioGroup colorScheme='red' defaultValue={taskSetDueDatesBasedOnDailyNote}> set due dates based on daily note
+              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+              <Radio value='enabled' onChange={() => onChangeEnableSetDueDateBasedOnDailyNote(true)}>enabled</Radio>
+              <Radio value='disabled' onChange={() => onChangeEnableSetDueDateBasedOnDailyNote(false)}>disabled</Radio>
               </Stack>
               </RadioGroup>
             </Stack>

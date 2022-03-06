@@ -91,6 +91,7 @@ export const useAddTask = () => {
       projectId?: number;
       content: string;
       description?: string;
+      due_date?: string
     }) => {
       const cli = await snapshot.getPromise(client);
       if (!cli) {
@@ -392,18 +393,25 @@ function createSectionMdString(section: Section, mdPrefix: string = "+ "): strin
 export function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", labelsList: Label[]): string {
   let mdString = mdPrefix;
 
+  // cleanup task content (link to craft block should be removed)
+  const regex = /\[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
+  const subst = `$1`;
+
+  // The substituted value will be contained in the result variable
+  const strippedTaskContent = task.content.replace(regex, subst);
+
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // both urls requested, need to separate them
-    mdString = mdString + task.content + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")";
+    mdString = mdString + strippedTaskContent + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")";
   } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // only App Url shall be included, just add it as direct url on the project name
-    mdString = mdString + task.content + " [Todoist Task](todoist://task?id=" + task.id + ")";
+    mdString = mdString + strippedTaskContent + " [Todoist Task](todoist://task?id=" + task.id + ")";
   } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
     // only Web Url shall be included, just add it as direct url on the project name
-    mdString = mdString + task.content + " [Todoist Task](" + task.url + ")";
+    mdString = mdString + strippedTaskContent + " [Todoist Task](" + task.url + ")";
   } else {
     // no url shall be included just add the name
-    mdString = mdString + task.content;
+    mdString = mdString + strippedTaskContent;
   }
   // metadata import
   mdString = mdString + getTaskMetadataInMarkdownFormat(task, labelsList)

@@ -119,6 +119,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **new/improved:** completely revamped settings window for easier usability
 - **fixed:** creating tasks features now respect link settings
 - **new:** option to import tasks after the current selected block (enabled by default)
+- **new:** option to set due dates for exported tasks to date of the daily notes (enabled by default)
 
 ### v0.5
 

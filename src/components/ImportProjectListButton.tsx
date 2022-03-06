@@ -5,7 +5,7 @@ import * as TodoistWrapper from "../todoistApiWrapper";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
-import { getSettingsMobileUrlUsage, getSettingsWebUrlUsage, taskImportAfterSelectedBlock } from "../settingsUtils";
+import { taskImportAfterSelectedBlock } from "../settingsUtils";
 import { createLocationContainerAfterCurrentSelection } from "../craftBlockInteractor";
 
 const ImportProjectListButton: React.FC = () => {
@@ -15,25 +15,6 @@ const ImportProjectListButton: React.FC = () => {
   let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = async () => {
     setIsLoading(true);
-
-    // get settings for link usage in task / project Links
-    let useMobileUrls:boolean;
-    let useWebUrls:boolean;
-
-    let mobileUrlSettings = await getSettingsMobileUrlUsage();
-    let webUrlSettings = await getSettingsWebUrlUsage();
-
-    if(mobileUrlSettings == "true" || mobileUrlSettings == "error"){
-      useMobileUrls = true;
-    } else {
-      useMobileUrls = false;
-    }
-    if(webUrlSettings == "true" || webUrlSettings == "error"){
-      useWebUrls = true;
-    } else {
-      useWebUrls = false;
-    }
-
 
     try {
       let projects = await getProjectList()

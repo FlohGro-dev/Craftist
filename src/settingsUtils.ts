@@ -9,6 +9,7 @@ export let taskGroupingTodayValues:string[] = ["sections","projects"];
 export let taskGroupingProjectValues:string[] = ["sections"];
 export let taskGroupingAllValues:string[] = ["sections","projects"];
 export let taskImportAfterSelectedBlock:string = "enabled";
+export let taskSetDueDatesBasedOnDailyNote:string = "enabled";
 
 // const taskMetadataSettingsDefaultValues:string[] = [];
 // const taskLinkSettingsDefaultValues:string[] = ["web","mobile"];
@@ -245,7 +246,7 @@ export async function getSettingsGroupAllTasksOption():Promise<taskGroupingOptio
   return taskGroupingOptions.none;
 }
 
-// project task grouping
+// import task location
 const useSettingsImportAfterSelectedBlockOption:string = "useSettingsImportAfterSelectedBlockOptionKey"
 
 export async function setSettingsImportAfterSelectedBlockOption(enabled:boolean){
@@ -265,6 +266,30 @@ export async function getSettingsImportAfterSelectedBlockOption():Promise<string
     return "error"
   }
 }
+
+// set due dates based on daily notes settings
+
+//taskSetDueDatesBasedOnDailyNote
+const useSettingsSetDueDateBasedOnDailyNoteOption:string = "useSettingsSetDueDateBasedOnDailyNoteOptionKey"
+
+export async function setSettingsSetDueDateBasedOnDailyNoteOption(enabled:boolean){
+  if(enabled){
+      taskSetDueDatesBasedOnDailyNote = "enabled";
+  } else {
+    taskSetDueDatesBasedOnDailyNote = "disabled";
+  }
+  await craft.storageApi.put(useSettingsSetDueDateBasedOnDailyNoteOption,taskSetDueDatesBasedOnDailyNote);
+}
+
+export async function getSettingsSetDueDateBasedOnDailyNoteOption():Promise<string>{
+  let result = await craft.storageApi.get(useSettingsSetDueDateBasedOnDailyNoteOption);
+  if(result.status == "success"){
+    return result.data
+  } else {
+    return "error"
+  }
+}
+
 
 
 async function checkIfSettingExists(key:string):Promise<boolean>{
