@@ -5,7 +5,8 @@ import * as TodoistWrapper from "../todoistApiWrapper";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
-import { getSettingsMobileUrlUsage, getSettingsWebUrlUsage } from "../settingsUtils";
+import { getSettingsMobileUrlUsage, getSettingsWebUrlUsage, taskImportAfterSelectedBlock } from "../settingsUtils";
+import { createLocationContainerAfterCurrentSelection } from "../craftBlockInteractor";
 
 const ImportProjectListButton: React.FC = () => {
   const toast = useToast();
@@ -42,7 +43,17 @@ const ImportProjectListButton: React.FC = () => {
         let mdContent = craft.markdown.markdownToCraftBlocks(TodoistWrapper.createProjectMdString(project, "- "));
         blocksToAdd = blocksToAdd.concat(mdContent);
       })
+
+      if(taskImportAfterSelectedBlock == "enabled"){
+        let location = await createLocationContainerAfterCurrentSelection();
+        if(location){
+            craft.dataApi.addBlocks(blocksToAdd, location);
+        } else {
+          craft.dataApi.addBlocks(blocksToAdd);
+        }
+      } else {
         craft.dataApi.addBlocks(blocksToAdd);
+      }
         setIsLoading(false);
         toast({
           position: "bottom",

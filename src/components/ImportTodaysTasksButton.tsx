@@ -7,7 +7,8 @@ import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import { useRecoilValue } from "recoil";
-import { getSettingsGroupTodaysTasksOption } from "../settingsUtils";
+import { getSettingsGroupTodaysTasksOption, taskImportAfterSelectedBlock } from "../settingsUtils";
+import { createLocationContainerAfterCurrentSelection } from "../craftBlockInteractor";
 
 const ImportTodaysTasksButton: React.FC = () => {
   const toast = useToast();
@@ -28,7 +29,19 @@ const ImportTodaysTasksButton: React.FC = () => {
 
     blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, labelList, todaysTasks, true, existingTaskIds, taskGroupingSettings, TodoistWrapper.tasksSortByOptions.priority))
 
-    craft.dataApi.addBlocks(blocksToAdd);
+    if(taskImportAfterSelectedBlock == "enabled"){
+      let location = await createLocationContainerAfterCurrentSelection();
+      if(location){
+          craft.dataApi.addBlocks(blocksToAdd, location);
+      } else {
+        craft.dataApi.addBlocks(blocksToAdd);
+      }
+    } else {
+      craft.dataApi.addBlocks(blocksToAdd);
+    }
+
+
+
     setIsLoading(false);
     toast({
       position: "bottom",

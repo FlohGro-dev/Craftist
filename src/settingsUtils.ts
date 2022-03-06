@@ -8,6 +8,7 @@ export let taskLinkSettingsValues:string[] = ["web","mobile"];
 export let taskGroupingTodayValues:string[] = ["sections","projects"];
 export let taskGroupingProjectValues:string[] = ["sections"];
 export let taskGroupingAllValues:string[] = ["sections","projects"];
+export let taskImportAfterSelectedBlock:string = "enabled";
 
 // const taskMetadataSettingsDefaultValues:string[] = [];
 // const taskLinkSettingsDefaultValues:string[] = ["web","mobile"];
@@ -244,6 +245,28 @@ export async function getSettingsGroupAllTasksOption():Promise<taskGroupingOptio
   return taskGroupingOptions.none;
 }
 
+// project task grouping
+const useSettingsImportAfterSelectedBlockOption:string = "useSettingsImportAfterSelectedBlockOptionKey"
+
+export async function setSettingsImportAfterSelectedBlockOption(enabled:boolean){
+  if(enabled){
+      taskImportAfterSelectedBlock = "enabled";
+  } else {
+    taskImportAfterSelectedBlock = "disabled";
+  }
+  await craft.storageApi.put(useSettingsImportAfterSelectedBlockOption,taskImportAfterSelectedBlock);
+}
+
+export async function getSettingsImportAfterSelectedBlockOption():Promise<string>{
+  let result = await craft.storageApi.get(useSettingsImportAfterSelectedBlockOption);
+  if(result.status == "success"){
+    return result.data
+  } else {
+    return "error"
+  }
+}
+
+
 async function checkIfSettingExists(key:string):Promise<boolean>{
   let getSettingResult = await craft.storageApi.get(key);
   if(getSettingResult.status == "success"){
@@ -260,6 +283,7 @@ export const writeDefaultSettings = async () => {
   let dueDatesSettings = await getSettingsDueDateUsage();
   let labelsSettings = await getSettingsLabelsUsage();
   let descriptionSettings = await getSettingsDescriptionUsage();
+  let locationSettings = await getSettingsImportAfterSelectedBlockOption();
 
   if (mobileUrlSettings == "error"){
     // write default
@@ -280,6 +304,10 @@ export const writeDefaultSettings = async () => {
   if (descriptionSettings == "error"){
     // write default
     setSettingsDescriptionUsage(false);
+  }
+  if (locationSettings == "error"){
+    // write default
+    setSettingsImportAfterSelectedBlockOption(true);
   }
   if (!checkIfSettingExists(useSettingsGroupTodaysTasksOption)){
     // write default
