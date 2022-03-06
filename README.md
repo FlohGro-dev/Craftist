@@ -118,6 +118,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **change:** added warning for disabled task links since syncing states is not possible without links
 - **new/improved:** completely revamped settings window for easier usability
 - **fixed:** creating tasks features now respect link settings
+- **new:** option to import tasks after the current selected block (enabled by default)
 
 ### v0.5
 
