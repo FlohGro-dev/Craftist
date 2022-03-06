@@ -120,22 +120,10 @@ const CreateTasksFromSelectionButton: React.FC = () => {
                 })
                   .then(async function(task) {
                     // append task link to block
-                    let blockToAppend: CraftTextRun[] = [
-                      {
-                        text: " "
-                      },
-                      {
-                        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-                      },
-                      {
-                        text: " "
-                      },
-                      {
-                        text: "Weblink", link: { type: "url", url: task.url }
-                      }
-                    ];
 
-                    block.content = block.content.concat(blockToAppend);
+                    let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task)
+
+                    block.content = blockToAppend;
                     //block.listStyle.type = "todo";
                     block.listStyle = {
                       type: "todo",
@@ -145,7 +133,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
                     if (result.status !== "success") {
                       throw new Error(result.message)
                     } else {
-                      
+
                     }
                     // //block.listStyle.type = "todo";
                     // CraftBlockInteractor.appendCraftTextRunToBlock(blockToAppend, block);

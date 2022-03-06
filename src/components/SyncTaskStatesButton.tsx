@@ -70,8 +70,6 @@ const SyncTaskStatesButton: React.FC = () => {
 
 
           // SYNC TODO STATE
-
-          let ignoreTask = false;
           // now we have the task ID - check its state with todoist api
           let getIsTaskStateCompleted = isTaskCompleted({
             id: Number(taskId)
@@ -147,7 +145,6 @@ const SyncTaskStatesButton: React.FC = () => {
               if (block.listStyle.type == "todo") {
                 // task couldn't be retrieved, mark it as done in craft since it is probably deleted
                 block.listStyle.state = "checked";
-                ignoreTask = true;
                 const result = await craft.dataApi.updateBlocks([block])
                 if (result.status !== "success") {
                   throw new Error(result.message)
@@ -155,38 +152,42 @@ const SyncTaskStatesButton: React.FC = () => {
               }
 
 
+            }).finally(async function(){
+              // SYNC METADATA:
+              setTimeout(async function(){
+                  getTask({taskId: Number(taskId)})
+                    .catch(function(){
+                      // task is not retrievable - was marked as done in Todoist
+                    })
+                    .then(async function (task){
+                      if(task){
+
+                      let prefix = "- [ ] "
+                      if(task.completed){
+                        prefix = "- [x] "
+                      }
+
+                      let newContent = TodoistWrapper.createTaskMdString(task, prefix, labelList);
+
+                      let newBlock = craft.markdown.markdownToCraftBlocks(newContent);
+                      const getPageResult = await craft.dataApi.getCurrentPage();
+                      if(getPageResult.status != "success"){
+                        throw new Error("get page failed")
+                      }
+                      // prevent readding task as open since somehow the craft api doesn't render the done checkbox correct.
+                      if(!task.completed){
+                        const blockLocation = craft.location.afterBlockLocation(getPageResult.data.id, block.id);
+                        await craft.dataApi.addBlocks(newBlock,blockLocation);
+                        await craft.dataApi.deleteBlocks([block.id]);
+                      }
+                    }
+                    })
+              }, 1000);
             })
 
-            // SYNC METADATA:
-            setTimeout(async function(){
-                getTask({taskId: Number(taskId)})
-                  .catch(function(){
-                    // task is not retrievable - was marked as done in Todoist
-                  })
-                  .then(async function (task){
-                    if(task){
 
-                    let prefix = "- [ ] "
-                    if(task.completed){
-                      prefix = "- [x] "
-                    }
 
-                    let newContent = TodoistWrapper.createTaskMdString(task, prefix, labelList);
 
-                    let newBlock = craft.markdown.markdownToCraftBlocks(newContent);
-                    const getPageResult = await craft.dataApi.getCurrentPage();
-                    if(getPageResult.status != "success"){
-                      throw new Error("get page failed")
-                    }
-                    // prevent readding task as open since somehow the craft api doesn't render the done checkbox correct.
-                    if(!task.completed){
-                      const blockLocation = craft.location.afterBlockLocation(getPageResult.data.id, block.id);
-                      await craft.dataApi.addBlocks(newBlock,blockLocation);
-                      await craft.dataApi.deleteBlocks([block.id]);
-                    }
-                  }
-                  })
-            }, 1000);
 
 
 

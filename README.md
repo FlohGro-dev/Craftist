@@ -117,6 +117,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **new:** metadata import - imported and synced tasks will now contain metadata from todoist (due dates, labels and descriptions) which you can enable / disable as you like
 - **change:** added warning for disabled task links since syncing states is not possible without links
 - **new/improved:** completely revamped settings window for easier usability
+- **fixed:** creating tasks features now respect link settings
 
 ### v0.5
 
