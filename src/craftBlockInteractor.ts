@@ -1,4 +1,4 @@
-import { CraftBlock, CraftTextBlock, CraftTextRun, CraftTextBlockInsert } from "@craftdocs/craft-extension-api";
+import { CraftBlock, CraftTextBlock, CraftTextRun, CraftTextBlockInsert, IndexLocation, AfterBlockLocation } from "@craftdocs/craft-extension-api";
 
 export async function getAllTodoItemsFromCurrentPage() {
   let todoBlocks: CraftTextBlock[] = [];
@@ -290,6 +290,32 @@ export function getTodoistTaskIdFromBlock(block: CraftTextBlock):string | undefi
     }
   }
   return undefined
+}
+
+export async function createLocationContainerAfterCurrentSelection():Promise<AfterBlockLocation|undefined>{
+  const getPageResult = await craft.dataApi.getCurrentPage();
+
+  if (getPageResult.status !== "success") {
+    throw new Error(getPageResult.message)
+  }
+  const pageBlock = getPageResult.data
+
+  const currentSelection = await craft.editorApi.getSelection()
+
+if (currentSelection.status !== "success") {
+    throw new Error(currentSelection.message)
+}
+
+  const selectedBlocks = currentSelection.data;
+
+  if(selectedBlocks.length == 0){
+    // no selection, return undefined
+    return undefined;
+  } else {
+
+      const lastBlock = selectedBlocks[selectedBlocks.length - 1]
+      return craft.location.afterBlockLocation(pageBlock.id, lastBlock.id);
+  }
 }
 
 export function getParentDocumentMdLinkOfBlock(block: CraftBlock) {

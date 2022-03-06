@@ -7,7 +7,8 @@ import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import { useRecoilValue } from "recoil";
-import { getSettingsGroupProjectTasksOption } from "../settingsUtils";
+import { getSettingsGroupProjectTasksOption, taskImportAfterSelectedBlock } from "../settingsUtils";
+import { createLocationContainerAfterCurrentSelection } from "../craftBlockInteractor";
 
 const ImportTasksFromLinkedProjectButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
@@ -64,9 +65,16 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
 
             blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList,labelList, taskList, true, existingTaskIds, taskGroupingSettings))
 
-
-
-            craft.dataApi.addBlocks(blocksToAdd);
+            if(taskImportAfterSelectedBlock == "enabled"){
+              let location = await createLocationContainerAfterCurrentSelection();
+              if(location){
+                  craft.dataApi.addBlocks(blocksToAdd, location);
+              } else {
+                craft.dataApi.addBlocks(blocksToAdd);
+              }
+            } else {
+              craft.dataApi.addBlocks(blocksToAdd);
+            }
 
             setIsLoading(false);
             toast({

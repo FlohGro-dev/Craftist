@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@chakra-ui/button";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { Box, Center, Checkbox, CheckboxGroup, Divider, FormControl, HStack, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, StackDivider, useDisclosure, useToast, VStack } from "@chakra-ui/react";
-import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskLinkSettingsValues, taskMetadataSettingsValues } from "../settingsUtils";
+import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsImportAfterSelectedBlockOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskImportAfterSelectedBlock, taskLinkSettingsValues, taskMetadataSettingsValues } from "../settingsUtils";
 
 
 
@@ -321,6 +321,22 @@ const SettingsMenu: React.FC = () => {
       ),
     })
   }
+
+  const onChangeEnableImportAfterSelectedBlocks = async (enable:boolean) => {
+    await setSettingsImportAfterSelectedBlockOption(enable)
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Location After Selected Block {enable ? "enabled":"disabled"}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+
   return (
     <>
       <Button onClick={onOpen}
@@ -374,6 +390,12 @@ const SettingsMenu: React.FC = () => {
                 <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingAllSections(value.target.checked)}>sections</Checkbox>
                 </Stack>
               </CheckboxGroup>
+              <RadioGroup colorScheme='red' defaultValue={taskImportAfterSelectedBlock}> import tasks after selected blocks
+              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+              <Radio value='enabled' onChange={() => onChangeEnableImportAfterSelectedBlocks(true)}>enabled</Radio>
+              <Radio value='disabled' onChange={() => onChangeEnableImportAfterSelectedBlocks(false)}>disabled</Radio>
+              </Stack>
+              </RadioGroup>
             </Stack>
             </FormControl>
           </ModalBody>
