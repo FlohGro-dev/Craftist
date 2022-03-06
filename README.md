@@ -116,7 +116,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
 
-### v0.6 (unreleased)
+### v0.6
 
 - **new/improved:** sync task improvements - recurring tasks are now enabled if due dates are included as metadata
 - **new:** metadata import - imported and synced tasks will now contain metadata from todoist (due dates, labels and descriptions) which you can enable / disable as you like
@@ -125,7 +125,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **fixed:** creating tasks features now respect link settings
 - **new:** option to import tasks after the current selected block (enabled by default)
 - **new:** option to set due dates for exported tasks to date of the daily notes (enabled by default)
-- **change:** craftdocs://open[..] urls (resulting from crosslinking) will be stripped from task contents since they don't work and just produce clutter.
+- **change:** craftdocs://open[..] urls (resulting from cross-linking) will be stripped from task contents since they don't work and just produce clutter.
 
 
 ### v0.5
