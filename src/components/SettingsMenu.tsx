@@ -1,45 +1,259 @@
 import React from "react";
 import { Button } from "@chakra-ui/button";
 import { SettingsIcon } from "@chakra-ui/icons";
-import { Box, Center, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, useToast } from "@chakra-ui/react";
-import { setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsMobileUrlUsage, setSettingsWebUrlUsage } from "../settingsUtils";
+import { Box, Center, Checkbox, CheckboxGroup, Divider, FormControl, HStack, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, StackDivider, useDisclosure, useToast, VStack } from "@chakra-ui/react";
+import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskLinkSettingsValues, taskMetadataSettingsValues } from "../settingsUtils";
+
+
 
 const SettingsMenu: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const onChangeLinks = async (value: string | string[]) => {
-
-    switch(value){
-      case 'webAndMobile': await setSettingsMobileUrlUsage(true); await setSettingsWebUrlUsage(true); break;
-      case 'webOnly': await setSettingsMobileUrlUsage(false); await setSettingsWebUrlUsage(true); break;
-      case 'mobileOnly': await setSettingsMobileUrlUsage(true); await setSettingsWebUrlUsage(false); break;
-      case 'none': await setSettingsMobileUrlUsage(false); await setSettingsWebUrlUsage(false); break;
-    }
+  const onChangeDueDates = async (value: boolean) => {
+    await setSettingsDueDateUsage(value);
     toast({
       position: "bottom",
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Task Links set to {value}
+            Due dates {value ? "enabled":"disabled"}
           </Box>
         </Center>
       ),
     })
   }
 
-  const onChangeDueDates = async (value: string | string[]) => {
-    if (value.toString() == "enabled") {
-      await setSettingsDueDateUsage(true);
+  const onChangeLabels = async (value: boolean) => {
+    await setSettingsLabelsUsage(value);
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Labels {value ? "enabled":"disabled"}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+  const onChangeDescriptions = async (value: boolean) => {
+    await setSettingsDescriptionUsage(value);
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Descriptions {value ? "enabled":"disabled"}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+
+  const onChangeWebUrls = async (value: boolean) => {
+    const settingsString = "web"
+    let toastActive = false;
+    const index = taskLinkSettingsValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskLinkSettingsValues.push(settingsString)
+    }
     } else {
-      await setSettingsDueDateUsage(false);
+      if (index > -1) {
+        taskLinkSettingsValues.splice(index, 1);
+        if(taskLinkSettingsValues.length == 0){
+          // no more links are enabled - display warning
+          toast({
+            position: "bottom",
+            render: () => (
+              <Center>
+                <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                  all URLs disabled - syncing states will not work anymore
+                </Box>
+              </Center>
+            ),
+          })
+          toastActive = true;
+        }
+      }
     }
+    await setSettingsWebUrlUsage(value);
+    if(!toastActive){
+      toast({
+        position: "bottom",
+        render: () => (
+          <Center>
+            <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+              Web URLs {value ? "enabled":"disabled"}
+            </Box>
+          </Center>
+        ),
+      })
+    }
+  }
+
+  const onChangeMobileUrls = async (value: boolean) => {
+    const settingsString = "mobile"
+    let toastActive = false;
+    const index = taskLinkSettingsValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskLinkSettingsValues.push(settingsString)
+    }
+    } else {
+      if (index > -1) {
+        taskLinkSettingsValues.splice(index, 1);
+        if(taskLinkSettingsValues.length == 0){
+          // no more links are enabled - display warning
+          toast({
+            position: "bottom",
+            render: () => (
+              <Center>
+                <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                  all URLs disabled - syncing states will not work anymore
+                </Box>
+              </Center>
+            ),
+          })
+          toastActive = true;
+        }
+      }
+    }
+    await setSettingsMobileUrlUsage(value);
+    if(!toastActive){
+      toast({
+        position: "bottom",
+        render: () => (
+          <Center>
+            <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+              Mobile URLs {value ? "enabled":"disabled"}
+            </Box>
+          </Center>
+        ),
+      })
+    }
+  }
+
+  const onChangeTaskGroupingTodayProjects = async (value: boolean) => {
+    const settingsString = "projects"
+    const index = taskGroupingTodayValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskGroupingTodayValues.push(settingsString)
+    }
+    } else {
+      if (index > -1) {
+        taskGroupingTodayValues.splice(index, 1);
+      }
+    }
+    await applyTaskTodayGrouping();
+  }
+
+  const onChangeTaskGroupingTodaySections = async (value: boolean) => {
+    const settingsString = "sections"
+    const index = taskGroupingTodayValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskGroupingTodayValues.push(settingsString)
+    }
+    } else {
+      if (index > -1) {
+        taskGroupingTodayValues.splice(index, 1);
+      }
+    }
+    await applyTaskTodayGrouping();
+  }
+
+
+  const applyTaskTodayGrouping = async () => {
+    let projectsIndex = taskGroupingTodayValues.indexOf("projects");
+    let sectionsIndex = taskGroupingTodayValues.indexOf("sections");
+    let newSetting = "";
+    if (projectsIndex > -1 && sectionsIndex > -1){
+      // both present
+      newSetting = "projectAndSection"
+    } else if (projectsIndex > -1 && sectionsIndex == -1){
+      // projects only
+      newSetting = "projectOnly"
+    } else if (projectsIndex == -1 && sectionsIndex > -1){
+      // sections only
+      newSetting = "sectionOnly"
+    } else if (projectsIndex == -1 && sectionsIndex == -1){
+      // none
+      newSetting = "none"
+    }
+    await setSettingsGroupTodaysTasksOption(newSetting);
     toast({
       position: "bottom",
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Due dates {value}
+            Today Task Grouping changed to {newSetting}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+  const onChangeTaskGroupingAllProjects = async (value: boolean) => {
+    const settingsString = "projects"
+    const index = taskGroupingAllValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskGroupingAllValues.push(settingsString)
+    }
+    } else {
+      if (index > -1) {
+        taskGroupingAllValues.splice(index, 1);
+      }
+    }
+    await applyTaskAllGrouping();
+  }
+
+  const onChangeTaskGroupingAllSections = async (value: boolean) => {
+    const settingsString = "sections"
+    const index = taskGroupingAllValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskGroupingAllValues.push(settingsString)
+    }
+    } else {
+      if (index > -1) {
+        taskGroupingAllValues.splice(index, 1);
+      }
+    }
+    await applyTaskAllGrouping();
+  }
+
+
+  const applyTaskAllGrouping = async () => {
+    let projectsIndex = taskGroupingAllValues.indexOf("projects");
+    let sectionsIndex = taskGroupingAllValues.indexOf("sections");
+    let newSetting = "";
+    if (projectsIndex > -1 && sectionsIndex > -1){
+      // both present
+      newSetting = "projectAndSection"
+    } else if (projectsIndex > -1 && sectionsIndex == -1){
+      // projects only
+      newSetting = "projectOnly"
+    } else if (projectsIndex == -1 && sectionsIndex > -1){
+      // sections only
+      newSetting = "sectionOnly"
+    } else if (projectsIndex == -1 && sectionsIndex == -1){
+      // none
+      newSetting = "none"
+    }
+    await setSettingsGroupAllTasksOption(newSetting);
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            All Tasks Grouping changed to {newSetting}
           </Box>
         </Center>
       ),
@@ -47,99 +261,127 @@ const SettingsMenu: React.FC = () => {
   }
 
 
-  const onChangeTodayGrouping = async (value: string | string[]) => {
-    await setSettingsGroupTodaysTasksOption(value.toString());
+  const onChangeTaskGroupingProjectImportProjects = async (value: boolean) => {
+    const settingsString = "projects"
+    const index = taskGroupingProjectValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskGroupingProjectValues.push(settingsString)
+    }
+    } else {
+      if (index > -1) {
+        taskGroupingProjectValues.splice(index, 1);
+      }
+    }
+    await applyTaskProjectImportGrouping();
+  }
+
+  const onChangeTaskGroupingProjectImportSections = async (value: boolean) => {
+    const settingsString = "sections"
+    const index = taskGroupingProjectValues.indexOf(settingsString, 0);
+    if(value){
+      if (index == -1) {
+      taskGroupingProjectValues.push(settingsString)
+    }
+    } else {
+      if (index > -1) {
+        taskGroupingProjectValues.splice(index, 1);
+      }
+    }
+    await applyTaskProjectImportGrouping();
+  }
+
+
+  const applyTaskProjectImportGrouping = async () => {
+    let projectsIndex = taskGroupingProjectValues.indexOf("projects");
+    let sectionsIndex = taskGroupingProjectValues.indexOf("sections");
+    let newSetting = "";
+    if (projectsIndex > -1 && sectionsIndex > -1){
+      // both present
+      newSetting = "projectAndSection"
+    } else if (projectsIndex > -1 && sectionsIndex == -1){
+      // projects only
+      newSetting = "projectOnly"
+    } else if (projectsIndex == -1 && sectionsIndex > -1){
+      // sections only
+      newSetting = "sectionOnly"
+    } else if (projectsIndex == -1 && sectionsIndex == -1){
+      // none
+      newSetting = "none"
+    }
+    await setSettingsGroupProjectTasksOption(newSetting);
     toast({
       position: "bottom",
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Grouping for Today Tasks changed to: {value}
+            Project Tasks Import Grouping changed to {newSetting}
           </Box>
         </Center>
       ),
     })
   }
-
-  const onChangeProjectGrouping = async (value: string | string[]) => {
-    await setSettingsGroupProjectTasksOption(value.toString());
-    toast({
-      position: "bottom",
-      render: () => (
-        <Center>
-          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Grouping for Today Tasks changed to: {value}
-          </Box>
-        </Center>
-      ),
-    })
-  }
-
-  const onChangeAllTasksGrouping = async (value: string | string[]) => {
-    await setSettingsGroupAllTasksOption(value.toString());
-    toast({
-      position: "bottom",
-      render: () => (
-        <Center>
-          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Grouping for Today Tasks changed to: {value}
-          </Box>
-        </Center>
-      ),
-    })
-  }
-
   return (
-    <Menu closeOnSelect={false}>
-      {({ isOpen }) => (
-        <>
-          <MenuButton
-            isActive={isOpen}
-            as={Button}
-            rightIcon={<SettingsIcon />}
-            colorScheme='red'
-            width="100%"
-            mb="2">
-            {isOpen ? 'Close Settings' : 'Settings'}
-          </MenuButton >
-          <MenuList>
-            <MenuOptionGroup defaultValue='webAndMobile' title='Task Links' type='radio' onChange={(value) => onChangeLinks(value)}>
-              <MenuItemOption value='webAndMobile'>Web and Mobile links</MenuItemOption>
-              <MenuItemOption value='webOnly'>only Weblinks</MenuItemOption>
-              <MenuItemOption value='mobileOnly'>only Mobile links</MenuItemOption>
-              <MenuItemOption value='none'>no links (not recommended)</MenuItemOption>
-            </MenuOptionGroup>
-            <MenuDivider />
-            <MenuDivider />
-            <MenuOptionGroup defaultValue='enabled' title='Import Due Dates' type='radio' onChange={(value) => onChangeDueDates(value)}>
-              <MenuItemOption value='enabled'>enabled</MenuItemOption>
-              <MenuItemOption value='disabled'>disabled</MenuItemOption>
-            </MenuOptionGroup>
-            <MenuDivider />
-            <MenuOptionGroup defaultValue='projectAndSection' title='Task Grouping for Import Todays Tasks' type='radio' onChange={(value) => onChangeTodayGrouping(value)}>
-              <MenuItemOption value='none'>no grouping</MenuItemOption>
-              <MenuItemOption value='projectAndSection'>group by project and section</MenuItemOption>
-              <MenuItemOption value='projectOnly'>group by project</MenuItemOption>
-              <MenuItemOption value='sectionOnly'>group by section</MenuItemOption>
-            </MenuOptionGroup>
-            <MenuDivider />
-            <MenuOptionGroup defaultValue='sectionOnly' title='Task Grouping for Import Project Tasks' type='radio' onChange={(value) => onChangeProjectGrouping(value)}>
-              <MenuItemOption value='none'>no grouping</MenuItemOption>
-              <MenuItemOption value='projectAndSection'>group by project and section</MenuItemOption>
-              <MenuItemOption value='projectOnly'>group by project</MenuItemOption>
-              <MenuItemOption value='sectionOnly'>group by section</MenuItemOption>
-            </MenuOptionGroup>
-            <MenuDivider />
-            <MenuOptionGroup defaultValue='projectAndSection' title='Task Grouping for All Tasks Import' type='radio' onChange={(value) => onChangeAllTasksGrouping(value)}>
-              <MenuItemOption value='none'>no grouping</MenuItemOption>
-              <MenuItemOption value='projectAndSection'>group by project and section</MenuItemOption>
-              <MenuItemOption value='projectOnly'>group by project</MenuItemOption>
-              <MenuItemOption value='sectionOnly'>group by section</MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </>
-      )}
-    </Menu>
+    <>
+      <Button onClick={onOpen}
+      width="100%"
+      mb="2"
+      //isLoading={isLoading}
+      rightIcon={<SettingsIcon />}
+      colorScheme='red'
+      variant='solid'
+      >Settings</Button>
+
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <ModalOverlay />
+        <ModalContent>
+        <ModalHeader>Settings</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl>
+            <Stack spacing={[1, 5]} direction={['column', 'row']} divider={<StackDivider borderColor='gray.200' />}>
+            <CheckboxGroup colorScheme='red' defaultValue={taskLinkSettingsValues}> Task Links
+              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+              <Checkbox value='mobile' onChange={(value) => onChangeMobileUrls(value.target.checked)}>mobile</Checkbox>
+              <Checkbox value='web' onChange={(value) => onChangeWebUrls(value.target.checked)}>web</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+              <CheckboxGroup colorScheme='red' defaultValue={taskMetadataSettingsValues}> task metadata import
+                <Stack spacing={[1, 5]} direction={['column', 'row']}>
+                <Checkbox value='dueDates' onChange={(value) => onChangeDueDates(value.target.checked)}>due dates</Checkbox> setTaskMetadataOptions
+                <Checkbox value='labels' onChange={(value) => onChangeLabels(value.target.checked)}>labels</Checkbox>
+                <Checkbox value='description' onChange={(value) => onChangeDescriptions(value.target.checked)}>description</Checkbox>
+                </Stack>
+              </CheckboxGroup>
+              <CheckboxGroup colorScheme='red' defaultValue={taskGroupingTodayValues}> import todays tasks grouping
+                <Stack spacing={[1, 5]} direction={['column', 'row']}>
+                <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingTodayProjects(value.target.checked)}>projects</Checkbox>
+                <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingTodaySections(value.target.checked)}>sections</Checkbox>
+                </Stack>
+              </CheckboxGroup>
+              <CheckboxGroup colorScheme='red' defaultValue={taskGroupingProjectValues}> import project tasks grouping
+                <Stack spacing={[1, 5]} direction={['column', 'row']}>
+                <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingProjectImportProjects(value.target.checked)}>projects</Checkbox>
+                <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingProjectImportSections(value.target.checked)}>sections</Checkbox>
+                </Stack>
+              </CheckboxGroup>
+              <CheckboxGroup colorScheme='red' defaultValue={taskGroupingAllValues}> import all tasks grouping
+                <Stack spacing={[1, 5]} direction={['column', 'row']}>
+                <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingAllProjects(value.target.checked)}>projects</Checkbox>
+                <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingAllSections(value.target.checked)}>sections</Checkbox>
+                </Stack>
+              </CheckboxGroup>
+            </Stack>
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 //<MenuItemOption value='byLabel'>group by label</MenuItemOption>

@@ -9,6 +9,8 @@ If this eXtension is valuable for and you like to thank me you can
 
 <a href="https://www.buymeacoffee.com/flohgro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 220px !important;" ></a>
 
+If you want to have a look to other things I'm working, check out my website at [flohgro.com](https://flohgro.com).
+
 ## Features
 
 The following features are currently supported by Craftist:
@@ -37,13 +39,18 @@ The following features are currently supported by Craftist:
 ### Sync Task States
 
 - sync task states
-  - this will sync the states of linked Tasks to todoist
+  - this will sync the states of linked Tasks with Todoist
   - the states will be changed with the following scheme:
     - if the task is completed anywhere (Todoist or craft) complete it on the other platform
     - if the task is cancelled in craft and open in todoist, close it in todoist
   - this will work for every todo item which was linked to a Todoist Task by this eXtension
-  - note: this will **not** work properly for repeating tasks thats why it is currently disabled
+  - syncing tasks is disabled if no task links are enablded since they are necessary to retrieve the tasks information
+  - if the due dates are imported as metadata the sync will work for repeating tasks, too since the due date will be updated. If you disabled due date import, repeating tasks will not be synced.
   - if a task couldn't be retrieved it will be marked as done in Craft since it is was probably deleted
+- sync task content (and metadata)
+  - syncing the tasks will also sync the content and (enabled) metadata
+  - content and metadata will just be synced one-way, from Todoist to Craft and **not** vice-verca
+  - this means if you make changes to the task in Todoist - the changes will be synced (e.g. the new content will be visible after the sync) but if you make changes to the block of the Task in Craft they will **not** be synced to Todoist (this would make the handling too complicated right now)
 
 <a href="https://www.loom.com/share/d220d3bd9e254b47b8b7bbfa397f3b7c">
     <p>Craftist: Sync Task States - Watch Video</p>
@@ -103,6 +110,13 @@ Thanks to @curtismchale for covering Craftist in a [YouTube Video Demo](https://
 Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
+
+### v0.6
+
+- **new/improved:** sync task improvements - recurring tasks are now enabled if due dates are included as metadata
+- **new:** metadata import - imported and synced tasks will now contain metadata from todoist (due dates, labels and descriptions) which you can enable / disable as you like
+- **change:** added warning for disabled task links since syncing states is not possible without links
+- **new/improved:** completely revamped settings window for easier usability
 
 ### v0.5
 

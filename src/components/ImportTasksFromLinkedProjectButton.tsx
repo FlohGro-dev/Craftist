@@ -16,6 +16,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
   const getTasksFromProject = TodoistWrapper.useGetTasksFromProject();
   const projectList = useRecoilValue(TodoistWrapper.projects);
   const sectionList = useRecoilValue(TodoistWrapper.sections);
+  const labelList = useRecoilValue(TodoistWrapper.labels);
   const [isLoading, setIsLoading] = React.useState(false);
   let blocksToAdd: CraftBlockInsert[] = [];
   const onClick = async () => {
@@ -61,7 +62,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
 
             let taskGroupingSettings = await getSettingsGroupProjectTasksOption();
 
-            blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, taskList, true, existingTaskIds, taskGroupingSettings))
+            blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList,labelList, taskList, true, existingTaskIds, taskGroupingSettings))
 
 
 
