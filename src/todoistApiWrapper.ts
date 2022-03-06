@@ -370,10 +370,10 @@ export function createProjectMdString(project: Project, mdPrefix: string = "+ ")
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // both urls requested, need to separate them
     mdString = mdString + "[" + project.name + "](todoist://project?id=" + project.id + ") [(Webview)](" + project.url + ")"
-  } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // only App Url shall be included, just add it as direct url on the project name
     mdString = mdString + "[" + project.name + "](todoist://project?id=" + project.id + ")";
-  } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
     // only Web Url shall be included, just add it as direct url on the project name
     mdString = mdString + "[" + project.name + "](" + project.url + ")";
   } else {
@@ -404,10 +404,10 @@ export function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", labe
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // both urls requested, need to separate them
     mdString = mdString + strippedTaskContent + " [Todoist Task](todoist://task?id=" + task.id + ") [(Webview)](" + task.url + ")";
-  } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // only App Url shall be included, just add it as direct url on the project name
     mdString = mdString + strippedTaskContent + " [Todoist Task](todoist://task?id=" + task.id + ")";
-  } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
     // only Web Url shall be included, just add it as direct url on the project name
     mdString = mdString + strippedTaskContent + " [Todoist Task](" + task.url + ")";
   } else {
@@ -678,54 +678,62 @@ export const useGetTask = () => {
   });
 };
 
-export function getTaskMetadataInMarkdownFormat(task:Task, labelsList: Label[]):string{
-  let mdString:string = "";
+export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[]): string {
+  let mdString: string = "";
   if (taskMetadataSettingsValues.length > 0) {
-      if (taskMetadataSettingsValues.includes("dueDates")) {
-        let dueString = "";
-        if (task.due) {
-          // task has a due date
-          let dueDateYMD = task.due.date.split("-")
-          dueString = "[" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + "](day://" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + ")"
+    if (taskMetadataSettingsValues.includes("dueDates")) {
+      let dueString = "";
+      if (task.due) {
+        // task has a due date
+        let dueDateYMD = task.due.date.split("-")
+        dueString = "[" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + "](day://" + dueDateYMD[0] + "." + dueDateYMD[1] + "." + dueDateYMD[2] + ")"
 
-          // check if its a due time
-          if (task.due.datetime) {
-            // task has an explicit time set
-            let dueDate = new Date(task.due.datetime)
-            dueString = dueString + " at " + dueDate.toLocaleTimeString();
-          }
-          mdString = mdString + " " + dueString;
+        // check if its a due time
+        if (task.due.datetime) {
+          // task has an explicit time set
+          let dueDate = new Date(task.due.datetime)
+          dueString = dueString + " at " + dueDate.toLocaleTimeString();
+        }
+        mdString = mdString + " " + dueString;
 
-          if (task.due.recurring){
-            mdString = mdString + " *(recurring)*"
-          }
+        if (task.due.recurring) {
+          mdString = mdString + " *(recurring)*"
         }
       }
+    }
 
-      if (taskMetadataSettingsValues.includes("labels")) {
-        if (task.labelIds.length > 0) {
-          task.labelIds.forEach((labelId) => {
-            labelsList.filter((label) => label.id == labelId)
-              .map((label) => { mdString = mdString + " ::@" + label.name + "::"; })
-          })
-        }
+    if (taskMetadataSettingsValues.includes("labels")) {
+      if (task.labelIds.length > 0) {
+        task.labelIds.forEach((labelId) => {
+          labelsList.filter((label) => label.id == labelId)
+            .map((label) => { mdString = mdString + " ::@" + label.name + "::"; })
+        })
       }
-      if (taskMetadataSettingsValues.includes("description")) {
-        if (task.description.length > 0) {
-          mdString = mdString + " description: *" + task.description + "*";
-        }
+    }
+    if (taskMetadataSettingsValues.includes("description")) {
+
+      if (task.description.length > 0) {
+        // strip link to document from description:
+        const regex = /Craft Document: \[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
+
+        const subst = ``;
+
+        // The substituted value will be contained in the result variable
+        const strippedDescription = task.description.replace(regex, subst);
+        mdString = mdString + " description: *" + strippedDescription + "*";
       }
+    }
   }
 
-  if(mdString.length > 0){
-      mdString = " // " + mdString;
+  if (mdString.length > 0) {
+    mdString = " // " + mdString;
   }
 
   return mdString;
 }
 
-export function createBlockTextRunFromTask(task:Task):CraftTextRun[]{
-  let result:CraftTextRun[] = []
+export function createBlockTextRunFromTask(task: Task): CraftTextRun[] {
+  let result: CraftTextRun[] = []
 
   // cleanup task content (link to craft block should be removed)
   const regex = /\[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
@@ -736,45 +744,45 @@ export function createBlockTextRunFromTask(task:Task):CraftTextRun[]{
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // both urls requested, need to separate them
     result = [
-    {
-      text: strippedTaskContent + " "
-    },
-    {
-      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-    },
-    {
-      text: " "
-    },
-    {
-      text: "(Weblink)", link: { type: "url", url: task.url }
-    }
+      {
+        text: strippedTaskContent + " "
+      },
+      {
+        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+      },
+      {
+        text: " "
+      },
+      {
+        text: "(Weblink)", link: { type: "url", url: task.url }
+      }
     ]
-  } else if ( !taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
     // only App Url shall be included, just add it as direct url on the task name
     result = [
-    {
-      text: strippedTaskContent + " "
-    },
-    {
-      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-    }
+      {
+        text: strippedTaskContent + " "
+      },
+      {
+        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+      }
     ]
-  } else if ( taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
     // only Web Url shall be included, just add it as direct url on the task name
     result = [
-    {
-      text: strippedTaskContent + " "
-    },
-    {
-      text: "Todoist Task", link: { type: "url", url: task.url }
-    }
+      {
+        text: strippedTaskContent + " "
+      },
+      {
+        text: "Todoist Task", link: { type: "url", url: task.url }
+      }
     ]
   } else {
     // no url shall be included just add the name
     result = [
-    {
-      text: strippedTaskContent
-    }
+      {
+        text: strippedTaskContent
+      }
     ]
   }
   return result;
