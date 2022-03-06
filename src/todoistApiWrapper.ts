@@ -711,15 +711,14 @@ export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[])
       }
     }
     if (taskMetadataSettingsValues.includes("description")) {
+      // strip link to document from description:
+      const regex = /Craft Document: \[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
 
-      if (task.description.length > 0) {
-        // strip link to document from description:
-        const regex = /Craft Document: \[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
+      const subst = ``;
 
-        const subst = ``;
-
-        // The substituted value will be contained in the result variable
-        const strippedDescription = task.description.replace(regex, subst);
+      // The substituted value will be contained in the result variable
+      const strippedDescription = task.description.replace(regex, subst);
+      if (strippedDescription.length > 0) {
         mdString = mdString + " description: *" + strippedDescription + "*";
       }
     }
