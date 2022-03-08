@@ -100,7 +100,7 @@ If you ever want to logout from your todoist account - use the "Login/Logout" bu
 
 ## Installation
 
-You can simply download the `.craftx` file from the latest [Release](https://github.com/FlohGro-dev/Craftist/releases/tag/0.3) and add it to your eXtensions in Craft on macOS.
+You can simply download the `.craftx` file from the latest [Release](https://github.com/FlohGro-dev/Craftist/releases/tag/0.6) and add it to your eXtensions in Craft on macOS.
 
 If you want to built the eXtension by yourself (and e.g. make some custom modifications) use the instructions given by the people at Craft:
 
