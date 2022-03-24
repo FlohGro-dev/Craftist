@@ -8,11 +8,6 @@ import { CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-exten
 import { Box, Center } from "@chakra-ui/react";
 import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
 
-// import { CraftEnv } from "../types"
-//
-// type CreateTasksFromSelectionButtonProperties = {
-//   craftEnv: CraftEnv;
-// }
 
 const CreateTasksFromSelectionButton: React.FC = () => {
   const toast = useToast();
