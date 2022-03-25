@@ -7,12 +7,14 @@ import { useToast } from "@chakra-ui/toast";
 import { CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
 import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+import { useRecoilValue } from "recoil";
 
 
 const CreateTasksFromSelectionButton: React.FC = () => {
   const toast = useToast();
   const add = TodoistWrapper.useAddTask();
   const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
+  const labelList = useRecoilValue(TodoistWrapper.labels);
   const [isLoading, setIsLoading] = React.useState(false);
   const onClick = async () => {
     setIsLoading(true);
@@ -126,7 +128,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
                   .then(async function(task) {
                     // append task link to block
 
-                    let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task)
+                    let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
 
                     block.content = blockToAppend;
                     //block.listStyle.type = "todo";

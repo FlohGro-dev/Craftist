@@ -191,6 +191,40 @@ export async function getSettingsDescriptionUsage(): Promise<string> {
   }
 }
 
+// priorities
+const useSettingsPrioritiesEnabledKey: string = "useSettingsPrioritiesKey"
+
+export async function setSettingsPrioritiesUsage(usePriorities: boolean) {
+  const settingsString = "priorities"
+  const index = taskMetadataSettingsValues.indexOf(settingsString, 0);
+  if (usePriorities) {
+    if (index == -1) {
+      taskMetadataSettingsValues.push(settingsString)
+    }
+  } else {
+    if (index > -1) {
+      taskMetadataSettingsValues.splice(index, 1);
+    }
+  }
+  await craft.storageApi.put(useSettingsPrioritiesEnabledKey, String(usePriorities));
+}
+
+export async function getSettingsPrioritiesUsage(): Promise<string> {
+  let prioritiesEnabled = await craft.storageApi.get(useSettingsPrioritiesEnabledKey);
+  if (prioritiesEnabled.status == "success") {
+    const settingsString = "priorities"
+    if (prioritiesEnabled.data == "true") {
+      const index = taskMetadataSettingsValues.indexOf(settingsString, 0);
+      if (index == -1) {
+        taskMetadataSettingsValues.push(settingsString)
+      }
+    }
+    return prioritiesEnabled.data
+  } else {
+    return "error"
+  }
+}
+
 // todays task grouping
 const useSettingsGroupTodaysTasksOption: string = "useSettingsGroupTodaysTasksOptionKey"
 
@@ -568,6 +602,7 @@ export const writeDefaultSettings = async () => {
   let dueDatesSettings = await getSettingsDueDateUsage();
   let labelsSettings = await getSettingsLabelsUsage();
   let descriptionSettings = await getSettingsDescriptionUsage();
+  let prioritiesSettings = await getSettingsPrioritiesUsage();
   let locationSettings = await getSettingsImportAfterSelectedBlockOption();
   let dailyNotesSettings = await getSettingsSetDueDateBasedOnDailyNoteOption();
 
@@ -590,6 +625,10 @@ export const writeDefaultSettings = async () => {
   if (descriptionSettings == "error") {
     // write default
     await setSettingsDescriptionUsage(false);
+  }
+  if (prioritiesSettings == "error") {
+    // write defaults
+    await setSettingsPrioritiesUsage(true);
   }
   if (locationSettings == "error") {
     // write default

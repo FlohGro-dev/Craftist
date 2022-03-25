@@ -116,6 +116,12 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
 
+### v0.7
+
+- **improved:** sync task improvements - switched to update Blocks - blocks will not get recreated in every sync
+- **new:** priorities sync - priorities can be synced as metadata which will colorize the task content similar to Todoists colors
+- **new:** recurring tasks will be unlinked when when they are completed in a daily note which will prevent repeated sync of the task / keep it checked in the daily note
+
 ### v0.6
 
 - **new/improved:** sync task improvements - recurring tasks are now enabled if due dates are included as metadata

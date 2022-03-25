@@ -4,7 +4,7 @@ import { UpDownIcon } from "@chakra-ui/icons";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
-import { CraftTextBlock } from "@craftdocs/craft-extension-api";
+import { CraftBlockUpdate, CraftTextBlock } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
 import { isAnyTaskLinkEnabled, taskMetadataSettingsValues } from "../settingsUtils";
 import { useRecoilValue } from "recoil";
@@ -18,6 +18,7 @@ const SyncTaskStatesButton: React.FC = () => {
   const isRecurringTask = TodoistWrapper.useCheckIfTaskIsRecurring();
   const setTaskCompleted = TodoistWrapper.useSetTaskComplete();
   const getTask = TodoistWrapper.useGetTask();
+
   const onClick = async () => {
     setIsLoading(true);
     // if no task links are enabled, return immediately and display a warning
@@ -38,8 +39,19 @@ const SyncTaskStatesButton: React.FC = () => {
       return;
     }
 
-    let todoBlocks = await CraftBlockInteractor.getAllTodoItemsFromCurrentPage();
+    // get page for document linking
+    const getPageResult = await craft.dataApi.getCurrentPage();
 
+    if (getPageResult.status !== "success") {
+      throw new Error(getPageResult.message)
+    }
+
+    const pageBlock = getPageResult.data
+    let documentDate: string | undefined = undefined;
+    documentDate = CraftBlockInteractor.getIsoDateIfCurrentDocumentIsDailyNote(pageBlock);
+
+    let todoBlocks = await CraftBlockInteractor.getAllTodoItemsFromCurrentPage();
+    let blocksToUpdate: CraftBlockUpdate[] = [];
 
     if (!todoBlocks.length) {
       setIsLoading(false);
@@ -75,16 +87,19 @@ const SyncTaskStatesButton: React.FC = () => {
           })
             .catch(() => {
               //ERROR
-              toast({
-                position: "bottom",
-                render: () => (
-                  <Center>
-                    <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
-                      Failed syncing states - please try to login again
+              if (!toast.isActive("failedToSyncToast")) {
+                toast({
+                  id: "failedToSyncToast",
+                  position: "bottom",
+                  render: () => (
+                    <Center>
+                      <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                        Failed syncing states - please try to login again
                       </Box>
-                  </Center>
-                ),
-              })
+                    </Center>
+                  ),
+                })
+              }
             })
 
           getIsTaskStateCompleted.then(async function(isCompleted) {
@@ -118,16 +133,31 @@ const SyncTaskStatesButton: React.FC = () => {
                   if (isCompleted && block.listStyle.state == "unchecked") {
                     // task is completed in todoist but not in Craft
                     block.listStyle.state = "checked";
-                    const result = await craft.dataApi.updateBlocks([block])
-                    if (result.status !== "success") {
-                      throw new Error(result.message)
-                    }
+                    //const result = await craft.dataApi.updateBlocks([block])
+                    blocksToUpdate.push(block);
                   }
                   if (!isCompleted && block.listStyle.state == "checked") {
                     // task is completed in craft but not in todoist
                     setTaskCompleted({
                       id: Number(taskId)
                     });
+
+                    if (isRecurring) {
+                      // special handling for recurring tasks:
+                      // unlink a recurring task if it is in a daily note
+                      if (documentDate) {
+                        getTask({ taskId: Number(taskId) })
+                          .catch()
+                          .then((task) => {
+                            block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList, true)
+                            blocksToUpdate.push(block)
+                          })
+                      } else {
+                        // otherwise uncheck the todo again
+                        block.listStyle.state = "unchecked"
+                        blocksToUpdate.push(block)
+                      }
+                    }
                   }
 
                   if (!isCompleted && block.listStyle.state == "canceled") {
@@ -144,10 +174,7 @@ const SyncTaskStatesButton: React.FC = () => {
               if (block.listStyle.type == "todo") {
                 // task couldn't be retrieved, mark it as done in craft since it is probably deleted
                 block.listStyle.state = "checked";
-                const result = await craft.dataApi.updateBlocks([block])
-                if (result.status !== "success") {
-                  throw new Error(result.message)
-                }
+                blocksToUpdate.push(block);
               }
 
 
@@ -161,32 +188,33 @@ const SyncTaskStatesButton: React.FC = () => {
                   .then(async function(task) {
                     if (task) {
 
-                      let prefix = "- [ ] "
-                      if (task.completed) {
-                        prefix = "- [x] "
-                      }
+                      // let prefix = "- [ ] "
+                      // if (task.completed) {
+                      //   prefix = "- [x] "
+                      // }
 
-                      let newContent = TodoistWrapper.createTaskMdString(task, prefix, labelList);
+                      // let newContent = TodoistWrapper.createTaskMdString(task, prefix, labelList);
 
-                      let newBlock = craft.markdown.markdownToCraftBlocks(newContent);
+                      // let newBlock = craft.markdown.markdownToCraftBlocks(newContent);
                       const getPageResult = await craft.dataApi.getCurrentPage();
                       if (getPageResult.status != "success") {
                         throw new Error("get page failed")
                       }
                       // prevent readding task as open since somehow the craft api doesn't render the done checkbox correct.
                       if (!task.completed) {
-                        const blockLocation = craft.location.afterBlockLocation(getPageResult.data.id, block.id);
-                        newBlock.forEach((nBlock) => {
-                          nBlock.indentationLevel = block.indentationLevel;
-                        })
-                        await craft.dataApi.addBlocks(newBlock, blockLocation);
-                        await craft.dataApi.deleteBlocks([block.id]);
+                        //const blockLocation = craft.location.afterBlockLocation(getPageResult.data.id, block.id);
+                        // newBlock.forEach((nBlock) => {
+                        //   nBlock.indentationLevel = block.indentationLevel;
+                        // })
+                        block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
+                        blocksToUpdate.push(block)
+                        //await craft.dataApi.addBlocks(newBlock, blockLocation);
+                        //await craft.dataApi.deleteBlocks([block.id]);
                       }
                     }
                   })
-              }, 1000);
+              }, 100);
             })
-
         } else {
           // nothing to be done - task is not crosslinked between todoist and craft (maybe link it right now?)
           if (!toast.isActive(tasksToSyncToastId)) {
@@ -203,7 +231,6 @@ const SyncTaskStatesButton: React.FC = () => {
             })
           }
         }
-        setIsLoading(false);
         if (!toast.isActive(tasksToSyncToastId)) {
           toast({
             id: tasksToSyncToastId,
@@ -211,7 +238,7 @@ const SyncTaskStatesButton: React.FC = () => {
             render: () => (
               <Center>
                 <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                  Synced Task states
+                  Synced Tasks
                     </Box>
               </Center>
             ),
@@ -219,6 +246,10 @@ const SyncTaskStatesButton: React.FC = () => {
         }
 
       })
+    setTimeout(async function() {
+      await craft.dataApi.updateBlocks(blocksToUpdate);
+    }, 1000)
+    setIsLoading(false);
   }
 
   return (
@@ -230,7 +261,7 @@ const SyncTaskStatesButton: React.FC = () => {
       mb="2"
       isLoading={isLoading}
     >
-      Sync Task States
+      Sync Tasks
       </Button>
   );
 }
