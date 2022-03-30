@@ -8,6 +8,7 @@ export let taskGroupingProjectValues: string[] = [];
 export let taskGroupingAllValues: string[] = [];
 export let taskImportAfterSelectedBlock: string = "";
 export let taskSetDueDatesBasedOnDailyNote: string = "";
+export let taskSyncContinuousMode: string = "";
 
 
 // const taskMetadataSettingsDefaultValues:string[] = [];
@@ -583,6 +584,28 @@ export async function getSettingsSetDueDateBasedOnDailyNoteOption():Promise<stri
   }
 }
 
+//
+const useSettingsSetContinuousSyncMode: string = "useSettingsSetContinuousSyncMode"
+
+export async function setSettingsSetContinuousSyncMode(enabled: boolean) {
+  if (enabled) {
+    taskSyncContinuousMode = "enabled";
+  } else {
+    taskSyncContinuousMode = "disabled";
+  }
+  await craft.storageApi.put(useSettingsSetContinuousSyncMode, taskSyncContinuousMode);
+}
+
+export async function getSettingsSetContinuousSyncMode():Promise<string>{
+  let result = await craft.storageApi.get(useSettingsSetContinuousSyncMode);
+  if(result.status == "success"){
+    return result.data
+  } else {
+    return "error"
+  }
+}
+
+
 
 
 
@@ -605,6 +628,7 @@ export const writeDefaultSettings = async () => {
   let prioritiesSettings = await getSettingsPrioritiesUsage();
   let locationSettings = await getSettingsImportAfterSelectedBlockOption();
   let dailyNotesSettings = await getSettingsSetDueDateBasedOnDailyNoteOption();
+  let continuousSyncSettings = await getSettingsSetContinuousSyncMode();
 
   if (mobileUrlSettings == "error") {
     // write default
@@ -637,6 +661,10 @@ export const writeDefaultSettings = async () => {
   if (dailyNotesSettings == "error") {
     // write default
     await setSettingsSetDueDateBasedOnDailyNoteOption(true);
+  }
+  if(continuousSyncSettings == "error") {
+    //write default
+    await setSettingsSetContinuousSyncMode(false);
   }
   if (!checkIfSettingExists(useSettingsGroupTodaysTasksOption)) {
     // write default

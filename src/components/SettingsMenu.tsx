@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@chakra-ui/button";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { Box, Center, Checkbox, CheckboxGroup, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, StackDivider, useDisclosure, useToast } from "@chakra-ui/react";
-import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsImportAfterSelectedBlockOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsPrioritiesUsage, setSettingsSetDueDateBasedOnDailyNoteOption, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskImportAfterSelectedBlock, taskLinkSettingsValues, taskMetadataSettingsValues, taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsImportAfterSelectedBlockOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsPrioritiesUsage, setSettingsSetContinuousSyncMode, setSettingsSetDueDateBasedOnDailyNoteOption, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskImportAfterSelectedBlock, taskLinkSettingsValues, taskMetadataSettingsValues, taskSetDueDatesBasedOnDailyNote, taskSyncContinuousMode } from "../settingsUtils";
 
 
 
@@ -364,6 +364,20 @@ const SettingsMenu: React.FC = () => {
     })
   }
 
+  const onChangeSetContinuousSyncMode = async (enable:boolean) => {
+    await setSettingsSetContinuousSyncMode(enable)
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Continuous Task Sync {enable ? "enabled":"disabled"}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
 
   return (
     <>
@@ -429,6 +443,12 @@ const SettingsMenu: React.FC = () => {
               <Stack spacing={[1, 5]} direction={['column', 'row']}>
               <Radio value='enabled' onChange={() => onChangeEnableSetDueDateBasedOnDailyNote(true)}>enabled</Radio>
               <Radio value='disabled' onChange={() => onChangeEnableSetDueDateBasedOnDailyNote(false)}>disabled</Radio>
+              </Stack>
+              </RadioGroup>
+              <RadioGroup colorScheme='red' defaultValue={taskSyncContinuousMode}> enable continous task sync (beta)
+              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+              <Radio value='enabled' onChange={() => onChangeSetContinuousSyncMode(true)}>enabled</Radio>
+              <Radio value='disabled' onChange={() => onChangeSetContinuousSyncMode(false)}>disabled</Radio>
               </Stack>
               </RadioGroup>
             </Stack>

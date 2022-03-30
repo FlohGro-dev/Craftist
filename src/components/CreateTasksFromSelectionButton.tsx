@@ -113,7 +113,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
             )
             .map((block) => {
               const documentTitle = "Craft Document: " + CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(pageBlock);
-              const mdLink = CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(block);
+              const mdContentWithLink = CraftBlockInteractor.getMarkdownContentWithLinkToCraftTextBlock(block);
 
               if (CraftBlockInteractor.blockContainsString("Todoist Task", block)) {
                 // nothing to be done - task is already linked
@@ -121,7 +121,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
 
                 add({
                   description: documentTitle,
-                  content: mdLink,
+                  content: mdContentWithLink,
                   projectId: linkedProjectId,
                   due_date: documentDate
                 })

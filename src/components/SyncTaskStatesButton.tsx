@@ -6,7 +6,7 @@ import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { useToast } from "@chakra-ui/toast";
 import { CraftBlockUpdate, CraftTextBlock } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
-import { isAnyTaskLinkEnabled, taskMetadataSettingsValues } from "../settingsUtils";
+import { isAnyTaskLinkEnabled, taskMetadataSettingsValues, taskSyncContinuousMode } from "../settingsUtils";
 import { useRecoilValue } from "recoil";
 
 const SyncTaskStatesButton: React.FC = () => {
@@ -18,8 +18,10 @@ const SyncTaskStatesButton: React.FC = () => {
   const isRecurringTask = TodoistWrapper.useCheckIfTaskIsRecurring();
   const setTaskCompleted = TodoistWrapper.useSetTaskComplete();
   const getTask = TodoistWrapper.useGetTask();
+  const [continuousSyncIsEnabled, setContinuousSyncIsEnabled] = React.useState(false);
+  const [intervalId, setIntervalId] = React.useState(0);
 
-  const onClick = async () => {
+  const onSyncTasks = async () => {
     setIsLoading(true);
     // if no task links are enabled, return immediately and display a warning
     const taskLinkEnabled: boolean = isAnyTaskLinkEnabled();
@@ -207,13 +209,15 @@ const SyncTaskStatesButton: React.FC = () => {
                         //   nBlock.indentationLevel = block.indentationLevel;
                         // })
                         block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
+//                        block.content = TodoistWrapper.createTaskMdString(task,"- [ ]",labelList)
+
                         blocksToUpdate.push(block)
                         //await craft.dataApi.addBlocks(newBlock, blockLocation);
                         //await craft.dataApi.deleteBlocks([block.id]);
                       }
                     }
                   })
-              }, 100);
+              }, 500);
             })
         } else {
           // nothing to be done - task is not crosslinked between todoist and craft (maybe link it right now?)
@@ -231,25 +235,61 @@ const SyncTaskStatesButton: React.FC = () => {
             })
           }
         }
-        if (!toast.isActive(tasksToSyncToastId)) {
-          toast({
-            id: tasksToSyncToastId,
-            position: "bottom",
-            render: () => (
-              <Center>
-                <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                  Synced Tasks
-                    </Box>
-              </Center>
-            ),
-          })
-        }
 
       })
     setTimeout(async function() {
       await craft.dataApi.updateBlocks(blocksToUpdate);
-    }, 1000)
-    setIsLoading(false);
+      setIsLoading(false);
+      if (!toast.isActive(tasksToSyncToastId)) {
+        toast({
+          id: tasksToSyncToastId,
+          position: "bottom",
+          render: () => (
+            <Center>
+              <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+                Synced Tasks
+                  </Box>
+            </Center>
+          ),
+        })
+      }
+    }, 2000)
+  }
+
+  const onClick = async () => {
+    // behavior: everytime the button is pressed the tasks will be synced / only if continuous sync is enabled no tasks will be synced
+    // the settings will be toggled depending on the current state
+
+    // check if we have to change the continuous sync variable
+    if(taskSyncContinuousMode == "enabled"){
+      // beta mode is enabled toggle the sync mode variable
+      let appliedValue = true;
+      if(continuousSyncIsEnabled == true){
+        setContinuousSyncIsEnabled(false)
+        appliedValue = false;
+        clearInterval(intervalId);
+      } else {
+        setContinuousSyncIsEnabled(true)
+        setIntervalId(setInterval(onSyncTasks, 10000))
+        onSyncTasks();
+      }
+      toast({
+        id: tasksToSyncToastId,
+        position: "bottom",
+        render: () => (
+          <Center>
+            <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+              Continuous Task Sync {appliedValue == true ? "enabled" : "disabled"}
+                </Box>
+          </Center>
+        ),
+      })
+    } else {
+      setContinuousSyncIsEnabled(false)
+      clearInterval(intervalId);
+      onSyncTasks();
+    }
+
   }
 
   return (

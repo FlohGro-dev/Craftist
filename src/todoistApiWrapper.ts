@@ -1,6 +1,6 @@
 import * as Recoil from "recoil";
 import { TodoistApi, Project, Task, Section, Label } from "@doist/todoist-api-typescript";
-import { CraftBlockInsert, CraftTextRun, TextHighlightColor } from "@craftdocs/craft-extension-api";
+import { CraftBlockInsert, CraftTextBlockInsert, CraftTextRun, TextHighlightColor } from "@craftdocs/craft-extension-api";
 import { taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
 
 
@@ -332,11 +332,18 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
     let mdContent = craft.markdown.markdownToCraftBlocks(createTaskMdString(curTask.task, "- [ ] ", labelsList));
 
+    let tB: CraftTextBlockInsert = {
+      content: createBlockTextRunFromTask(curTask.task,labelsList, false),
+      type: "textBlock"
+    };
+    tB.indentationLevel = indentationLevel;
+
     mdContent.forEach((block) => {
       block.indentationLevel = indentationLevel;
     })
 
-    blocksToAdd = blocksToAdd.concat(mdContent);
+    //blocksToAdd = blocksToAdd.concat(mdContent);
+    blocksToAdd = blocksToAdd.concat(tB);
 
 
     if (curTask.children != undefined) {
@@ -734,6 +741,7 @@ export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[])
 
 export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forceUnlinked:boolean = false): CraftTextRun[] {
   let result: CraftTextRun[] = []
+  //let testResult: CraftTextRun[] = []
 
   // cleanup task content (link to craft block should be removed)
   const regex = /\[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
@@ -741,24 +749,33 @@ export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forc
 
   // The substituted value will be contained in the result variable
   const strippedTaskContent = task.content.replace(regex, subst);
-  if (taskMetadataSettingsValues.includes("priorities")) {
-    // check color
-    let highlightColor: undefined | TextHighlightColor = undefined;
-    switch(task.priority){
-      case 1: break;
-      case 2: highlightColor = "blue"; break;
-      case 3: highlightColor = "yellow"; break;
-      case 4: highlightColor = "red"; break;
-    }
-    result.push({
-        text: strippedTaskContent,
-        highlightColor: highlightColor
-    })
-  } else {
-    result.push({
-        text: strippedTaskContent
-    })
-  }
+
+  let mdBlocks = craft.markdown.markdownToCraftBlocks(strippedTaskContent);
+  //
+  mdBlocks.forEach((mdBlock)=>{
+    if(mdBlock.type == "textBlock"){
+
+
+      if(typeof mdBlock.content == "string"){
+        result.push({
+            text: mdBlock.content
+        })
+      } else {
+        let textRunContent:CraftTextRun[] = mdBlock.content;
+        textRunContent.forEach((textRun) =>{
+          result.push({
+            text: textRun.text,
+            highlightColor: textRun.highlightColor,
+            isBold: textRun.isBold,
+            isCode: textRun.isCode,
+            isItalic: textRun.isItalic,
+            isStrikethrough: textRun.isStrikethrough,
+            link: textRun.link
+          })
+        })
+      }
+     }
+  })
 
   if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile") && !forceUnlinked) {
     // both urls requested, need to separate them
@@ -832,6 +849,25 @@ function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): CraftTextRun
       }
     }
 
+    if (taskMetadataSettingsValues.includes("priorities")) {
+      // check color
+      let priorityText = "";
+      let highlightColor: undefined | TextHighlightColor = undefined;
+      switch(task.priority){
+        case 1: priorityText = "p4"; highlightColor = "grey"; break;
+        case 2: priorityText = "p3"; highlightColor = "blue"; break;
+        case 3: priorityText = "p2"; highlightColor = "yellow"; break;
+        case 4: priorityText = "p1"; highlightColor = "red"; break;
+      }
+      result.push({
+          text: " "
+      })
+      result.push({
+          text: priorityText,
+          highlightColor: highlightColor
+      })
+    }
+
     if (taskMetadataSettingsValues.includes("labels")) {
       if (task.labelIds.length > 0) {
         task.labelIds.forEach((labelId) => {
@@ -842,7 +878,7 @@ function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): CraftTextRun
               })
               result.push({
                 text: "@" + label.name,
-                highlightColor: "grey"
+                highlightColor: "lime"
               })
             })
         })
@@ -858,7 +894,8 @@ function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): CraftTextRun
       const strippedDescription = task.description.replace(regex, subst);
       if (strippedDescription.length > 0) {
         result.push({
-          text: " description: "
+          text: " description: ",
+          isItalic: true
         })
         result.push({
           text: strippedDescription,
