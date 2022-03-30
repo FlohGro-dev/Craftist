@@ -148,32 +148,25 @@ const SyncTaskStatesButton: React.FC = () => {
                       // special handling for recurring tasks:
                       // unlink a recurring task if it is in a daily note
                       if (documentDate) {
-                        toast({
-                          id: tasksToSyncToastId,
-                          position: "bottom",
-                          render: () => (
-                            <Center>
-                              <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
-                                date {documentDate}
-                            </Box>
-                            </Center>
-                          ),
-                        })
-                        await getTask({ taskId: Number(taskId) })
-                          .catch()
-                          .then((task) => {
-                            block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList, true)
-                            blocksToUpdate.push(block)
-                          })
+                        setTimeout(async function() {
+                          await getTask({ taskId: Number(taskId) })
+                            .catch()
+                            .then((task) => {
+                              block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList, true)
+                              blocksToUpdate.push(block)
+                            })
+                        }, 200)
                       } else {
                         // otherwise uncheck the todo again
                         block.listStyle.state = "unchecked"
-                        await getTask({ taskId: Number(taskId) })
-                          .catch()
-                          .then((task) => {
-                            block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
-                            blocksToUpdate.push(block)
-                          })
+                        setTimeout(async function() {
+                          await getTask({ taskId: Number(taskId) })
+                            .catch()
+                            .then((task) => {
+                              block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
+                              blocksToUpdate.push(block)
+                            })
+                        }, 200)
                       }
                     }
                   }
@@ -210,7 +203,7 @@ const SyncTaskStatesButton: React.FC = () => {
                         throw new Error("get page failed")
                       }
                       // only update uncompleted tasks and tasks which are not recurring here
-                      if (!task.completed && !task.due?.recurring) {
+                      if (!task.completed && !task.due ?.recurring) {
                         block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
                         blocksToUpdate.push(block)
                       }
@@ -260,10 +253,10 @@ const SyncTaskStatesButton: React.FC = () => {
     // the settings will be toggled depending on the current state
 
     // check if we have to change the continuous sync variable
-    if(taskSyncContinuousMode == "enabled"){
+    if (taskSyncContinuousMode == "enabled") {
       // beta mode is enabled toggle the sync mode variable
       let appliedValue = true;
-      if(continuousSyncIsEnabled == true){
+      if (continuousSyncIsEnabled == true) {
         setContinuousSyncIsEnabled(false)
         appliedValue = false;
         clearInterval(intervalId);
@@ -279,7 +272,7 @@ const SyncTaskStatesButton: React.FC = () => {
           <Center>
             <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
               Continuous Task Sync {appliedValue == true ? "enabled" : "disabled"}
-                </Box>
+            </Box>
           </Center>
         ),
       })
