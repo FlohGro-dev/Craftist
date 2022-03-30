@@ -335,9 +335,9 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
 
     let tB: CraftTextBlockInsert = {
-      content: createBlockTextRunFromTask(curTask.task,labelsList, false),
+      content: createBlockTextRunFromTask(curTask.task, labelsList, false),
       type: "textBlock",
-      listStyle: {type: "todo", state: "unchecked" }
+      listStyle: { type: "todo", state: "unchecked" }
     };
     tB.indentationLevel = indentationLevel;
 
@@ -746,7 +746,7 @@ export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[])
   return mdString;
 }
 
-export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forceUnlinked:boolean = false, prefix:string = "- [ ] "): CraftTextRun[] {
+export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forceUnlinked: boolean = false): CraftTextRun[] {
   let result: CraftTextRun[] = []
   //let testResult: CraftTextRun[] = []
 
@@ -755,21 +755,21 @@ export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forc
   const subst = `$1`;
 
   // The substituted value will be contained in the result variable
-  const strippedTaskContent = prefix + task.content.replace(regex, subst);
+  const strippedTaskContent = task.content.replace(regex, subst);
 
   let mdBlocks = craft.markdown.markdownToCraftBlocks(strippedTaskContent);
   //
-  mdBlocks.forEach((mdBlock)=>{
-    if(mdBlock.type == "textBlock"){
+  mdBlocks.forEach((mdBlock) => {
+    if (mdBlock.type == "textBlock") {
 
 
-      if(typeof mdBlock.content == "string"){
+      if (typeof mdBlock.content == "string") {
         result.push({
-            text: mdBlock.content
+          text: mdBlock.content
         })
       } else {
-        let textRunContent:CraftTextRun[] = mdBlock.content;
-        textRunContent.forEach((textRun) =>{
+        let textRunContent: CraftTextRun[] = mdBlock.content;
+        textRunContent.forEach((textRun) => {
           result.push({
             text: textRun.text,
             highlightColor: textRun.highlightColor,
@@ -781,39 +781,41 @@ export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forc
           })
         })
       }
-     }
+    }
   })
 
-  if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile") && !forceUnlinked) {
-    // both urls requested, need to separate them
-    result.push({
-      text: " "
-    })
-    result.push({
-      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-    })
-    result.push({
-      text: " "
-    })
-    result.push({
-      text: "(Weblink)", link: { type: "url", url: task.url }
-    })
-  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile") && !forceUnlinked) {
-    // only App Url shall be included, just add it as direct url on the task name
-    result.push({
-      text: " "
-    })
-    result.push({
-      text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-    })
-  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile") && !forceUnlinked) {
-    // only Web Url shall be included, just add it as direct url on the task name
-    result.push({
-      text: " "
-    })
-    result.push({
-      text: "Todoist Task", link: { type: "url", url: task.url }
-    })
+  if (!forceUnlinked) {
+    if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+      // both urls requested, need to separate them
+      result.push({
+        text: " "
+      })
+      result.push({
+        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+      })
+      result.push({
+        text: " "
+      })
+      result.push({
+        text: "(Weblink)", link: { type: "url", url: task.url }
+      })
+    } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+      // only App Url shall be included, just add it as direct url on the task name
+      result.push({
+        text: " "
+      })
+      result.push({
+        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+      })
+    } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+      // only Web Url shall be included, just add it as direct url on the task name
+      result.push({
+        text: " "
+      })
+      result.push({
+        text: "Todoist Task", link: { type: "url", url: task.url }
+      })
+    }
   }
 
   result = result.concat(getTaskMetadataAsTextRun(task, labelsList));
@@ -860,18 +862,18 @@ function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): CraftTextRun
       // check color
       let priorityText = "";
       let highlightColor: undefined | TextHighlightColor = undefined;
-      switch(task.priority){
+      switch (task.priority) {
         case 1: priorityText = "p4"; highlightColor = "grey"; break;
         case 2: priorityText = "p3"; highlightColor = "blue"; break;
         case 3: priorityText = "p2"; highlightColor = "yellow"; break;
         case 4: priorityText = "p1"; highlightColor = "red"; break;
       }
       result.push({
-          text: " "
+        text: " "
       })
       result.push({
-          text: priorityText,
-          highlightColor: highlightColor
+        text: priorityText,
+        highlightColor: highlightColor
       })
     }
 

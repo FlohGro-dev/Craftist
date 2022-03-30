@@ -140,7 +140,7 @@ const SyncTaskStatesButton: React.FC = () => {
                   }
                   if (!isCompleted && block.listStyle.state == "checked") {
                     // task is completed in craft but not in todoist
-                    setTaskCompleted({
+                    await setTaskCompleted({
                       id: Number(taskId)
                     });
 
@@ -148,7 +148,18 @@ const SyncTaskStatesButton: React.FC = () => {
                       // special handling for recurring tasks:
                       // unlink a recurring task if it is in a daily note
                       if (documentDate) {
-                        getTask({ taskId: Number(taskId) })
+                        toast({
+                          id: tasksToSyncToastId,
+                          position: "bottom",
+                          render: () => (
+                            <Center>
+                              <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                                date {documentDate}
+                            </Box>
+                            </Center>
+                          ),
+                        })
+                        await getTask({ taskId: Number(taskId) })
                           .catch()
                           .then((task) => {
                             block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList, true)
@@ -157,7 +168,12 @@ const SyncTaskStatesButton: React.FC = () => {
                       } else {
                         // otherwise uncheck the todo again
                         block.listStyle.state = "unchecked"
-                        blocksToUpdate.push(block)
+                        await getTask({ taskId: Number(taskId) })
+                          .catch()
+                          .then((task) => {
+                            block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
+                            blocksToUpdate.push(block)
+                          })
                       }
                     }
                   }
@@ -189,35 +205,18 @@ const SyncTaskStatesButton: React.FC = () => {
                   })
                   .then(async function(task) {
                     if (task) {
-
-                      // let prefix = "- [ ] "
-                      // if (task.completed) {
-                      //   prefix = "- [x] "
-                      // }
-
-                      // let newContent = TodoistWrapper.createTaskMdString(task, prefix, labelList);
-
-                      // let newBlock = craft.markdown.markdownToCraftBlocks(newContent);
                       const getPageResult = await craft.dataApi.getCurrentPage();
                       if (getPageResult.status != "success") {
                         throw new Error("get page failed")
                       }
-                      // prevent readding task as open since somehow the craft api doesn't render the done checkbox correct.
-                      if (!task.completed) {
-                        //const blockLocation = craft.location.afterBlockLocation(getPageResult.data.id, block.id);
-                        // newBlock.forEach((nBlock) => {
-                        //   nBlock.indentationLevel = block.indentationLevel;
-                        // })
+                      // only update uncompleted tasks and tasks which are not recurring here
+                      if (!task.completed && !task.due?.recurring) {
                         block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
-//                        block.content = TodoistWrapper.createTaskMdString(task,"- [ ]",labelList)
-
                         blocksToUpdate.push(block)
-                        //await craft.dataApi.addBlocks(newBlock, blockLocation);
-                        //await craft.dataApi.deleteBlocks([block.id]);
                       }
                     }
                   })
-              }, 500);
+              }, 1000);
             })
         } else {
           // nothing to be done - task is not crosslinked between todoist and craft (maybe link it right now?)
