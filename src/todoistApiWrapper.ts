@@ -1,6 +1,6 @@
 import * as Recoil from "recoil";
 import { TodoistApi, Project, Task, Section, Label } from "@doist/todoist-api-typescript";
-import { CraftBlockInsert, CraftTextRun } from "@craftdocs/craft-extension-api";
+import { CraftBlockInsert, CraftTextBlockInsert, CraftTextRun, TextHighlightColor } from "@craftdocs/craft-extension-api";
 import { taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
 
 
@@ -332,11 +332,25 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
     let mdContent = craft.markdown.markdownToCraftBlocks(createTaskMdString(curTask.task, "- [ ] ", labelsList));
 
+
+
+    let tB: CraftTextBlockInsert = {
+      content: createBlockTextRunFromTask(curTask.task, labelsList, false),
+      type: "textBlock",
+      listStyle: { type: "todo", state: "unchecked" }
+    };
+    tB.indentationLevel = indentationLevel;
+
+
+
+
+
     mdContent.forEach((block) => {
       block.indentationLevel = indentationLevel;
     })
 
-    blocksToAdd = blocksToAdd.concat(mdContent);
+    //blocksToAdd = blocksToAdd.concat(mdContent);
+    blocksToAdd = blocksToAdd.concat(tB);
 
 
     if (curTask.children != undefined) {
@@ -732,8 +746,9 @@ export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[])
   return mdString;
 }
 
-export function createBlockTextRunFromTask(task: Task): CraftTextRun[] {
+export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forceUnlinked: boolean = false): CraftTextRun[] {
   let result: CraftTextRun[] = []
+  //let testResult: CraftTextRun[] = []
 
   // cleanup task content (link to craft block should be removed)
   const regex = /\[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
@@ -741,49 +756,169 @@ export function createBlockTextRunFromTask(task: Task): CraftTextRun[] {
 
   // The substituted value will be contained in the result variable
   const strippedTaskContent = task.content.replace(regex, subst);
-  if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
-    // both urls requested, need to separate them
-    result = [
-      {
-        text: strippedTaskContent + " "
-      },
-      {
-        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-      },
-      {
+
+  let mdBlocks = craft.markdown.markdownToCraftBlocks(strippedTaskContent);
+  //
+  mdBlocks.forEach((mdBlock) => {
+    if (mdBlock.type == "textBlock") {
+
+
+      if (typeof mdBlock.content == "string") {
+        result.push({
+          text: mdBlock.content
+        })
+      } else {
+        let textRunContent: CraftTextRun[] = mdBlock.content;
+        textRunContent.forEach((textRun) => {
+          result.push({
+            text: textRun.text,
+            highlightColor: textRun.highlightColor,
+            isBold: textRun.isBold,
+            isCode: textRun.isCode,
+            isItalic: textRun.isItalic,
+            isStrikethrough: textRun.isStrikethrough,
+            link: textRun.link
+          })
+        })
+      }
+    }
+  })
+
+  if (!forceUnlinked) {
+    if (taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+      // both urls requested, need to separate them
+      result.push({
         text: " "
-      },
-      {
-        text: "(Weblink)", link: { type: "url", url: task.url }
-      }
-    ]
-  } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
-    // only App Url shall be included, just add it as direct url on the task name
-    result = [
-      {
-        text: strippedTaskContent + " "
-      },
-      {
+      })
+      result.push({
         text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
-      }
-    ]
-  } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
-    // only Web Url shall be included, just add it as direct url on the task name
-    result = [
-      {
-        text: strippedTaskContent + " "
-      },
-      {
+      })
+      result.push({
+        text: " "
+      })
+      result.push({
+        text: "(Weblink)", link: { type: "url", url: task.url }
+      })
+    } else if (!taskLinkSettingsValues.includes("web") && taskLinkSettingsValues.includes("mobile")) {
+      // only App Url shall be included, just add it as direct url on the task name
+      result.push({
+        text: " "
+      })
+      result.push({
+        text: "Todoist Task", link: { type: "url", url: "todoist://task?id=" + task.id }
+      })
+    } else if (taskLinkSettingsValues.includes("web") && !taskLinkSettingsValues.includes("mobile")) {
+      // only Web Url shall be included, just add it as direct url on the task name
+      result.push({
+        text: " "
+      })
+      result.push({
         text: "Todoist Task", link: { type: "url", url: task.url }
-      }
-    ]
-  } else {
-    // no url shall be included just add the name
-    result = [
-      {
-        text: strippedTaskContent
-      }
-    ]
+      })
+    }
   }
+
+  result = result.concat(getTaskMetadataAsTextRun(task, labelsList));
+
+  return result;
+}
+
+
+function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): CraftTextRun[] {
+  let result: CraftTextRun[] = []
+  if (taskMetadataSettingsValues.length > 0) {
+    if (taskMetadataSettingsValues.includes("dueDates")) {
+      if (task.due) {
+        // task has a due date
+        result.push(
+          {
+            text: task.due.date, link:
+            {
+              type: "dateLink",
+              // The date in yyyy-MM-dd format
+              date: task.due.date
+            }
+          }
+        )
+        // check if its a due time
+        if (task.due.datetime) {
+          // task has an explicit time set
+          let dueDate = new Date(task.due.datetime)
+          result.push({
+            text: " at " + dueDate.toLocaleTimeString()
+          })
+        }
+
+        if (task.due.recurring) {
+          result.push({
+            text: " (recurring)",
+            isItalic: true
+          })
+        }
+      }
+    }
+
+    if (taskMetadataSettingsValues.includes("priorities")) {
+      // check color
+      let priorityText = "";
+      let highlightColor: undefined | TextHighlightColor = undefined;
+      switch (task.priority) {
+        case 1: priorityText = "p4"; highlightColor = "grey"; break;
+        case 2: priorityText = "p3"; highlightColor = "blue"; break;
+        case 3: priorityText = "p2"; highlightColor = "yellow"; break;
+        case 4: priorityText = "p1"; highlightColor = "red"; break;
+      }
+      result.push({
+        text: " "
+      })
+      result.push({
+        text: priorityText,
+        highlightColor: highlightColor
+      })
+    }
+
+    if (taskMetadataSettingsValues.includes("labels")) {
+      if (task.labelIds.length > 0) {
+        task.labelIds.forEach((labelId) => {
+          labelsList.filter((label) => label.id == labelId)
+            .map((label) => {
+              result.push({
+                text: " "
+              })
+              result.push({
+                text: "@" + label.name,
+                highlightColor: "lime"
+              })
+            })
+        })
+      }
+    }
+    if (taskMetadataSettingsValues.includes("description")) {
+      // strip link to document from description:
+      const regex = /Craft Document: \[(.+)\]\(craftdocs:\/\/open\?blockId=([^&]+)\&spaceId=([^\)]+)\)/gm;
+
+      const subst = ``;
+
+      // The substituted value will be contained in the result variable
+      const strippedDescription = task.description.replace(regex, subst);
+      if (strippedDescription.length > 0) {
+        result.push({
+          text: " description: ",
+          isItalic: true
+        })
+        result.push({
+          text: strippedDescription,
+          isItalic: true
+        })
+      }
+    }
+  }
+
+  if (result.length > 0) {
+    result.unshift({
+      text: " //",
+    })
+  }
+
   return result;
 }

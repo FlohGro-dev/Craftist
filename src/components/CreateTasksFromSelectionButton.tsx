@@ -7,12 +7,14 @@ import { useToast } from "@chakra-ui/toast";
 import { CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
 import { Box, Center } from "@chakra-ui/react";
 import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+import { useRecoilValue } from "recoil";
 
 
 const CreateTasksFromSelectionButton: React.FC = () => {
   const toast = useToast();
   const add = TodoistWrapper.useAddTask();
   const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
+  const labelList = useRecoilValue(TodoistWrapper.labels);
   const [isLoading, setIsLoading] = React.useState(false);
   const onClick = async () => {
     setIsLoading(true);
@@ -111,7 +113,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
             )
             .map((block) => {
               const documentTitle = "Craft Document: " + CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(pageBlock);
-              const mdLink = CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(block);
+              const mdContentWithLink = CraftBlockInteractor.getMarkdownContentWithLinkToCraftTextBlock(block);
 
               if (CraftBlockInteractor.blockContainsString("Todoist Task", block)) {
                 // nothing to be done - task is already linked
@@ -119,14 +121,14 @@ const CreateTasksFromSelectionButton: React.FC = () => {
 
                 add({
                   description: documentTitle,
-                  content: mdLink,
+                  content: mdContentWithLink,
                   projectId: linkedProjectId,
                   due_date: documentDate
                 })
                   .then(async function(task) {
                     // append task link to block
 
-                    let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task)
+                    let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
 
                     block.content = blockToAppend;
                     //block.listStyle.type = "todo";

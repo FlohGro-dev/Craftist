@@ -1,4 +1,4 @@
-import { CraftTextBlock, CraftTextRun, CraftTextBlockInsert, AfterBlockLocation } from "@craftdocs/craft-extension-api";
+import { CraftTextBlock, CraftTextRun, CraftTextBlockInsert, AfterBlockLocation, CraftBlock } from "@craftdocs/craft-extension-api";
 
 export async function getAllTodoItemsFromCurrentPage() {
   let todoBlocks: CraftTextBlock[] = [];
@@ -95,6 +95,18 @@ export function getMarkdownLinkToCraftTextBlock(block: CraftTextBlock) {
   let blockText: string = block.content.map((c) => c.text).join("");
   return "[" + blockText + "](craftdocs://open?blockId=" + block.id + "&spaceId=" + block.spaceId + ")"
 }
+
+export function getMarkdownContentWithLinkToCraftTextBlock(block: CraftBlock) {
+  const blocks:CraftBlock[] = [block];
+  //let blockText: string = block.content.map((c) => c.text).join("");
+  let mdContent = craft.markdown.craftBlockToMarkdown(blocks,"common",{tableSupported: false});
+  mdContent = mdContent.replace("- [ ]","")
+  return "[" + mdContent + "](craftdocs://open?blockId=" + block.id + "&spaceId=" + block.spaceId + ")"
+  //return mdContent + " [linkTest](craftdocs://open?blockId=" + block.id + "&spaceId=" + block.spaceId + ")"
+}
+
+
+
 
 export async function appendCraftTextRunToBlock(textToAppend: CraftTextRun[], block: CraftTextBlock) {
   block.content = block.content.concat(textToAppend)
