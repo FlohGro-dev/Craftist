@@ -332,11 +332,18 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
     let mdContent = craft.markdown.markdownToCraftBlocks(createTaskMdString(curTask.task, "- [ ] ", labelsList));
 
+
+
     let tB: CraftTextBlockInsert = {
       content: createBlockTextRunFromTask(curTask.task,labelsList, false),
-      type: "textBlock"
+      type: "textBlock",
+      listStyle: {type: "todo", state: "unchecked" }
     };
     tB.indentationLevel = indentationLevel;
+
+
+
+
 
     mdContent.forEach((block) => {
       block.indentationLevel = indentationLevel;
@@ -739,7 +746,7 @@ export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[])
   return mdString;
 }
 
-export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forceUnlinked:boolean = false): CraftTextRun[] {
+export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forceUnlinked:boolean = false, prefix:string = "- [ ] "): CraftTextRun[] {
   let result: CraftTextRun[] = []
   //let testResult: CraftTextRun[] = []
 
@@ -748,7 +755,7 @@ export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forc
   const subst = `$1`;
 
   // The substituted value will be contained in the result variable
-  const strippedTaskContent = task.content.replace(regex, subst);
+  const strippedTaskContent = prefix + task.content.replace(regex, subst);
 
   let mdBlocks = craft.markdown.markdownToCraftBlocks(strippedTaskContent);
   //
