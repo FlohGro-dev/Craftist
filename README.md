@@ -123,8 +123,7 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **new:** recurring tasks will be unlinked when when they are completed in a daily note which will prevent repeated sync of the task / keep it checked in the daily note
 - **new:** (beta) continuous sync of tasks can be enabled in the settings - this will perform a sync every 30 seconds - it will be enabled / disabled with the Sync Tasks Button
   - this is a beta feature so please be patient and expect bugs; report them in the repository with as much details as possible
-
-//test if sync works with new timings
+  - to report issues or thoughts on the beta you can add comments in the [discussion](https://github.com/FlohGro-dev/Craftist/discussions/45)
 
 ### v0.6
 

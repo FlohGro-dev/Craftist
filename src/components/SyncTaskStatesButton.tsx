@@ -262,7 +262,7 @@ const SyncTaskStatesButton: React.FC = () => {
         clearInterval(intervalId);
       } else {
         setContinuousSyncIsEnabled(true)
-        setIntervalId(setInterval(onSyncTasks, 10000))
+        setIntervalId(setInterval(onSyncTasks, 30000))
         onSyncTasks();
       }
       toast({
