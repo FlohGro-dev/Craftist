@@ -86,6 +86,7 @@ The following features are currently supported by Craftist:
   - task grouping: select how tasks should be grouped on import (by project, by section or both); available for all import features
   - import location: you can decide if you want to import tasks below the current selected block or always at the end of a document
   - due dates from daily notes: you can choose if created / crosslinked tasks shall receive the due date of the current open daily note (this will not add due dates if you create tasks from other documents)
+  - (beta) enable continuous task sync
 
 ## Login
 
@@ -100,7 +101,7 @@ If you ever want to logout from your todoist account - use the "Login/Logout" bu
 
 ## Installation
 
-You can simply download the `.craftx` file from the latest [Release](https://github.com/FlohGro-dev/Craftist/releases/tag/0.6) and add it to your eXtensions in Craft on macOS.
+You can simply download the `.craftx` file from the latest [Release](https://github.com/FlohGro-dev/Craftist/releases/tag/0.7) and add it to your eXtensions in Craft on macOS.
 
 If you want to built the eXtension by yourself (and e.g. make some custom modifications) use the instructions given by the people at Craft:
 
