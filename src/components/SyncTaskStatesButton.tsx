@@ -110,6 +110,7 @@ const SyncTaskStatesButton: React.FC = () => {
             })
 
             let syncState: boolean;
+            let noSyncReason: string = "";
 
             isRecurring.then(async function(isRecurring) {
               if (isRecurring) {
@@ -119,7 +120,10 @@ const SyncTaskStatesButton: React.FC = () => {
                 if (taskMetadataSettingsValues.includes("dueDates")) {
                   // if due dates are imported as metadata enable it since the due date will be updated in the sync
                   syncState = true;
+                } else {
+                  noSyncReason = "recurring task will not be synced without enabled due dates"
                 }
+
               } else {
                 // sync the state normally
                 syncState = true;
@@ -171,6 +175,20 @@ const SyncTaskStatesButton: React.FC = () => {
                     }
                   }
 
+                  if (!isCompleted && block.listStyle.state == "unchecked"){
+                    // task is uncompleted on both ends - just needed to sync metadate for recurring tasks
+                    if (isRecurring) {
+                        setTimeout(async function() {
+                          await getTask({ taskId: Number(taskId) })
+                            .catch()
+                            .then((task) => {
+                              block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
+                              blocksToUpdate.push(block)
+                            })
+                        }, 200)
+                    }
+                  }
+
                   if (!isCompleted && block.listStyle.state == "canceled") {
                     // task is cancelled in craft but open in todoist
                     setTaskCompleted({
@@ -178,7 +196,23 @@ const SyncTaskStatesButton: React.FC = () => {
                     });
                   }
                 }
+              } else {
+                //display a toast to show the user why a task was note synced
+                if (!toast.isActive("no-sync-reason-id")) {
+                  toast({
+                    id: "no-sync-reason-id",
+                    position: "bottom",
+                    render: () => (
+                      <Center>
+                        <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
+                          {noSyncReason}
+                          </Box>
+                      </Center>
+                    ),
+                  })
+                }
               }
+
             })
           })
             .catch(async function() {
