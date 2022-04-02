@@ -117,6 +117,11 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
 
+### v0.7.1
+
+- **fixed:** settings for continuous sync and due dates in daily notes were not read properly
+- **improved:** notification for unsynced tasks (recurring tasks are not synced when due dates are disabled)
+
 ### v0.7
 
 - **improved:** sync task improvements - switched to update Blocks - blocks will not get recreated in every sync
