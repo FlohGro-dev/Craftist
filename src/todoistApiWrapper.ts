@@ -830,6 +830,9 @@ function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): CraftTextRun
     if (taskMetadataSettingsValues.includes("dueDates")) {
       if (task.due) {
         // task has a due date
+        result.push({
+          text: " "
+        })
         result.push(
           {
             text: task.due.date, link:
