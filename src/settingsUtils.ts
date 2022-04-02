@@ -578,6 +578,7 @@ export async function setSettingsSetDueDateBasedOnDailyNoteOption(enabled: boole
 export async function getSettingsSetDueDateBasedOnDailyNoteOption():Promise<string>{
   let result = await craft.storageApi.get(useSettingsSetDueDateBasedOnDailyNoteOption);
   if(result.status == "success"){
+    taskSetDueDatesBasedOnDailyNote = result.data;
     return result.data
   } else {
     return "error"
@@ -599,6 +600,7 @@ export async function setSettingsSetContinuousSyncMode(enabled: boolean) {
 export async function getSettingsSetContinuousSyncMode():Promise<string>{
   let result = await craft.storageApi.get(useSettingsSetContinuousSyncMode);
   if(result.status == "success"){
+    taskSyncContinuousMode = result.data
     return result.data
   } else {
     return "error"
