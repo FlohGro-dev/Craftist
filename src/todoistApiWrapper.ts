@@ -847,8 +847,14 @@ function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): CraftTextRun
         if (task.due.datetime) {
           // task has an explicit time set
           let dueDate = new Date(task.due.datetime)
+          //remove seconds from time
+          const regex = /(\d+:\d+)(:\d+)(.*)/gm;
+          const subst = `$1$3`;
+          // The substituted value will be contained in the result variable
+          const dateString = dueDate.toLocaleTimeString().replace(regex, subst);
+          
           result.push({
-            text: " at " + dueDate.toLocaleTimeString()
+            text: " at " + dateString
           })
         }
 

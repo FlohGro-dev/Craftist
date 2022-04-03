@@ -117,6 +117,10 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 
 ## Changelog
 
+### v0.8
+
+- **improved:** removed seconds from due time string
+
 ### v0.7.1
 
 - **fixed:** settings for continuous sync and due dates in daily notes were not read properly
