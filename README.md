@@ -58,6 +58,11 @@ The following features are currently supported by Craftist:
     <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/d220d3bd9e254b47b8b7bbfa397f3b7c-with-play.gif">
   </a>
 
+#### Why is my task not synced by Craftist?
+
+![why is my task not synced?](https://user-images.githubusercontent.com/13785667/161394302-eeb8341a-2cf6-4f44-9b3f-4f2a8ff6e485.png)
+
+
 ### Import Tasks / Project List
 
 - import todays tasks
