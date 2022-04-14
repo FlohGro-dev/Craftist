@@ -6,9 +6,11 @@ Also make sure to check out the latest changes in the [changelog](#changelog) wh
 
 If you want to follow me for updates or get in touch you can follow me on [Twitter](https://twitter.com/FlohGro) or choose anything else to contact on my [website](https://flohgro.com/contactme/). Feel free to create issues in the repository for bugs you notice or features you'd like to see.
 
-If this eXtension is valuable for and you like to thank me you can
+If this eXtension is valuable for and you like to thank me you can support me on
 
 <a href="https://www.buymeacoffee.com/flohgro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 220px !important;" ></a>
+
+<a href="https://www.patreon.com/flohgro" target="_blank"><img src="https://user-images.githubusercontent.com/13785667/162812708-55b96cdc-8c32-4433-a340-6dd4c1f7326d.jpg" alt="Become A patreon" style="height: 110px !important;width: 220px !important;" ></a>
 
 If you want to have a look to other things I'm working, check out my website at [flohgro.com](https://flohgro.com).
 
