@@ -21,8 +21,8 @@ The following features are currently supported by Craftist:
 ### Create / Link Tasks
 
 - create Tasks from Selection
-  - this will create tasks from the selected blocks
-  - if the blocks are not already a todo item in craft they will be converted
+  - this will create tasks from the current selected blocks
+  - if the blocks are not already a todo item in craft they will be converted to todo blocks
 
 <a href="https://www.loom.com/share/3220504dbae449ffa61a1390c2c27820">
     <p>Craftist: Create Tasks from Selection - Watch Video</p>
