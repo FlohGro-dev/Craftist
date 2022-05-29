@@ -149,6 +149,7 @@ Thanks to every user who provides valuable feedback for the further development 
 - **new:** version check in the *Info* Tab (thanks to [@DharamKapila](https://twitter.com/DharamKapila) for the support and inspiration)
 - **new:** import tasks with label feature - this allows the user to import all tasks with the selected label
 - **new:** setting to exclude importing tasks that are assigned to other people in Todoist (enabled by default)
+- **improved:** recurring tasks now include the "due string" to show more information about the recurring frequency
 - **improved:** removed seconds from due time string
 - **improved:** no completed tasks are imported anymore when importing tasks from a linked project
 - **changed:** emojis to indicate mobile (App) 📱  and web 🌐 links to tasks - this reduces the needed space for the links
