@@ -1,13 +1,13 @@
-import React from "react";
 import { Button } from "@chakra-ui/button";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import * as TodoistWrapper from "../todoistApiWrapper";
-import * as CraftBlockInteractor from "../craftBlockInteractor";
+import { Box, Center } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import { CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
-import { Box, Center } from "@chakra-ui/react";
-import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+import React from "react";
 import { useRecoilValue } from "recoil";
+import * as CraftBlockInteractor from "../craftBlockInteractor";
+import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+import * as TodoistWrapper from "../todoistApiWrapper";
 
 
 const CreateTasksFromSelectionButton: React.FC = () => {
@@ -70,9 +70,9 @@ const CreateTasksFromSelectionButton: React.FC = () => {
     }
 
     const pageBlock = getPageResult.data
-    let documentDate:string | undefined = undefined;
+    let documentDate: string | undefined = undefined;
 
-    if(taskSetDueDatesBasedOnDailyNote == "enabled"){
+    if (taskSetDueDatesBasedOnDailyNote == "enabled") {
       documentDate = CraftBlockInteractor.getIsoDateIfCurrentDocumentIsDailyNote(pageBlock);
     }
 
@@ -83,7 +83,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
     craft.editorApi
       .getSelection()
       .then((resp) => {
-        if (!resp.data ?.length) {
+        if (!resp.data?.length) {
           throw new Error();
         }
         return resp.data;
@@ -96,7 +96,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
             <Center>
               <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
                 No Blocks selected
-            </Box>
+              </Box>
             </Center>
           ),
         })
@@ -125,7 +125,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
                   projectId: linkedProjectId,
                   due_date: documentDate
                 })
-                  .then(async function(task) {
+                  .then(async function (task) {
                     // append task link to block
 
                     let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
@@ -154,7 +154,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
                         <Center>
                           <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
                             Failed adding Task - please try to login again
-                        </Box>
+                          </Box>
                         </Center>
                       ),
                     })
@@ -173,11 +173,11 @@ const CreateTasksFromSelectionButton: React.FC = () => {
       colorScheme='red'
       onClick={onClick}
       width="100%"
-      mb="2"
+      mb="1"
       isLoading={isLoading}
     >
       Create Tasks from Selection
-      </Button>
+    </Button>
   );
 }
 

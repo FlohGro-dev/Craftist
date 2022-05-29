@@ -1,20 +1,21 @@
-import React from "react";
 import { Button } from "@chakra-ui/button";
 import { DownloadIcon } from "@chakra-ui/icons";
-import * as TodoistWrapper from "../todoistApiWrapper";
-import * as CraftBlockInteractor from "../craftBlockInteractor";
-import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/toast";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
+import React from "react";
 import { useRecoilValue } from "recoil";
-import { getSettingsGroupProjectTasksOption, taskImportAfterSelectedBlock } from "../settingsUtils";
+import * as CraftBlockInteractor from "../craftBlockInteractor";
 import { createLocationContainerAfterCurrentSelection } from "../craftBlockInteractor";
+import { getSettingsGroupProjectTasksOption, taskImportAfterSelectedBlock, taskImportPersonalTasksOnly } from "../settingsUtils";
+import * as TodoistWrapper from "../todoistApiWrapper";
 
 const ImportTasksFromLinkedProjectButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
   const todoistProjectUrl = TodoistWrapper.todoistProjectLinkUrl;
   const getTasksFromProject = TodoistWrapper.useGetTasksFromProject();
+  const getTasksFromFilter = TodoistWrapper.useGetTasksFromFilter();
   const projectList = useRecoilValue(TodoistWrapper.projects);
   const sectionList = useRecoilValue(TodoistWrapper.sections);
   const labelList = useRecoilValue(TodoistWrapper.labels);
@@ -53,53 +54,62 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
           if (foundProjectIDs.every((val, _i, arr) => val === arr[0])) {
             // all ids are equal - thats valid
             linkedProjectId = parseInt(foundProjectIDs[0]);
+            let p = projectList.filter((project) => { if (project.id == linkedProjectId) { return project } })
+            let filterStr = "##" + p[0].name
+            if (taskImportPersonalTasksOnly) {
+              filterStr = filterStr + " & (assigned to: me | !assigned)"
+            }
 
-            try{
-            let taskList = await getTasksFromProject({ projectId: linkedProjectId });
+            try {
 
-            taskList.sort()
+              //let taskList = await getTasksFromProject({ projectId: linkedProjectId });
+              let taskList = await getTasksFromFilter({ filter: filterStr })
 
-            let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
-            let taskGroupingSettings = await getSettingsGroupProjectTasksOption();
+              taskList.sort((task) => task.order)
+              taskList = taskList.filter((task) => !task.completed)
 
-            blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList,labelList, taskList, true, existingTaskIds, taskGroupingSettings))
+              let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
-            if(taskImportAfterSelectedBlock == "enabled"){
-              let location = await createLocationContainerAfterCurrentSelection();
-              if(location){
+              let taskGroupingSettings = await getSettingsGroupProjectTasksOption();
+
+              blocksToAdd = blocksToAdd.concat(await TodoistWrapper.createGroupedBlocksFromFlatTaskArray(projectList, sectionList, labelList, taskList, true, existingTaskIds, taskGroupingSettings))
+
+              if (taskImportAfterSelectedBlock == "enabled") {
+                let location = await createLocationContainerAfterCurrentSelection();
+                if (location) {
                   craft.dataApi.addBlocks(blocksToAdd, location);
+                } else {
+                  craft.dataApi.addBlocks(blocksToAdd);
+                }
               } else {
                 craft.dataApi.addBlocks(blocksToAdd);
               }
-            } else {
-              craft.dataApi.addBlocks(blocksToAdd);
-            }
 
-            setIsLoading(false);
-            toast({
-              position: "bottom",
-              render: () => (
-                <Center>
-                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                    Imported Tasks from project
-              </Box>
-                </Center>
-              ),
-            })
-          } catch (error) {
-            toast({
-              position: "bottom",
-              render: () => (
-                <Center>
-                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
-                    Failed importing Tasks - please try to login again
-                </Box>
-                </Center>
-              ),
-            })
-            setIsLoading(false);
-          }
+              setIsLoading(false);
+              toast({
+                position: "bottom",
+                render: () => (
+                  <Center>
+                    <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+                      Imported Tasks from project
+                    </Box>
+                  </Center>
+                ),
+              })
+            } catch (error) {
+              toast({
+                position: "bottom",
+                render: () => (
+                  <Center>
+                    <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                      Failed importing Tasks - please try to login again
+                    </Box>
+                  </Center>
+                ),
+              })
+              setIsLoading(false);
+            }
 
           }
           else {
@@ -112,7 +122,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
                 <Center>
                   <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
                     linkedProjectIds are not all equal please remove links to other projects
-              </Box>
+                  </Box>
                 </Center>
               ),
             });
@@ -126,7 +136,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
               <Center>
                 <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
                   document is not linked to a project
-            </Box>
+                </Box>
               </Center>
             ),
           })
@@ -142,11 +152,11 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
       colorScheme='red'
       onClick={onClick}
       width="100%"
-      mb="2"
+      mb="1"
       isLoading={isLoading}
     >
       Import Tasks from linked Project
-      </Button>
+    </Button>
   );
 }
 

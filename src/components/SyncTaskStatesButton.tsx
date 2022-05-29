@@ -1,13 +1,14 @@
-import React from "react";
 import { Button } from "@chakra-ui/button";
 import { UpDownIcon } from "@chakra-ui/icons";
-import * as TodoistWrapper from "../todoistApiWrapper";
-import * as CraftBlockInteractor from "../craftBlockInteractor";
+import { Box, Center } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import { CraftBlockUpdate, CraftTextBlock } from "@craftdocs/craft-extension-api";
-import { Box, Center } from "@chakra-ui/react";
-import { isAnyTaskLinkEnabled, taskMetadataSettingsValues, taskSyncContinuousMode } from "../settingsUtils";
+import React from "react";
 import { useRecoilValue } from "recoil";
+import * as CraftBlockInteractor from "../craftBlockInteractor";
+import { isAnyTaskLinkEnabled, taskBlocksUseClutterFreeView, taskMetadataSettingsValues, taskSyncContinuousMode } from "../settingsUtils";
+import * as TodoistWrapper from "../todoistApiWrapper";
+import Defines from '../utils/defines';
 
 const SyncTaskStatesButton: React.FC = () => {
   const toast = useToast();
@@ -34,13 +35,12 @@ const SyncTaskStatesButton: React.FC = () => {
           <Center>
             <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
               syncing not possible since no task links are enabled
-          </Box>
+            </Box>
           </Center>
         ),
       })
       return;
     }
-
     // get page for document linking
     const getPageResult = await craft.dataApi.getCurrentPage();
 
@@ -64,7 +64,7 @@ const SyncTaskStatesButton: React.FC = () => {
           <Center>
             <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
               No tasks to sync
-          </Box>
+            </Box>
           </Center>
         ),
       })
@@ -104,7 +104,7 @@ const SyncTaskStatesButton: React.FC = () => {
               }
             })
 
-          getIsTaskStateCompleted.then(async function(isCompleted) {
+          getIsTaskStateCompleted.then(async function (isCompleted) {
             let isRecurring = isRecurringTask({
               id: Number(taskId)
             })
@@ -112,10 +112,9 @@ const SyncTaskStatesButton: React.FC = () => {
             let syncState: boolean;
             let noSyncReason: string = "";
 
-            isRecurring.then(async function(isRecurring) {
+            isRecurring.then(async function (isRecurring) {
               if (isRecurring) {
                 // its a recurring task - not easy to handle since currently no metadata can be attached
-                // ignore for now - workaround in planning
                 syncState = false;
                 if (taskMetadataSettingsValues.includes("dueDates")) {
                   // if due dates are imported as metadata enable it since the due date will be updated in the sync
@@ -144,48 +143,73 @@ const SyncTaskStatesButton: React.FC = () => {
                   }
                   if (!isCompleted && block.listStyle.state == "checked") {
                     // task is completed in craft but not in todoist
-                    await setTaskCompleted({
-                      id: Number(taskId)
-                    });
+
+                    // local var to check if the task shall be set completed - this is necessary due to recurring tasks handling
+                    let setTaskStateCompleted = true;
 
                     if (isRecurring) {
                       // special handling for recurring tasks:
                       // unlink a recurring task if it is in a daily note
                       if (documentDate) {
-                        setTimeout(async function() {
+                        setTimeout(async function () {
                           await getTask({ taskId: Number(taskId) })
                             .catch()
                             .then((task) => {
                               block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList, true)
                               blocksToUpdate.push(block)
                             })
-                        }, 200)
+                        }, 350)
                       } else {
-                        // otherwise uncheck the todo again
+                        // check if the due date of the task is different to the date link in the task block
+                        let dateStr = CraftBlockInteractor.getIsoDateFromBlockLinkedToDate(block)
+                        let curTask = await getTask({ taskId: Number(taskId) })
+                        if (curTask.due?.date) {
+                          if (curTask.due.date != dateStr) {
+                            // due dates are not the same, just sync the task metadata, don't mark the task as completed
+                            setTaskStateCompleted = false;
+                          }
+                        }
+
+                        // uncheck the todo again
                         block.listStyle.state = "unchecked"
-                        setTimeout(async function() {
-                          await getTask({ taskId: Number(taskId) })
-                            .catch()
-                            .then((task) => {
-                              block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
-                              blocksToUpdate.push(block)
-                            })
-                        }, 200)
+                        setTimeout(async function () {
+                          let curTask = await getTask({ taskId: Number(taskId) })
+                          block.content = TodoistWrapper.createBlockTextRunFromTask(curTask, labelList)
+                          if (taskBlocksUseClutterFreeView) {
+                            if (block.subblocks[0]) {
+                              if (block.subblocks[0].type == "textBlock") {
+                                block.subblocks[0].content = TodoistWrapper.getTaskMetadataAsTextRun(curTask, labelList)
+                              }
+                            }
+                            for (let subBlock of block.subblocks) {
+                              if (subBlock.type == "textBlock") {
+                                subBlock.content = TodoistWrapper.getTaskMetadataAsTextRun(curTask, labelList)
+                                blocksToUpdate.push(subBlock)
+                              }
+                            }
+                          }
+                          blocksToUpdate.push(block)
+                        }, 350)
                       }
+                    }
+                    if (setTaskStateCompleted) {
+                      await setTaskCompleted({
+                        id: Number(taskId)
+                      });
                     }
                   }
 
-                  if (!isCompleted && block.listStyle.state == "unchecked"){
+                  if (!isCompleted && block.listStyle.state == "unchecked") {
                     // task is uncompleted on both ends - just needed to sync metadate for recurring tasks
                     if (isRecurring) {
-                        setTimeout(async function() {
-                          await getTask({ taskId: Number(taskId) })
-                            .catch()
-                            .then((task) => {
-                              block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
-                              blocksToUpdate.push(block)
-                            })
-                        }, 200)
+                      setTimeout(async function () {
+                        await getTask({ taskId: Number(taskId) })
+                          .catch()
+                          .then((task) => {
+                            block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
+                            blocksToUpdate.push(block)
+                          })
+                      }, 300)
                     }
                   }
 
@@ -206,7 +230,7 @@ const SyncTaskStatesButton: React.FC = () => {
                       <Center>
                         <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
                           {noSyncReason}
-                          </Box>
+                        </Box>
                       </Center>
                     ),
                   })
@@ -215,7 +239,7 @@ const SyncTaskStatesButton: React.FC = () => {
 
             })
           })
-            .catch(async function() {
+            .catch(async function () {
               if (block.listStyle.type == "todo") {
                 // task couldn't be retrieved, mark it as done in craft since it is probably deleted
                 block.listStyle.state = "checked";
@@ -223,47 +247,31 @@ const SyncTaskStatesButton: React.FC = () => {
               }
 
 
-            }).finally(async function() {
+            }).finally(async function () {
               // SYNC METADATA:
-              setTimeout(async function() {
+              setTimeout(async function () {
                 getTask({ taskId: Number(taskId) })
-                  .catch(function() {
+                  .catch(function () {
                     // task is not retrievable - was marked as done in Todoist
                   })
-                  .then(async function(task) {
+                  .then(async function (task) {
                     if (task) {
                       const getPageResult = await craft.dataApi.getCurrentPage();
                       if (getPageResult.status != "success") {
                         throw new Error("get page failed")
                       }
                       // only update uncompleted tasks and tasks which are not recurring here
-                      if (!task.completed && !task.due ?.recurring) {
+                      if (!task.completed && !task.due?.recurring) {
                         block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
                         blocksToUpdate.push(block)
                       }
                     }
                   })
-              }, 1000);
+              }, Defines.SYNC_TASKS_TIMING_BLOCK_METADATA_SYNC_WAIT_TIME_MS);
             })
-        } else {
-          // nothing to be done - task is not crosslinked between todoist and craft (maybe link it right now?)
-          if (!toast.isActive(tasksToSyncToastId)) {
-            toast({
-              id: tasksToSyncToastId,
-              position: "bottom",
-              render: () => (
-                <Center>
-                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
-                    no crosslinked tasks to sync
-                    </Box>
-                </Center>
-              ),
-            })
-          }
         }
-
       })
-    setTimeout(async function() {
+    setTimeout(async function () {
       await craft.dataApi.updateBlocks(blocksToUpdate);
       setIsLoading(false);
       if (!toast.isActive(tasksToSyncToastId)) {
@@ -274,12 +282,12 @@ const SyncTaskStatesButton: React.FC = () => {
             <Center>
               <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
                 Synced Tasks
-                  </Box>
+              </Box>
             </Center>
           ),
         })
       }
-    }, 2000)
+    }, Defines.SYNC_TASKS_TIMING_BLOCK_UPDATE_WAIT_TIME_MS)
   }
 
   const onClick = async () => {
@@ -296,7 +304,7 @@ const SyncTaskStatesButton: React.FC = () => {
         clearInterval(intervalId);
       } else {
         setContinuousSyncIsEnabled(true)
-        setIntervalId(setInterval(onSyncTasks, 30000))
+        setIntervalId(setInterval(onSyncTasks, Defines.SYNC_TASKS_TIMING_CONTINOUS_SYNC_PERIOD_TIME_MS))
         onSyncTasks();
       }
       toast({
@@ -324,11 +332,11 @@ const SyncTaskStatesButton: React.FC = () => {
       leftIcon={<UpDownIcon />}
       onClick={onClick}
       width="100%"
-      mb="2"
+      mb="1"
       isLoading={isLoading}
     >
       Sync Tasks
-      </Button>
+    </Button>
   );
 }
 

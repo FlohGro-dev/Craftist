@@ -1,8 +1,6 @@
+import { Box, Center, Checkbox, CheckboxGroup, FormControl, Radio, RadioGroup, Stack, StackDivider, useDisclosure, useToast } from "@chakra-ui/react";
 import React from "react";
-import { Button } from "@chakra-ui/button";
-import { SettingsIcon } from "@chakra-ui/icons";
-import { Box, Center, Checkbox, CheckboxGroup, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, StackDivider, useDisclosure, useToast } from "@chakra-ui/react";
-import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsImportAfterSelectedBlockOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsPrioritiesUsage, setSettingsSetContinuousSyncMode, setSettingsSetDueDateBasedOnDailyNoteOption, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingProjectValues, taskGroupingTodayValues, taskImportAfterSelectedBlock, taskLinkSettingsValues, taskMetadataSettingsValues, taskSetDueDatesBasedOnDailyNote, taskSyncContinuousMode } from "../settingsUtils";
+import { setSettingsDescriptionUsage, setSettingsDueDateUsage, setSettingsGroupAllTasksOption, setSettingsGroupLabelTasksOption, setSettingsGroupProjectTasksOption, setSettingsGroupTodaysTasksOption, setSettingsImportAfterSelectedBlockOption, setSettingsLabelsUsage, setSettingsMobileUrlUsage, setSettingsPrioritiesUsage, setSettingsSetContinuousSyncMode, setSettingsSetDueDateBasedOnDailyNoteOption, setSettingsSetUsePersonalTasksOnly, setSettingsWebUrlUsage, taskGroupingAllValues, taskGroupingLabelValues, taskGroupingProjectValues, taskGroupingTodayValues, taskImportAfterSelectedBlock, taskImportPersonalTasksOnly, taskLinkSettingsValues, taskMetadataSettingsValues, taskSetDueDatesBasedOnDailyNote, taskSyncContinuousMode } from "../settingsUtils";
 
 
 
@@ -18,7 +16,7 @@ const SettingsMenu: React.FC = () => {
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Due dates {value ? "enabled":"disabled"}
+            Due dates {value ? "enabled" : "disabled"}
           </Box>
         </Center>
       ),
@@ -32,7 +30,7 @@ const SettingsMenu: React.FC = () => {
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Labels {value ? "enabled":"disabled"}
+            Labels {value ? "enabled" : "disabled"}
           </Box>
         </Center>
       ),
@@ -46,7 +44,7 @@ const SettingsMenu: React.FC = () => {
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Descriptions {value ? "enabled":"disabled"}
+            Descriptions {value ? "enabled" : "disabled"}
           </Box>
         </Center>
       ),
@@ -60,7 +58,7 @@ const SettingsMenu: React.FC = () => {
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Priorities {value ? "enabled":"disabled"}
+            Priorities {value ? "enabled" : "disabled"}
           </Box>
         </Center>
       ),
@@ -72,14 +70,14 @@ const SettingsMenu: React.FC = () => {
     const settingsString = "web"
     let toastActive = false;
     const index = taskLinkSettingsValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskLinkSettingsValues.push(settingsString)
-    }
+        taskLinkSettingsValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskLinkSettingsValues.splice(index, 1);
-        if(taskLinkSettingsValues.length == 0){
+        if (taskLinkSettingsValues.length == 0) {
           // no more links are enabled - display warning
           toast({
             position: "bottom",
@@ -96,13 +94,13 @@ const SettingsMenu: React.FC = () => {
       }
     }
     await setSettingsWebUrlUsage(value);
-    if(!toastActive){
+    if (!toastActive) {
       toast({
         position: "bottom",
         render: () => (
           <Center>
             <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-              Web URLs {value ? "enabled":"disabled"}
+              Web URLs {value ? "enabled" : "disabled"}
             </Box>
           </Center>
         ),
@@ -114,14 +112,14 @@ const SettingsMenu: React.FC = () => {
     const settingsString = "mobile"
     let toastActive = false;
     const index = taskLinkSettingsValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskLinkSettingsValues.push(settingsString)
-    }
+        taskLinkSettingsValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskLinkSettingsValues.splice(index, 1);
-        if(taskLinkSettingsValues.length == 0){
+        if (taskLinkSettingsValues.length == 0) {
           // no more links are enabled - display warning
           toast({
             position: "bottom",
@@ -138,13 +136,13 @@ const SettingsMenu: React.FC = () => {
       }
     }
     await setSettingsMobileUrlUsage(value);
-    if(!toastActive){
+    if (!toastActive) {
       toast({
         position: "bottom",
         render: () => (
           <Center>
             <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-              Mobile URLs {value ? "enabled":"disabled"}
+              Mobile URLs {value ? "enabled" : "disabled"}
             </Box>
           </Center>
         ),
@@ -155,10 +153,10 @@ const SettingsMenu: React.FC = () => {
   const onChangeTaskGroupingTodayProjects = async (value: boolean) => {
     const settingsString = "projects"
     const index = taskGroupingTodayValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskGroupingTodayValues.push(settingsString)
-    }
+        taskGroupingTodayValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskGroupingTodayValues.splice(index, 1);
@@ -170,10 +168,10 @@ const SettingsMenu: React.FC = () => {
   const onChangeTaskGroupingTodaySections = async (value: boolean) => {
     const settingsString = "sections"
     const index = taskGroupingTodayValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskGroupingTodayValues.push(settingsString)
-    }
+        taskGroupingTodayValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskGroupingTodayValues.splice(index, 1);
@@ -187,16 +185,16 @@ const SettingsMenu: React.FC = () => {
     let projectsIndex = taskGroupingTodayValues.indexOf("projects");
     let sectionsIndex = taskGroupingTodayValues.indexOf("sections");
     let newSetting = "";
-    if (projectsIndex > -1 && sectionsIndex > -1){
+    if (projectsIndex > -1 && sectionsIndex > -1) {
       // both present
       newSetting = "projectAndSection"
-    } else if (projectsIndex > -1 && sectionsIndex == -1){
+    } else if (projectsIndex > -1 && sectionsIndex == -1) {
       // projects only
       newSetting = "projectOnly"
-    } else if (projectsIndex == -1 && sectionsIndex > -1){
+    } else if (projectsIndex == -1 && sectionsIndex > -1) {
       // sections only
       newSetting = "sectionOnly"
-    } else if (projectsIndex == -1 && sectionsIndex == -1){
+    } else if (projectsIndex == -1 && sectionsIndex == -1) {
       // none
       newSetting = "none"
     }
@@ -216,10 +214,10 @@ const SettingsMenu: React.FC = () => {
   const onChangeTaskGroupingAllProjects = async (value: boolean) => {
     const settingsString = "projects"
     const index = taskGroupingAllValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskGroupingAllValues.push(settingsString)
-    }
+        taskGroupingAllValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskGroupingAllValues.splice(index, 1);
@@ -231,10 +229,10 @@ const SettingsMenu: React.FC = () => {
   const onChangeTaskGroupingAllSections = async (value: boolean) => {
     const settingsString = "sections"
     const index = taskGroupingAllValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskGroupingAllValues.push(settingsString)
-    }
+        taskGroupingAllValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskGroupingAllValues.splice(index, 1);
@@ -248,16 +246,16 @@ const SettingsMenu: React.FC = () => {
     let projectsIndex = taskGroupingAllValues.indexOf("projects");
     let sectionsIndex = taskGroupingAllValues.indexOf("sections");
     let newSetting = "";
-    if (projectsIndex > -1 && sectionsIndex > -1){
+    if (projectsIndex > -1 && sectionsIndex > -1) {
       // both present
       newSetting = "projectAndSection"
-    } else if (projectsIndex > -1 && sectionsIndex == -1){
+    } else if (projectsIndex > -1 && sectionsIndex == -1) {
       // projects only
       newSetting = "projectOnly"
-    } else if (projectsIndex == -1 && sectionsIndex > -1){
+    } else if (projectsIndex == -1 && sectionsIndex > -1) {
       // sections only
       newSetting = "sectionOnly"
-    } else if (projectsIndex == -1 && sectionsIndex == -1){
+    } else if (projectsIndex == -1 && sectionsIndex == -1) {
       // none
       newSetting = "none"
     }
@@ -278,10 +276,10 @@ const SettingsMenu: React.FC = () => {
   const onChangeTaskGroupingProjectImportProjects = async (value: boolean) => {
     const settingsString = "projects"
     const index = taskGroupingProjectValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskGroupingProjectValues.push(settingsString)
-    }
+        taskGroupingProjectValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskGroupingProjectValues.splice(index, 1);
@@ -293,10 +291,10 @@ const SettingsMenu: React.FC = () => {
   const onChangeTaskGroupingProjectImportSections = async (value: boolean) => {
     const settingsString = "sections"
     const index = taskGroupingProjectValues.indexOf(settingsString, 0);
-    if(value){
+    if (value) {
       if (index == -1) {
-      taskGroupingProjectValues.push(settingsString)
-    }
+        taskGroupingProjectValues.push(settingsString)
+      }
     } else {
       if (index > -1) {
         taskGroupingProjectValues.splice(index, 1);
@@ -310,16 +308,16 @@ const SettingsMenu: React.FC = () => {
     let projectsIndex = taskGroupingProjectValues.indexOf("projects");
     let sectionsIndex = taskGroupingProjectValues.indexOf("sections");
     let newSetting = "";
-    if (projectsIndex > -1 && sectionsIndex > -1){
+    if (projectsIndex > -1 && sectionsIndex > -1) {
       // both present
       newSetting = "projectAndSection"
-    } else if (projectsIndex > -1 && sectionsIndex == -1){
+    } else if (projectsIndex > -1 && sectionsIndex == -1) {
       // projects only
       newSetting = "projectOnly"
-    } else if (projectsIndex == -1 && sectionsIndex > -1){
+    } else if (projectsIndex == -1 && sectionsIndex > -1) {
       // sections only
       newSetting = "sectionOnly"
-    } else if (projectsIndex == -1 && sectionsIndex == -1){
+    } else if (projectsIndex == -1 && sectionsIndex == -1) {
       // none
       newSetting = "none"
     }
@@ -336,128 +334,214 @@ const SettingsMenu: React.FC = () => {
     })
   }
 
-  const onChangeEnableImportAfterSelectedBlocks = async (enable:boolean) => {
+  const onChangeTaskGroupingLabelProjects = async (value: boolean) => {
+    const settingsString = "projects"
+    const index = taskGroupingLabelValues.indexOf(settingsString, 0);
+    if (value) {
+      if (index == -1) {
+        taskGroupingLabelValues.push(settingsString)
+      }
+    } else {
+      if (index > -1) {
+        taskGroupingLabelValues.splice(index, 1);
+      }
+    }
+    await applyTaskLabelImportGrouping();
+  }
+
+  const onChangeTaskGroupingLabelSections = async (value: boolean) => {
+    const settingsString = "sections"
+    const index = taskGroupingLabelValues.indexOf(settingsString, 0);
+    if (value) {
+      if (index == -1) {
+        taskGroupingLabelValues.push(settingsString)
+      }
+    } else {
+      if (index > -1) {
+        taskGroupingLabelValues.splice(index, 1);
+      }
+    }
+    await applyTaskLabelImportGrouping();
+  }
+
+
+  const applyTaskLabelImportGrouping = async () => {
+    let projectsIndex = taskGroupingLabelValues.indexOf("projects");
+    let sectionsIndex = taskGroupingLabelValues.indexOf("sections");
+    let newSetting = "";
+    if (projectsIndex > -1 && sectionsIndex > -1) {
+      // both present
+      newSetting = "projectAndSection"
+    } else if (projectsIndex > -1 && sectionsIndex == -1) {
+      // projects only
+      newSetting = "projectOnly"
+    } else if (projectsIndex == -1 && sectionsIndex > -1) {
+      // sections only
+      newSetting = "sectionOnly"
+    } else if (projectsIndex == -1 && sectionsIndex == -1) {
+      // none
+      newSetting = "none"
+    }
+    await setSettingsGroupLabelTasksOption(newSetting);
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Label Tasks Import Grouping changed to {newSetting}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+
+
+
+  const onChangeEnableImportAfterSelectedBlocks = async (enable: boolean) => {
     await setSettingsImportAfterSelectedBlockOption(enable)
     toast({
       position: "bottom",
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Location After Selected Block {enable ? "enabled":"disabled"}
+            Location After Selected Block {enable ? "enabled" : "disabled"}
           </Box>
         </Center>
       ),
     })
   }
 
-  const onChangeEnableSetDueDateBasedOnDailyNote = async (enable:boolean) => {
+  const onChangeEnableSetDueDateBasedOnDailyNote = async (enable: boolean) => {
     await setSettingsSetDueDateBasedOnDailyNoteOption(enable)
     toast({
       position: "bottom",
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Due Dates based on Daily Notes {enable ? "enabled":"disabled"}
+            Due Dates based on Daily Notes {enable ? "enabled" : "disabled"}
           </Box>
         </Center>
       ),
     })
   }
 
-  const onChangeSetContinuousSyncMode = async (enable:boolean) => {
+  const onChangeSetContinuousSyncMode = async (enable: boolean) => {
     await setSettingsSetContinuousSyncMode(enable)
     toast({
       position: "bottom",
       render: () => (
         <Center>
           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
-            Continuous Task Sync {enable ? "enabled":"disabled"}
+            Continuous Task Sync {enable ? "enabled" : "disabled"}
           </Box>
         </Center>
       ),
     })
   }
 
+  const onChangeSetImportPersonalTasksOnly = async (enable: boolean) => {
+    await setSettingsSetUsePersonalTasksOnly(enable)
+    toast({
+      position: "bottom",
+      render: () => (
+        <Center>
+          <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+            Use Personal Tasks only {enable ? "enabled" : "disabled"}
+          </Box>
+        </Center>
+      ),
+    })
+  }
+
+  //   const onChangeSetUseClutterFreeView = async (enable: boolean) => {
+  //     await setSettingsSetUseClutterFreeView(enable)
+  //     toast({
+  //       position: "bottom",
+  //       render: () => (
+  //         <Center>
+  //           <Box color='white' w='80%' borderRadius='lg' p={3} bg='green.500'>
+  //             Clutter Free View {enable ? "enabled" : "disabled"}
+  //           </Box>
+  //         </Center>
+  //       ),
+  //     })
+  //   }
+  //   <RadioGroup colorScheme='red' defaultValue={String(taskBlocksUseClutterFreeView)}> use clutter free task view for task blocks
+  //   <Stack spacing={[1, 2]} direction={['column', 'row']}>
+  //     <Radio value='true' onChange={() => onChangeSetUseClutterFreeView(true)}>enabled</Radio>
+  //     <Radio value='false' onChange={() => onChangeSetUseClutterFreeView(false)}>disabled</Radio>
+  //   </Stack>
+  // </RadioGroup>
 
   return (
     <>
-      <Button onClick={onOpen}
-      width="100%"
-      mb="2"
-      //isLoading={isLoading}
-      rightIcon={<SettingsIcon />}
-      colorScheme='red'
-      variant='solid'
-      >Settings</Button>
-
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-      >
-        <ModalOverlay />
-        <ModalContent>
-        <ModalHeader>Settings</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl>
-            <Stack spacing={[1, 5]} direction={['column', 'row']} divider={<StackDivider borderColor='gray.200' />}>
-            <CheckboxGroup colorScheme='red' defaultValue={taskLinkSettingsValues}> Task Links
-              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+      <FormControl>
+        <Stack spacing={1} direction={['column']} divider={<StackDivider borderColor='gray.200' />}>
+          <CheckboxGroup colorScheme='red' defaultValue={taskLinkSettingsValues}> Task Links
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
               <Checkbox value='mobile' onChange={(value) => onChangeMobileUrls(value.target.checked)}>mobile</Checkbox>
               <Checkbox value='web' onChange={(value) => onChangeWebUrls(value.target.checked)}>web</Checkbox>
-              </Stack>
-            </CheckboxGroup>
-              <CheckboxGroup colorScheme='red' defaultValue={taskMetadataSettingsValues}> task metadata import
-                <Stack spacing={[1, 5]} direction={['column', 'row']}>
-                <Checkbox value='dueDates' onChange={(value) => onChangeDueDates(value.target.checked)}>due dates</Checkbox> setTaskMetadataOptions
-                <Checkbox value='labels' onChange={(value) => onChangeLabels(value.target.checked)}>labels</Checkbox>
-                <Checkbox value='description' onChange={(value) => onChangeDescriptions(value.target.checked)}>description</Checkbox>
-                <Checkbox value='priorities' onChange={(value) => onChangePriorities(value.target.checked)}>priorities</Checkbox>
-                </Stack>
-              </CheckboxGroup>
-              <CheckboxGroup colorScheme='red' defaultValue={taskGroupingTodayValues}> import todays tasks grouping
-                <Stack spacing={[1, 5]} direction={['column', 'row']}>
-                <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingTodayProjects(value.target.checked)}>projects</Checkbox>
-                <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingTodaySections(value.target.checked)}>sections</Checkbox>
-                </Stack>
-              </CheckboxGroup>
-              <CheckboxGroup colorScheme='red' defaultValue={taskGroupingProjectValues}> import project tasks grouping
-                <Stack spacing={[1, 5]} direction={['column', 'row']}>
-                <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingProjectImportProjects(value.target.checked)}>projects</Checkbox>
-                <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingProjectImportSections(value.target.checked)}>sections</Checkbox>
-                </Stack>
-              </CheckboxGroup>
-              <CheckboxGroup colorScheme='red' defaultValue={taskGroupingAllValues}> import all tasks grouping
-                <Stack spacing={[1, 5]} direction={['column', 'row']}>
-                <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingAllProjects(value.target.checked)}>projects</Checkbox>
-                <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingAllSections(value.target.checked)}>sections</Checkbox>
-                </Stack>
-              </CheckboxGroup>
-              <RadioGroup colorScheme='red' defaultValue={taskImportAfterSelectedBlock}> import tasks after selected blocks
-              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+            </Stack>
+          </CheckboxGroup>
+          <CheckboxGroup colorScheme='red' defaultValue={taskMetadataSettingsValues}> task metadata import
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
+              <Checkbox value='dueDates' onChange={(value) => onChangeDueDates(value.target.checked)}>due dates</Checkbox> setTaskMetadataOptions
+              <Checkbox value='labels' onChange={(value) => onChangeLabels(value.target.checked)}>labels</Checkbox>
+              <Checkbox value='description' onChange={(value) => onChangeDescriptions(value.target.checked)}>description</Checkbox>
+              <Checkbox value='priorities' onChange={(value) => onChangePriorities(value.target.checked)}>priorities</Checkbox>
+            </Stack>
+          </CheckboxGroup>
+          <CheckboxGroup colorScheme='red' defaultValue={taskGroupingTodayValues}> import todays tasks grouping
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
+              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingTodayProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingTodaySections(value.target.checked)}>sections</Checkbox>
+            </Stack>
+          </CheckboxGroup>
+          <CheckboxGroup colorScheme='red' defaultValue={taskGroupingProjectValues}> import project tasks grouping
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
+              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingProjectImportProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingProjectImportSections(value.target.checked)}>sections</Checkbox>
+            </Stack>
+          </CheckboxGroup>
+          <CheckboxGroup colorScheme='red' defaultValue={taskGroupingAllValues}> import all tasks grouping
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
+              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingAllProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingAllSections(value.target.checked)}>sections</Checkbox>
+            </Stack>
+          </CheckboxGroup>
+          <CheckboxGroup colorScheme='red' defaultValue={taskGroupingLabelValues}> import label tasks grouping
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
+              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingLabelProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingLabelSections(value.target.checked)}>sections</Checkbox>
+            </Stack>
+          </CheckboxGroup>
+          <RadioGroup colorScheme='red' defaultValue={taskImportAfterSelectedBlock}> import tasks after selected blocks
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
               <Radio value='enabled' onChange={() => onChangeEnableImportAfterSelectedBlocks(true)}>enabled</Radio>
               <Radio value='disabled' onChange={() => onChangeEnableImportAfterSelectedBlocks(false)}>disabled</Radio>
-              </Stack>
-              </RadioGroup>
-              <RadioGroup colorScheme='red' defaultValue={taskSetDueDatesBasedOnDailyNote}> set due dates based on daily note
-              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+            </Stack>
+          </RadioGroup>
+          <RadioGroup colorScheme='red' defaultValue={taskSetDueDatesBasedOnDailyNote}> set due dates based on daily note
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
               <Radio value='enabled' onChange={() => onChangeEnableSetDueDateBasedOnDailyNote(true)}>enabled</Radio>
               <Radio value='disabled' onChange={() => onChangeEnableSetDueDateBasedOnDailyNote(false)}>disabled</Radio>
-              </Stack>
-              </RadioGroup>
-              <RadioGroup colorScheme='red' defaultValue={taskSyncContinuousMode}> enable continous task sync (beta)
-              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+            </Stack>
+          </RadioGroup>
+          <RadioGroup colorScheme='red' defaultValue={String(taskImportPersonalTasksOnly)}> import personal tasks only (not assigned to others)
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
+              <Radio value='true' onChange={() => onChangeSetImportPersonalTasksOnly(true)}>enabled</Radio>
+              <Radio value='false' onChange={() => onChangeSetImportPersonalTasksOnly(false)}>disabled</Radio>
+            </Stack>
+          </RadioGroup>
+          <RadioGroup colorScheme='red' defaultValue={taskSyncContinuousMode}> enable continous task sync (beta)
+            <Stack spacing={[1, 2]} direction={['column', 'row']}>
               <Radio value='enabled' onChange={() => onChangeSetContinuousSyncMode(true)}>enabled</Radio>
               <Radio value='disabled' onChange={() => onChangeSetContinuousSyncMode(false)}>disabled</Radio>
-              </Stack>
-              </RadioGroup>
             </Stack>
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </RadioGroup>
+        </Stack>
+      </FormControl>
     </>
   );
 }
