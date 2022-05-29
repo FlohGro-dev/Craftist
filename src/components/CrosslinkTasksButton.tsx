@@ -1,13 +1,13 @@
-import React from "react";
 import { Button } from "@chakra-ui/button";
 import { LinkIcon } from "@chakra-ui/icons";
-import * as TodoistWrapper from "../todoistApiWrapper";
-import * as CraftBlockInteractor from "../craftBlockInteractor";
+import { Box, Center } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import { CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
-import { Box, Center } from "@chakra-ui/react";
-import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+import React from "react";
 import { useRecoilValue } from "recoil";
+import * as CraftBlockInteractor from "../craftBlockInteractor";
+import { taskSetDueDatesBasedOnDailyNote } from "../settingsUtils";
+import * as TodoistWrapper from "../todoistApiWrapper";
 
 const CrosslinkTasksButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
@@ -21,8 +21,8 @@ const CrosslinkTasksButton: React.FC = () => {
     setIsLoading(true);
 
     // check if document is linked to a todoist project
-    let foundProjectIDs:string[] = [];
-    let linkedProjectId:number;
+    let foundProjectIDs: string[] = [];
+    let linkedProjectId: number;
 
     let linkedProjectBlocksPromise = CraftBlockInteractor.checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls(todoistProjectUrl);
     linkedProjectBlocksPromise.catch(() => {
@@ -33,53 +33,53 @@ const CrosslinkTasksButton: React.FC = () => {
         duration: 1000,
       });
     })
-    .then((urls) => {
-      if(urls){
-        return Promise.all(
-          urls
-            .map((url) => {
-                if(url.includes(todoistProjectUrl)){
-                  foundProjectIDs.push(url.replace(todoistProjectUrl,""));
+      .then((urls) => {
+        if (urls) {
+          return Promise.all(
+            urls
+              .map((url) => {
+                if (url.includes(todoistProjectUrl)) {
+                  foundProjectIDs.push(url.replace(todoistProjectUrl, ""));
                 }
+              })
+          )
+        }
+      })
+      .finally(() => {
+        if (foundProjectIDs.length > 0) {
+          if (foundProjectIDs.every((val, _i, arr) => val === arr[0])) {
+            // all ids are equal - thats valid
+            linkedProjectId = parseInt(foundProjectIDs[0]);
+          }
+          else {
+            // not all ids are equal - this is not valid!
+            toast({
+              position: "bottom",
+              render: () => (
+                <Center>
+                  <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                    linked project Ids are not all equal - this is not valid
+                  </Box>
+                </Center>
+              ),
             })
-        )
-      }
-    })
-    .finally(() => {
-      if(foundProjectIDs.length > 0){
-        if(foundProjectIDs.every( (val, _i, arr) => val === arr[0] )){
-          // all ids are equal - thats valid
-          linkedProjectId = parseInt(foundProjectIDs[0]);
-                  }
-                  else{
-                    // not all ids are equal - this is not valid!
-                        toast({
-                          position: "bottom",
-                          render: () => (
-                            <Center>
-                              <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
-                                linked project Ids are not all equal - this is not valid
-                            </Box>
-                            </Center>
-                          ),
-                        })
 
-                  }
-      }
-    })
+          }
+        }
+      })
 
     // get page for document linking
     const getPageResult = await craft.dataApi.getCurrentPage();
 
     if (getPageResult.status !== "success") {
-        throw new Error(getPageResult.message)
+      throw new Error(getPageResult.message)
     }
 
     const pageBlock = getPageResult.data
 
-    let documentDate:string | undefined = undefined;
+    let documentDate: string | undefined = undefined;
 
-    if(taskSetDueDatesBasedOnDailyNote == "enabled"){
+    if (taskSetDueDatesBasedOnDailyNote == "enabled") {
       documentDate = CraftBlockInteractor.getIsoDateIfCurrentDocumentIsDailyNote(pageBlock);
     }
 
@@ -94,7 +94,7 @@ const CrosslinkTasksButton: React.FC = () => {
             <Center>
               <Box color='white' w='80%' borderRadius='lg' p={3} bg='yellow.500'>
                 no open tasks
-            </Box>
+              </Box>
             </Center>
           ),
         })
@@ -111,49 +111,49 @@ const CrosslinkTasksButton: React.FC = () => {
             //const mdLink = CraftBlockInteractor.getMarkdownLinkToCraftTextBlock(block);
             const mdContentWithLink = CraftBlockInteractor.getMarkdownContentWithLinkToCraftTextBlock(block);
             // check if task is already crosslinked
-            if(CraftBlockInteractor.blockContainsString("Todoist Task", block)){
+            if (CraftBlockInteractor.blockContainsString("Todoist Task", block)) {
               // nothing to be done - task is already linked
             } else {
-            // create task and append link to block
-            add({
-              description: documentTitle,
-              content: mdContentWithLink,
-              projectId: linkedProjectId,
-              due_date: documentDate
-            })
-              .then(async function(task) {
-                // append task link to block
-                let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
-                block.content = blockToAppend;
-                //block.listStyle.type = "todo";
-                block.listStyle = {
-                  type: "todo",
-                  state: "unchecked"
-                };
-                const result = await craft.dataApi.updateBlocks([block])
-                if (result.status !== "success") {
-                  throw new Error(result.message)
-                } else {
+              // create task and append link to block
+              add({
+                description: documentTitle,
+                content: mdContentWithLink,
+                projectId: linkedProjectId,
+                due_date: documentDate
+              })
+                .then(async function (task) {
+                  // append task link to block
+                  let blockToAppend: CraftTextRun[] = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
+                  block.content = blockToAppend;
+                  //block.listStyle.type = "todo";
+                  block.listStyle = {
+                    type: "todo",
+                    state: "unchecked"
+                  };
+                  const result = await craft.dataApi.updateBlocks([block])
+                  if (result.status !== "success") {
+                    throw new Error(result.message)
+                  } else {
 
-                }
-              })
-              .catch(() => {
-                //ERROR
-                setIsLoading(false)
-                if (!toast.isActive(errorToastId)) {
-                  toast({
-                    id: errorToastId,
-                    position: "bottom",
-                    render: () => (
-                      <Center>
-                        <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
-                          Failed adding Task - please try to login again
-                      </Box>
-                      </Center>
-                    ),
-                  })
-                }
-              })
+                  }
+                })
+                .catch(() => {
+                  //ERROR
+                  setIsLoading(false)
+                  if (!toast.isActive(errorToastId)) {
+                    toast({
+                      id: errorToastId,
+                      position: "bottom",
+                      render: () => (
+                        <Center>
+                          <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
+                            Failed adding Task - please try to login again
+                          </Box>
+                        </Center>
+                      ),
+                    })
+                  }
+                })
             }
           })
       )
@@ -162,16 +162,17 @@ const CrosslinkTasksButton: React.FC = () => {
         //setIsLoading(false);
         setIsLoading(false);
         if (!toast.isActive(errorToastId)) {
-        toast({
-          position: "bottom",
-          render: () => (
-            <Center>
-              <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                Crosslinked Tasks
-            </Box>
-            </Center>
-          ),
-        })}
+          toast({
+            position: "bottom",
+            render: () => (
+              <Center>
+                <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+                  Crosslinked Tasks
+                </Box>
+              </Center>
+            ),
+          })
+        }
       });
   }
   return (
@@ -180,11 +181,11 @@ const CrosslinkTasksButton: React.FC = () => {
       colorScheme='red'
       onClick={onClick}
       width="100%"
-      mb="2"
+      mb="1"
       isLoading={isLoading}
     >
       Crosslink Open Tasks
-      </Button>
+    </Button>
   );
 }
 

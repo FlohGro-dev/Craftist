@@ -1,4 +1,4 @@
-import { CraftTextBlock, CraftTextRun, CraftTextBlockInsert, AfterBlockLocation, CraftBlock } from "@craftdocs/craft-extension-api";
+import { AfterBlockLocation, CraftBlock, CraftTextBlock, CraftTextBlockInsert, CraftTextRun } from "@craftdocs/craft-extension-api";
 
 export async function getAllTodoItemsFromCurrentPage() {
   let todoBlocks: CraftTextBlock[] = [];
@@ -10,7 +10,7 @@ export async function getAllTodoItemsFromCurrentPage() {
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.listStyle.type == "todo") {
       if (subBlock.type == "textBlock") {
         todoBlocks.push(subBlock);
@@ -30,7 +30,7 @@ export async function getUncheckedTodoItemsFromCurrentPage() {
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.listStyle.type == "todo") {
       if (subBlock.listStyle.state == "unchecked") {
         if (subBlock.type == "textBlock") {
@@ -54,7 +54,7 @@ export async function getCheckedTodoItemsFromCurrentPage() {
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.listStyle.type == "todo") {
       if (subBlock.listStyle.state == "checked") {
         if (subBlock.type == "textBlock") {
@@ -78,7 +78,7 @@ export async function getCanceledTodoItemsFromCurrentPage() {
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.listStyle.type == "todo") {
       if (subBlock.listStyle.state == "canceled") {
         if (subBlock.type == "textBlock") {
@@ -97,10 +97,10 @@ export function getMarkdownLinkToCraftTextBlock(block: CraftTextBlock) {
 }
 
 export function getMarkdownContentWithLinkToCraftTextBlock(block: CraftBlock) {
-  const blocks:CraftBlock[] = [block];
+  const blocks: CraftBlock[] = [block];
   //let blockText: string = block.content.map((c) => c.text).join("");
-  let mdContent = craft.markdown.craftBlockToMarkdown(blocks,"common",{tableSupported: false});
-  mdContent = mdContent.replace("- [ ]","")
+  let mdContent = craft.markdown.craftBlockToMarkdown(blocks, "common", { tableSupported: false });
+  mdContent = mdContent.replace("- [ ]", "")
   return "[" + mdContent + "](craftdocs://open?blockId=" + block.id + "&spaceId=" + block.spaceId + ")"
   //return mdContent + " [linkTest](craftdocs://open?blockId=" + block.id + "&spaceId=" + block.spaceId + ")"
 }
@@ -142,8 +142,8 @@ export function getBlockContentAsString(block: CraftTextBlock) {
 
 export function getExternalUrlsFromBlock(block: CraftTextBlock) {
   let urls: string[] = [];
-  block.content.forEach(function(contentItem) {
-    if (contentItem.link ?.type == "url") {
+  block.content.forEach(function (contentItem) {
+    if (contentItem.link?.type == "url") {
       urls.push(contentItem.link.url);
     }
   }
@@ -189,7 +189,7 @@ export async function checkIfPageContainsStringInAnyBlockAndReturnFoundBlocks(se
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.type == "textBlock") {
       let content = getBlockContentAsString(subBlock);
       if (content.includes(searchString)) {
@@ -213,7 +213,7 @@ export async function checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.type == "textBlock") {
       let blockUrls = getExternalUrlsFromBlock(subBlock);
       for (let url of blockUrls) {
@@ -226,11 +226,11 @@ export async function checkIfPageContainsExternalUrlInAnyBlockAndReturnFoundUrls
   })
 
 
-return foundUrls;
+  return foundUrls;
 }
 
 export async function checkIfPageContainsTodoistTaskId(taskId: number) {
-  let blockFound:boolean = false;
+  let blockFound: boolean = false;
   const getPageResult = await craft.dataApi.getCurrentPage();
 
   if (getPageResult.status !== "success") {
@@ -238,7 +238,7 @@ export async function checkIfPageContainsTodoistTaskId(taskId: number) {
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.type == "textBlock") {
       let content = getBlockContentAsString(subBlock);
       if (content.includes(taskId.toString())) {
@@ -268,7 +268,7 @@ export async function getCurrentTodoistTaskIdsOfTasksOnPage() {
   }
   const pageBlock = getPageResult.data
 
-  pageBlock.subblocks.forEach(function(subBlock) {
+  pageBlock.subblocks.forEach(function (subBlock) {
     if (subBlock.type == "textBlock") {
       let blockUrls = getExternalUrlsFromBlock(subBlock)
 
@@ -291,7 +291,7 @@ export async function getCurrentTodoistTaskIdsOfTasksOnPage() {
 const todoistTaskLinkMobileUrl = "todoist://task?id="
 const todoistTaskLinkWebUrl = "https://todoist.com/showTask?id="
 
-export function getTodoistTaskIdFromBlock(block: CraftTextBlock):string | undefined{
+export function getTodoistTaskIdFromBlock(block: CraftTextBlock): string | undefined {
   let blockUrls = getExternalUrlsFromBlock(block);
 
   for (let url of blockUrls) {
@@ -304,7 +304,7 @@ export function getTodoistTaskIdFromBlock(block: CraftTextBlock):string | undefi
   return undefined
 }
 
-export async function createLocationContainerAfterCurrentSelection():Promise<AfterBlockLocation|undefined>{
+export async function createLocationContainerAfterCurrentSelection(): Promise<AfterBlockLocation | undefined> {
   const getPageResult = await craft.dataApi.getCurrentPage();
 
   if (getPageResult.status !== "success") {
@@ -314,35 +314,52 @@ export async function createLocationContainerAfterCurrentSelection():Promise<Aft
 
   const currentSelection = await craft.editorApi.getSelection()
 
-if (currentSelection.status !== "success") {
+  if (currentSelection.status !== "success") {
     throw new Error(currentSelection.message)
-}
+  }
 
   const selectedBlocks = currentSelection.data;
 
-  if(selectedBlocks.length == 0){
+  if (selectedBlocks.length == 0) {
     // no selection, return undefined
     return undefined;
   } else {
 
-      const lastBlock = selectedBlocks[selectedBlocks.length - 1]
-      return craft.location.afterBlockLocation(pageBlock.id, lastBlock.id);
+    const lastBlock = selectedBlocks[selectedBlocks.length - 1]
+    return craft.location.afterBlockLocation(pageBlock.id, lastBlock.id);
   }
 }
 
-export function getIsoDateIfCurrentDocumentIsDailyNote(pageBlock:CraftTextBlock):string | undefined{
+export function getIsoDateIfCurrentDocumentIsDailyNote(pageBlock: CraftTextBlock): string | undefined {
 
   let firstBlockText = pageBlock.content[0].text
 
 
   const regex = /(\d{4}).(\d{2}).(\d{2})$/gm;
 
-  if(firstBlockText.match(regex)){
+  if (firstBlockText.match(regex)) {
     const subst = `$1-$2-$3`;
     // create iso Date from craft date format
     const isoDate = firstBlockText.replace(regex, subst);
     return isoDate;
   } else {
     return undefined
+  }
+}
+
+export function getIsoDateFromBlockLinkedToDate(block: CraftTextBlock): string | undefined {
+  let dateStr = "";
+  block.content.map((bContent) => {
+    if (bContent.link) {
+      if (bContent.link.type == "dateLink") {
+        dateStr = bContent.link.date;
+      }
+    }
+  })
+
+  if (dateStr == "") {
+    return undefined;
+  } else {
+    return dateStr;
   }
 }

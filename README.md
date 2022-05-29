@@ -14,6 +14,13 @@ If this eXtension is valuable for and you like to thank me you can support me on
 
 If you want to have a look to other things I'm working, check out my website at [flohgro.com](https://flohgro.com).
 
+## Demo Videos
+
+Here are some demo videos of Craftist from myself or other creators:
+
+- [@curtismchale](https://twitter.com/curtismchale)'s video about Craftist: [YouTube Video Demo](https://www.youtube.com/watch?v=IxONW0W9QPY)
+- [Craftist 0.7 Demo](https://www.youtube.com/watch?v=gTjN4vQS_mU&list=PLTkrU9ydNFijCcuZttfuwhZjks4x0NoLU)
+
 ## Features
 
 The following features are currently supported by Craftist:
@@ -64,7 +71,6 @@ The following features are currently supported by Craftist:
 
 ![why is my task not synced?](https://user-images.githubusercontent.com/13785667/161394302-eeb8341a-2cf6-4f44-9b3f-4f2a8ff6e485.png)
 
-
 ### Import Tasks / Project List
 
 - import todays tasks
@@ -73,6 +79,10 @@ The following features are currently supported by Craftist:
 - import all tasks
   - this will import all tasks from your todoist account (which could be a lot)
   - it's planned to improve this action (e.g. grouping by project) if you'd like to have this feature please comment on the related issue.
+- import tasks from linked project
+  - this will import all tasks from the project linked in this document / page
+- import tasks with label
+  - this will import all tasks with the selected label
 - the imported tasks will be nested by project, section and parent task if available
 - import project list
   - this will import the list of your Todoist projects
@@ -93,6 +103,7 @@ The following features are currently supported by Craftist:
   - task grouping: select how tasks should be grouped on import (by project, by section or both); available for all import features
   - import location: you can decide if you want to import tasks below the current selected block or always at the end of a document
   - due dates from daily notes: you can choose if created / crosslinked tasks shall receive the due date of the current open daily note (this will not add due dates if you create tasks from other documents)
+  - import personal tasks only: choose if only tasks assigned to you (or unassigned) shall be imported
   - (beta) enable continuous task sync
 
 ## Login
@@ -124,15 +135,24 @@ To learn more about Craft eXtensions visit the [Craft X developer portal](https:
 
 ## Thanks
 
-Thanks to @curtismchale for covering Craftist in a [YouTube Video Demo](https://www.youtube.com/watch?v=IxONW0W9QPY) and [Blogpost](https://curtismchale.ca/2022/01/31/connect-todoist-with-craft/) lately.
-
 Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
+
+Thanks to [@DharamKapila](https://twitter.com/DharamKapila) for the inspiration and support for the UI of the info panel
+
+Thanks to every user who provides valuable feedback for the further development and the gratefulness i received.
 
 ## Changelog
 
 ### v0.8
 
+- **new:** tab layout to divide into *Features* / *Settings* and *Info*
+- **new:** version check in the *Info* Tab (thanks to [@DharamKapila](https://twitter.com/DharamKapila) for the support and inspiration)
+- **new:** import tasks with label feature - this allows the user to import all tasks with the selected label
+- **new:** setting to exclude importing tasks that are assigned to other people in Todoist (enabled by default)
 - **improved:** removed seconds from due time string
+- **improved:** no completed tasks are imported anymore when importing tasks from a linked project
+- **changed:** emojis to indicate mobile (App) 📱  and web 🌐 links to tasks - this reduces the needed space for the links
+- **fixed:** prevent sync task states when the due date in Craft is older than in Todoist for recurring tasks
 
 ### v0.7.1
 
@@ -159,7 +179,6 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 - **new:** option to set due dates for exported tasks to date of the daily notes (enabled by default)
 - **change:** craftdocs://open[..] urls (resulting from cross-linking) will be stripped from task contents since they don't work and just produce clutter.
 
-
 ### v0.5
 
 - **new/fixed:** **Craftist is now working in the web version of Craft**
@@ -169,17 +188,16 @@ Thanks to @thomaszdxsn for the inspiration in his integration for Todoist.
 ### v0.4
 
 - **new:** TASK GROUPING - now all imported tasks are grouped by their parent task / project / section
-	- if you import tasks from a linked project the tasks will just be grouped in their sections (this can be changed later with settings)
+  - if you import tasks from a linked project the tasks will just be grouped in their sections (this can be changed later with settings)
 - **new:** imported Tasks will contain the due date of the task which is linked to the correct daily note
 - **new:** Settings Menu to change some basic settings:
-	- Enable / Disable Mobile Url (for tasks and projects)
-	- Enable / Disable Webview Url (for tasks and projects)
-	- Enable / Disable Due Dates for imported tasks
-	- *note: these settings are stored locally but must be set again after you reinstalled the eXtension (at least from my testing results)*
+  - Enable / Disable Mobile Url (for tasks and projects)
+  - Enable / Disable Webview Url (for tasks and projects)
+  - Enable / Disable Due Dates for imported tasks
+  - *note: these settings are stored locally but must be set again after you reinstalled the eXtension (at least from my testing results)*
 - **change:** „import project List“ now uses correct order of projects
 - **fixed:** „import todays tasks“ button now also imports overdue tasks
 - **fixed:** tasks won't get imported twice when they are already present in the document
-
 
 ### v0.3
 

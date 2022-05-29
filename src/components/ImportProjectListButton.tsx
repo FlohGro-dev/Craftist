@@ -1,12 +1,12 @@
-import React from "react";
 import { Button } from "@chakra-ui/button";
 import { DownloadIcon } from "@chakra-ui/icons";
-import * as TodoistWrapper from "../todoistApiWrapper";
-import { useToast } from "@chakra-ui/toast";
 import { Box, Center } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/toast";
 import { CraftBlockInsert } from "@craftdocs/craft-extension-api";
-import { taskImportAfterSelectedBlock } from "../settingsUtils";
+import React from "react";
 import { createLocationContainerAfterCurrentSelection } from "../craftBlockInteractor";
+import { taskImportAfterSelectedBlock } from "../settingsUtils";
+import * as TodoistWrapper from "../todoistApiWrapper";
 
 const ImportProjectListButton: React.FC = () => {
   const toast = useToast();
@@ -25,35 +25,35 @@ const ImportProjectListButton: React.FC = () => {
         blocksToAdd = blocksToAdd.concat(mdContent);
       })
 
-      if(taskImportAfterSelectedBlock == "enabled"){
+      if (taskImportAfterSelectedBlock == "enabled") {
         let location = await createLocationContainerAfterCurrentSelection();
-        if(location){
-            craft.dataApi.addBlocks(blocksToAdd, location);
+        if (location) {
+          craft.dataApi.addBlocks(blocksToAdd, location);
         } else {
           craft.dataApi.addBlocks(blocksToAdd);
         }
       } else {
         craft.dataApi.addBlocks(blocksToAdd);
       }
-        setIsLoading(false);
-        toast({
-          position: "bottom",
-          render: () => (
-            <Center>
-              <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
-                Imported Project List
+      setIsLoading(false);
+      toast({
+        position: "bottom",
+        render: () => (
+          <Center>
+            <Box color='white' w='80%' borderRadius='lg' p={3} bg='blue.500'>
+              Imported Project List
             </Box>
-            </Center>
-          ),
-        })
-    } catch(error) {
+          </Center>
+        ),
+      })
+    } catch (error) {
       toast({
         position: "bottom",
         render: () => (
           <Center>
             <Box color='white' w='80%' borderRadius='lg' p={3} bg='red.500'>
               Failed importing project list - please try to login again
-          </Box>
+            </Box>
           </Center>
         ),
       })
@@ -66,11 +66,11 @@ const ImportProjectListButton: React.FC = () => {
       colorScheme='red'
       onClick={onClick}
       width="100%"
-      mb="2"
+      mb="1"
       isLoading={isLoading}
     >
       Import Project List
-      </Button>
+    </Button>
   );
 }
 

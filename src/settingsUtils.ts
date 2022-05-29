@@ -1,14 +1,18 @@
 
 import { taskGroupingOptions } from "./todoistApiWrapper";
 
+export const currentVersion = "0.7.1"
 export let taskMetadataSettingsValues: string[] = [];
 export let taskLinkSettingsValues: string[] = [];
 export let taskGroupingTodayValues: string[] = [];
 export let taskGroupingProjectValues: string[] = [];
+export let taskGroupingLabelValues: string[] = [];
 export let taskGroupingAllValues: string[] = [];
 export let taskImportAfterSelectedBlock: string = "";
 export let taskSetDueDatesBasedOnDailyNote: string = "";
 export let taskSyncContinuousMode: string = "";
+export let taskImportPersonalTasksOnly: boolean = true;
+export let taskBlocksUseClutterFreeView: boolean = false;
 
 
 // const taskMetadataSettingsDefaultValues:string[] = [];
@@ -351,7 +355,7 @@ export async function setSettingsGroupProjectTasksOption(groupByOption: string) 
         taskGroupingProjectValues.push("projects");
       }
       if (sectionsIndex > -1) {
-        taskGroupingTodayValues.splice(sectionsIndex, 0);
+        taskGroupingProjectValues.splice(sectionsIndex, 0);
       }
       break;
     case "sectionOnly": ;
@@ -359,16 +363,16 @@ export async function setSettingsGroupProjectTasksOption(groupByOption: string) 
         taskGroupingProjectValues.push("sections");
       }
       if (projectsIndex > -1) {
-        taskGroupingTodayValues.splice(projectsIndex, 0);
+        taskGroupingProjectValues.splice(projectsIndex, 0);
       }
       break;
     //case "label": return taskGroupingOptions.label;
     case "none":
       if (projectsIndex > -1) {
-        taskGroupingTodayValues.splice(projectsIndex, 0);
+        taskGroupingProjectValues.splice(projectsIndex, 0);
       }
       if (sectionsIndex > -1) {
-        taskGroupingTodayValues.splice(sectionsIndex, 0);
+        taskGroupingProjectValues.splice(sectionsIndex, 0);
       }
       break;
   }
@@ -454,7 +458,7 @@ export async function setSettingsGroupAllTasksOption(groupByOption: string) {
         taskGroupingAllValues.push("projects");
       }
       if (sectionsIndex > -1) {
-        taskGroupingTodayValues.splice(sectionsIndex, 0);
+        taskGroupingAllValues.splice(sectionsIndex, 0);
       }
       break;
     case "sectionOnly": ;
@@ -462,16 +466,16 @@ export async function setSettingsGroupAllTasksOption(groupByOption: string) {
         taskGroupingAllValues.push("sections");
       }
       if (projectsIndex > -1) {
-        taskGroupingTodayValues.splice(projectsIndex, 0);
+        taskGroupingAllValues.splice(projectsIndex, 0);
       }
       break;
     //case "label": return taskGroupingOptions.label;
     case "none":
       if (projectsIndex > -1) {
-        taskGroupingTodayValues.splice(projectsIndex, 0);
+        taskGroupingAllValues.splice(projectsIndex, 0);
       }
       if (sectionsIndex > -1) {
-        taskGroupingTodayValues.splice(sectionsIndex, 0);
+        taskGroupingAllValues.splice(sectionsIndex, 0);
       }
       break;
   }
@@ -537,6 +541,112 @@ export async function getSettingsGroupAllTasksOption(): Promise<taskGroupingOpti
   return taskGroupingOptions.error;
 }
 
+
+
+// label import grouping
+const useSettingsGroupLabelTasksOption: string = "useSettingsGroupLabelTasksOptionKey"
+
+export async function setSettingsGroupLabelTasksOption(groupByOption: string) {
+  let projectsIndex = taskGroupingLabelValues.indexOf("projects");
+  let sectionsIndex = taskGroupingLabelValues.indexOf("sections");
+  switch (groupByOption) {
+    case "projectAndSection":
+      if (projectsIndex == -1) {
+        taskGroupingLabelValues.push("projects");
+      }
+      if (sectionsIndex == -1) {
+        taskGroupingLabelValues.push("sections");
+      }
+      break;
+    case "projectOnly":
+      if (projectsIndex == -1) {
+        taskGroupingLabelValues.push("projects");
+      }
+      if (sectionsIndex > -1) {
+        taskGroupingLabelValues.splice(sectionsIndex, 0);
+      }
+      break;
+    case "sectionOnly": ;
+      if (sectionsIndex == -1) {
+        taskGroupingLabelValues.push("sections");
+      }
+      if (projectsIndex > -1) {
+        taskGroupingLabelValues.splice(projectsIndex, 0);
+      }
+      break;
+    //case "label": return taskGroupingOptions.label;
+    case "none":
+      if (projectsIndex > -1) {
+        taskGroupingLabelValues.splice(projectsIndex, 0);
+      }
+      if (sectionsIndex > -1) {
+        taskGroupingLabelValues.splice(sectionsIndex, 0);
+      }
+      break;
+  }
+  await craft.storageApi.put(useSettingsGroupLabelTasksOption, groupByOption);
+}
+
+export async function loadLabelGroupingSettingsIntoVar() {
+  const result = await craft.storageApi.get(useSettingsGroupLabelTasksOption);
+  let projectsIndex = taskGroupingLabelValues.indexOf("projects");
+  let sectionsIndex = taskGroupingLabelValues.indexOf("sections");
+  const groupByOption = result.data;
+  switch (groupByOption) {
+    case "projectAndSection":
+      if (projectsIndex == -1) {
+        taskGroupingLabelValues.push("projects");
+      }
+      if (sectionsIndex == -1) {
+        taskGroupingLabelValues.push("sections");
+      }
+      break;
+    case "projectOnly":
+      if (projectsIndex == -1) {
+        taskGroupingLabelValues.push("projects");
+      }
+      if (sectionsIndex > -1) {
+        taskGroupingLabelValues.splice(sectionsIndex, 0);
+      }
+      break;
+    case "sectionOnly": ;
+      if (sectionsIndex == -1) {
+        taskGroupingLabelValues.push("sections");
+      }
+      if (projectsIndex > -1) {
+        taskGroupingLabelValues.splice(projectsIndex, 0);
+      }
+      break;
+    //case "label": return taskGroupingOptions.label;
+    case "none":
+      if (projectsIndex > -1) {
+        taskGroupingLabelValues.splice(projectsIndex, 0);
+      }
+      if (sectionsIndex > -1) {
+        taskGroupingLabelValues.splice(sectionsIndex, 0);
+      }
+      break;
+  }
+}
+
+export async function getSettingsGroupLabelTasksOption(): Promise<taskGroupingOptions> {
+  let result = await craft.storageApi.get(useSettingsGroupLabelTasksOption);
+  if (result.status == "success") {
+    switch (result.data) {
+      case "projectAndSection": return taskGroupingOptions.projectAndSection;
+      case "projectOnly": return taskGroupingOptions.projectOnly;
+      case "sectionOnly": return taskGroupingOptions.sectionOnly;
+      //case "label": return taskGroupingOptions.label;
+      case "none": return taskGroupingOptions.none;
+    }
+  } else {
+    return taskGroupingOptions.error;
+  }
+  // return to prevent errors.
+  return taskGroupingOptions.error;
+}
+
+
 // import task location
 
 const useSettingsImportAfterSelectedBlockOption: string = "useSettingsImportAfterSelectedBlockOptionKey"
@@ -575,9 +685,9 @@ export async function setSettingsSetDueDateBasedOnDailyNoteOption(enabled: boole
   await craft.storageApi.put(useSettingsSetDueDateBasedOnDailyNoteOption, taskSetDueDatesBasedOnDailyNote);
 }
 
-export async function getSettingsSetDueDateBasedOnDailyNoteOption():Promise<string>{
+export async function getSettingsSetDueDateBasedOnDailyNoteOption(): Promise<string> {
   let result = await craft.storageApi.get(useSettingsSetDueDateBasedOnDailyNoteOption);
-  if(result.status == "success"){
+  if (result.status == "success") {
     taskSetDueDatesBasedOnDailyNote = result.data;
     return result.data
   } else {
@@ -597,9 +707,9 @@ export async function setSettingsSetContinuousSyncMode(enabled: boolean) {
   await craft.storageApi.put(useSettingsSetContinuousSyncMode, taskSyncContinuousMode);
 }
 
-export async function getSettingsSetContinuousSyncMode():Promise<string>{
+export async function getSettingsSetContinuousSyncMode(): Promise<string> {
   let result = await craft.storageApi.get(useSettingsSetContinuousSyncMode);
-  if(result.status == "success"){
+  if (result.status == "success") {
     taskSyncContinuousMode = result.data
     return result.data
   } else {
@@ -608,8 +718,49 @@ export async function getSettingsSetContinuousSyncMode():Promise<string>{
 }
 
 
+const useSettingsSetImportPersonalTasksOnly: string = "useSettingsSetImportPersonalTasksOnly"
+
+export async function setSettingsSetUsePersonalTasksOnly(enabled: boolean) {
+  if (enabled) {
+    taskImportPersonalTasksOnly = true;
+  } else {
+    taskImportPersonalTasksOnly = false;
+  }
+  await craft.storageApi.put(useSettingsSetImportPersonalTasksOnly, String(taskImportPersonalTasksOnly));
+}
+
+export async function getSettingsUsePersonalTasksOnly(): Promise<string> {
+  let result = await craft.storageApi.get(useSettingsSetImportPersonalTasksOnly);
+  if (result.status == "success") {
+    taskImportPersonalTasksOnly = Boolean(result.data)
+    return result.data
+  } else {
+    return "error"
+  }
+}
 
 
+
+const useSettingsSetUseClutterFreeView: string = "useSettingsSetUseClutterFreeView"
+
+export async function setSettingsSetUseClutterFreeView(enabled: boolean) {
+  if (enabled) {
+    taskBlocksUseClutterFreeView = true;
+  } else {
+    taskBlocksUseClutterFreeView = false;
+  }
+  await craft.storageApi.put(useSettingsSetUseClutterFreeView, String(taskBlocksUseClutterFreeView));
+}
+
+export async function getSettingsUseClutterFreeView(): Promise<string> {
+  let result = await craft.storageApi.get(useSettingsSetUseClutterFreeView);
+  if (result.status == "success") {
+    taskBlocksUseClutterFreeView = Boolean(result.data)
+    return result.data
+  } else {
+    return "error"
+  }
+}
 
 async function checkIfSettingExists(key: string): Promise<boolean> {
   let getSettingResult = await craft.storageApi.get(key);
@@ -619,6 +770,12 @@ async function checkIfSettingExists(key: string): Promise<boolean> {
     return false
   }
 }
+
+
+
+
+
+
 
 export const writeDefaultSettings = async () => {
   // shall only write defaults if no settings are present.
@@ -631,6 +788,8 @@ export const writeDefaultSettings = async () => {
   let locationSettings = await getSettingsImportAfterSelectedBlockOption();
   let dailyNotesSettings = await getSettingsSetDueDateBasedOnDailyNoteOption();
   let continuousSyncSettings = await getSettingsSetContinuousSyncMode();
+  let usePersonalTasksOnlySettings = await getSettingsUsePersonalTasksOnly();
+  let useClutterFreeTaskView = await getSettingsUseClutterFreeView();
 
   if (mobileUrlSettings == "error") {
     // write default
@@ -664,9 +823,17 @@ export const writeDefaultSettings = async () => {
     // write default
     await setSettingsSetDueDateBasedOnDailyNoteOption(true);
   }
-  if(continuousSyncSettings == "error") {
+  if (continuousSyncSettings == "error") {
     //write default
     await setSettingsSetContinuousSyncMode(false);
+  }
+  if (usePersonalTasksOnlySettings == "error") {
+    //write default
+    await setSettingsSetUsePersonalTasksOnly(true);
+  }
+  if (useClutterFreeTaskView == "error") {
+    //write default
+    await setSettingsSetUseClutterFreeView(false);
   }
   if (!checkIfSettingExists(useSettingsGroupTodaysTasksOption)) {
     // write default
@@ -705,6 +872,19 @@ export const writeDefaultSettings = async () => {
       await setSettingsGroupAllTasksOption("projectAndSection");
     } else {
       await loadAllGroupingSettingsIntoVar()
+    }
+  }
+  if (!checkIfSettingExists(useSettingsGroupLabelTasksOption)) {
+    // write default
+    await setSettingsGroupLabelTasksOption("projectAndSection");
+  } else {
+    // just read into var
+    let setting = await getSettingsGroupLabelTasksOption()
+    if (setting == taskGroupingOptions.error) {
+      // key exists but no valid value stored, set default
+      await setSettingsGroupLabelTasksOption("projectAndSection");
+    } else {
+      await loadLabelGroupingSettingsIntoVar()
     }
   }
 }
