@@ -24,7 +24,7 @@ const ImportTodaysTasksButton: React.FC = () => {
     let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
     try {
-      let filterStr = "(overdue, today)"
+      let filterStr = "(overdue | today)"
       if (taskImportPersonalTasksOnly) {
         filterStr = filterStr + " & (assigned to: me | !assigned)"
       }
