@@ -1,7 +1,7 @@
 import { CraftBlockInsert, CraftTextBlockInsert, CraftTextRun, TextHighlightColor } from "@craftdocs/craft-extension-api";
 import { Label, Project, Section, Task, TodoistApi } from "@doist/todoist-api-typescript";
 import * as Recoil from "recoil";
-import { taskBlocksUseClutterFreeView, taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
+import { taskLinkSettingsValues, taskMetadataSettingsValues } from "./settingsUtils";
 
 
 export const API_TOKEN_KEY = "TODOIST_API_TOKEN";
@@ -347,25 +347,25 @@ function createBlocksFromNestedTasks(tasks: NestedTask[], indentationLevel: numb
 
     let tB: CraftTextBlockInsert
 
-    if (taskBlocksUseClutterFreeView) {
-      let blockMeta: CraftTextBlockInsert = {
-        content: getTaskMetadataAsTextRun(curTask.task, labelsList),
-        type: "textBlock"
-      }
+    // if (taskBlocksUseClutterFreeView) {
+    //   let blockMeta: CraftTextBlockInsert = {
+    //     content: getTaskMetadataAsTextRun(curTask.task, labelsList),
+    //     type: "textBlock"
+    //   }
 
-      tB = {
-        content: createBlockTextRunFromTask(curTask.task, labelsList, false),
-        type: "textBlock",
-        listStyle: { type: "todo", state: "unchecked" },
-        subblocks: [blockMeta]
-      };
-    } else {
+    //   tB = {
+    //     content: createBlockTextRunFromTask(curTask.task, labelsList, false),
+    //     type: "textBlock",
+    //     listStyle: { type: "todo", state: "unchecked" },
+    //     subblocks: [blockMeta]
+    //   };
+    // } else {
       tB = {
         content: createBlockTextRunFromTask(curTask.task, labelsList, false),
         type: "textBlock",
         listStyle: { type: "todo", state: "unchecked" }
       };
-    }
+    //}
 
     tB.indentationLevel = indentationLevel;
 
@@ -838,9 +838,9 @@ export function createBlockTextRunFromTask(task: Task, labelsList: Label[], forc
     }
   }
 
-  if (!taskBlocksUseClutterFreeView) {
+  //if (!taskBlocksUseClutterFreeView) {
     result = result.concat(getTaskMetadataAsTextRun(task, labelsList));
-  }
+  //}
 
   return result;
 }

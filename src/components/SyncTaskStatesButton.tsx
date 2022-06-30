@@ -6,7 +6,7 @@ import { CraftBlockUpdate, CraftTextBlock } from "@craftdocs/craft-extension-api
 import React from "react";
 import { useRecoilValue } from "recoil";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
-import { isAnyTaskLinkEnabled, taskBlocksUseClutterFreeView, taskMetadataSettingsValues, taskSyncContinuousMode } from "../settingsUtils";
+import { isAnyTaskLinkEnabled, taskMetadataSettingsValues, taskSyncContinuousMode } from "../settingsUtils";
 import * as TodoistWrapper from "../todoistApiWrapper";
 import Defines from '../utils/defines';
 
@@ -175,19 +175,19 @@ const SyncTaskStatesButton: React.FC = () => {
                         setTimeout(async function () {
                           let curTask = await getTask({ taskId: Number(taskId) })
                           block.content = TodoistWrapper.createBlockTextRunFromTask(curTask, labelList)
-                          if (taskBlocksUseClutterFreeView) {
-                            if (block.subblocks[0]) {
-                              if (block.subblocks[0].type == "textBlock") {
-                                block.subblocks[0].content = TodoistWrapper.getTaskMetadataAsTextRun(curTask, labelList)
-                              }
-                            }
-                            for (let subBlock of block.subblocks) {
-                              if (subBlock.type == "textBlock") {
-                                subBlock.content = TodoistWrapper.getTaskMetadataAsTextRun(curTask, labelList)
-                                blocksToUpdate.push(subBlock)
-                              }
-                            }
-                          }
+                          // if (taskBlocksUseClutterFreeView) {
+                          //   if (block.subblocks[0]) {
+                          //     if (block.subblocks[0].type == "textBlock") {
+                          //       block.subblocks[0].content = TodoistWrapper.getTaskMetadataAsTextRun(curTask, labelList)
+                          //     }
+                          //   }
+                          //   for (let subBlock of block.subblocks) {
+                          //     if (subBlock.type == "textBlock") {
+                          //       subBlock.content = TodoistWrapper.getTaskMetadataAsTextRun(curTask, labelList)
+                          //       blocksToUpdate.push(subBlock)
+                          //     }
+                          //   }
+                          // }
                           blocksToUpdate.push(block)
                         }, 350)
                       }

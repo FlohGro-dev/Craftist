@@ -12,7 +12,7 @@ export let taskImportAfterSelectedBlock: string = "";
 export let taskSetDueDatesBasedOnDailyNote: string = "";
 export let taskSyncContinuousMode: string = "";
 export let taskImportPersonalTasksOnly: boolean = true;
-export let taskBlocksUseClutterFreeView: boolean = false;
+//export let taskBlocksUseClutterFreeView: boolean = false;
 
 
 // const taskMetadataSettingsDefaultValues:string[] = [];
@@ -741,26 +741,26 @@ export async function getSettingsUsePersonalTasksOnly(): Promise<string> {
 
 
 
-const useSettingsSetUseClutterFreeView: string = "useSettingsSetUseClutterFreeView"
+// const useSettingsSetUseClutterFreeView: string = "useSettingsSetUseClutterFreeView"
 
-export async function setSettingsSetUseClutterFreeView(enabled: boolean) {
-  if (enabled) {
-    taskBlocksUseClutterFreeView = true;
-  } else {
-    taskBlocksUseClutterFreeView = false;
-  }
-  await craft.storageApi.put(useSettingsSetUseClutterFreeView, String(taskBlocksUseClutterFreeView));
-}
+// export async function setSettingsSetUseClutterFreeView(enabled: boolean) {
+//   if (enabled) {
+//     taskBlocksUseClutterFreeView = true;
+//   } else {
+//     taskBlocksUseClutterFreeView = false;
+//   }
+//   await craft.storageApi.put(useSettingsSetUseClutterFreeView, String(taskBlocksUseClutterFreeView));
+// }
 
-export async function getSettingsUseClutterFreeView(): Promise<string> {
-  let result = await craft.storageApi.get(useSettingsSetUseClutterFreeView);
-  if (result.status == "success") {
-    taskBlocksUseClutterFreeView = Boolean(result.data)
-    return result.data
-  } else {
-    return "error"
-  }
-}
+// export async function getSettingsUseClutterFreeView(): Promise<string> {
+//   let result = await craft.storageApi.get(useSettingsSetUseClutterFreeView);
+//   if (result.status == "success") {
+//     taskBlocksUseClutterFreeView = Boolean(result.data)
+//     return result.data
+//   } else {
+//     return "error"
+//   }
+// }
 
 async function checkIfSettingExists(key: string): Promise<boolean> {
   let getSettingResult = await craft.storageApi.get(key);
@@ -789,7 +789,7 @@ export const writeDefaultSettings = async () => {
   let dailyNotesSettings = await getSettingsSetDueDateBasedOnDailyNoteOption();
   let continuousSyncSettings = await getSettingsSetContinuousSyncMode();
   let usePersonalTasksOnlySettings = await getSettingsUsePersonalTasksOnly();
-  let useClutterFreeTaskView = await getSettingsUseClutterFreeView();
+  //let useClutterFreeTaskView = await getSettingsUseClutterFreeView();
 
   if (mobileUrlSettings == "error") {
     // write default
@@ -831,10 +831,10 @@ export const writeDefaultSettings = async () => {
     //write default
     await setSettingsSetUsePersonalTasksOnly(true);
   }
-  if (useClutterFreeTaskView == "error") {
-    //write default
-    await setSettingsSetUseClutterFreeView(false);
-  }
+  // if (useClutterFreeTaskView == "error") {
+  //   //write default
+  //   await setSettingsSetUseClutterFreeView(false);
+  // }
   if (!checkIfSettingExists(useSettingsGroupTodaysTasksOption)) {
     // write default
     await setSettingsGroupTodaysTasksOption("projectAndSection");
