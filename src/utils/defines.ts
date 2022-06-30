@@ -1,11 +1,11 @@
 const Defines = {
     // version
-    CURRENT_VERSION: '0.8',
+    CURRENT_VERSION: '0.8.1',
     // links
     WEBSITE_LINK: 'https://flohgro.com',
     CRAFTIST_REPOSITORY_LINK: 'https://github.com/FlohGro-dev/Craftist',
     CRAFTIST_DOWNLOAD_LINK: 'https://github.com/FlohGro-dev/Craftist#installation',
-    CRAFTIST_UPDATE_STATUS_LINK: 'https://flohgro.com/craftist-releases/0.8.html',
+    CRAFTIST_UPDATE_STATUS_LINK: 'https://flohgro.com/craftist-releases/0.8.1.html',
     MAIL_TO_LINK: 'mailto:hi@flohgro.com',
     TWITTER_LINK: 'https://www.twitter.com/flohgro',
     BUYMEACOFFEE_LINK: 'https://www.buymeacoffee.com/flohgro',

@@ -143,6 +143,10 @@ Thanks to every user who provides valuable feedback for the further development 
 
 ## Changelog
 
+### v0.8.1
+
+**fixed:** Imported tasks were taking up more space
+
 ### v0.8
 
 - **new:** tab layout to divide into *Features* / *Settings* and *Info*
