@@ -1,6 +1,6 @@
 const Defines = {
     // version
-    CURRENT_VERSION: '0.8.1',
+    CURRENT_VERSION: '0.9',
     // links
     WEBSITE_LINK: 'https://flohgro.com',
     CRAFTIST_REPOSITORY_LINK: 'https://github.com/FlohGro-dev/Craftist',
