@@ -255,7 +255,7 @@ export async function checkIfPageContainsTodoistTaskId(taskId: number) {
 }
 
 export async function getCurrentTodoistTaskIdsOfTasksOnPage() {
-  let taskIds: number[] = [];
+  let taskIds: string[] = [];
 
   const todoistLinkSchemeMobile = "todoist://task?id=";
   const todoistLinkSchemeWeb = "https://todoist.com/showTask?id=";
@@ -275,10 +275,10 @@ export async function getCurrentTodoistTaskIdsOfTasksOnPage() {
       // may produce duplicates in an array but doesnt really matter.
       for (let url of blockUrls) {
         if (url.includes(todoistLinkSchemeMobile)) {
-          taskIds.push(Number(url.replace(todoistLinkSchemeMobile, "")));
+          taskIds.push(url.replace(todoistLinkSchemeMobile, ""));
           break;
         } else if (url.includes(todoistLinkSchemeWeb)) {
-          taskIds.push(Number(url.replace(todoistLinkSchemeWeb, "")));
+          taskIds.push(url.replace(todoistLinkSchemeWeb, ""));
           break;
         }
       }

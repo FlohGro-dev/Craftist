@@ -67,17 +67,15 @@ const LoginLogoutButton: React.FC = () => {
       <Button onClick={onOpen}
         width="100%"
         mb="1"
-        //isLoading={isLoading}
         rightIcon={<ArrowForwardIcon />}
-        colorScheme='gray'
-        variant='solid'
+        colorScheme='orange'
       >Login/Logout</Button>
 
       <Modal
         isOpen={isOpen}
         onClose={onClose}
       >
-        <ModalOverlay />
+        <ModalOverlay/>
         <ModalContent>
           <ModalHeader>Login / Logout</ModalHeader>
           <ModalCloseButton />

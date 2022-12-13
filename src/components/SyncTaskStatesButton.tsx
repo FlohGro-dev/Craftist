@@ -2,7 +2,7 @@ import { Button } from "@chakra-ui/button";
 import { UpDownIcon } from "@chakra-ui/icons";
 import { Box, Center } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
-import { CraftBlockUpdate, CraftTextBlock } from "@craftdocs/craft-extension-api";
+import { CraftBlockUpdate, CraftTextBlock, CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import React from "react";
 import { useRecoilValue } from "recoil";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
@@ -85,7 +85,7 @@ const SyncTaskStatesButton: React.FC = () => {
           // SYNC TODO STATE
           // now we have the task ID - check its state with todoist api
           let getIsTaskStateCompleted = isTaskCompleted({
-            id: Number(taskId)
+            id: taskId
           })
             .catch(() => {
               //ERROR
@@ -106,7 +106,7 @@ const SyncTaskStatesButton: React.FC = () => {
 
           getIsTaskStateCompleted.then(async function (isCompleted) {
             let isRecurring = isRecurringTask({
-              id: Number(taskId)
+              id: String(taskId)
             })
 
             let syncState: boolean;
@@ -152,7 +152,7 @@ const SyncTaskStatesButton: React.FC = () => {
                       // unlink a recurring task if it is in a daily note
                       if (documentDate) {
                         setTimeout(async function () {
-                          await getTask({ taskId: Number(taskId) })
+                          await getTask({ taskId: String(taskId) })
                             .catch()
                             .then((task) => {
                               block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList, true)
@@ -162,7 +162,7 @@ const SyncTaskStatesButton: React.FC = () => {
                       } else {
                         // check if the due date of the task is different to the date link in the task block
                         let dateStr = CraftBlockInteractor.getIsoDateFromBlockLinkedToDate(block)
-                        let curTask = await getTask({ taskId: Number(taskId) })
+                        let curTask = await getTask({ taskId: String(taskId) })
                         if (curTask.due?.date) {
                           if (curTask.due.date != dateStr) {
                             // due dates are not the same, just sync the task metadata, don't mark the task as completed
@@ -173,7 +173,7 @@ const SyncTaskStatesButton: React.FC = () => {
                         // uncheck the todo again
                         block.listStyle.state = "unchecked"
                         setTimeout(async function () {
-                          let curTask = await getTask({ taskId: Number(taskId) })
+                          let curTask = await getTask({ taskId: String(taskId) })
                           block.content = TodoistWrapper.createBlockTextRunFromTask(curTask, labelList)
                           // if (taskBlocksUseClutterFreeView) {
                           //   if (block.subblocks[0]) {
@@ -194,16 +194,16 @@ const SyncTaskStatesButton: React.FC = () => {
                     }
                     if (setTaskStateCompleted) {
                       await setTaskCompleted({
-                        id: Number(taskId)
+                        id: String(taskId)
                       });
                     }
                   }
 
                   if (!isCompleted && block.listStyle.state == "unchecked") {
-                    // task is uncompleted on both ends - just needed to sync metadate for recurring tasks
+                    // task is uncompleted on both ends - just needed to sync metadata for recurring tasks
                     if (isRecurring) {
                       setTimeout(async function () {
-                        await getTask({ taskId: Number(taskId) })
+                        await getTask({ taskId: String(taskId) })
                           .catch()
                           .then((task) => {
                             block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
@@ -216,7 +216,7 @@ const SyncTaskStatesButton: React.FC = () => {
                   if (!isCompleted && block.listStyle.state == "canceled") {
                     // task is cancelled in craft but open in todoist
                     setTaskCompleted({
-                      id: Number(taskId)
+                      id: String(taskId)
                     });
                   }
                 }
@@ -250,7 +250,7 @@ const SyncTaskStatesButton: React.FC = () => {
             }).finally(async function () {
               // SYNC METADATA:
               setTimeout(async function () {
-                getTask({ taskId: Number(taskId) })
+                getTask({ taskId: String(taskId) })
                   .catch(function () {
                     // task is not retrievable - was marked as done in Todoist
                   })
@@ -261,7 +261,7 @@ const SyncTaskStatesButton: React.FC = () => {
                         throw new Error("get page failed")
                       }
                       // only update uncompleted tasks and tasks which are not recurring here
-                      if (!task.completed && !task.due?.recurring) {
+                      if (!task.isCompleted && !task.due?.isRecurring) {
                         block.content = TodoistWrapper.createBlockTextRunFromTask(task, labelList)
                         blocksToUpdate.push(block)
                       }

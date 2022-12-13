@@ -10,17 +10,20 @@ import { writeDefaultSettings } from "./settingsUtils";
 import { readStoredApiTokenToVariable } from "./todoistApiWrapper";
 import { CraftEnv } from "./types";
 
-const config: ThemeConfig = {
-  //  initialColorMode: getCraftColorMode(),
-  //initialColorMode: useCraftEnv().isDarkMode ? 'dark':'light',
-  initialColorMode: 'light',
-  useSystemColorMode: true,
-}
+// const config: ThemeConfig = {
+  
+//   //  initialColorMode: getCraftColorMode(),
+//   //initialColorMode: useCraftEnv().isDarkMode ? 'dark':'light',
+//   //initialColorMode: 'light',
+//   //useSystemColorMode: true,
+// }
 
 //const { colorMode, toggleColorMode } = useColorMode();
 
 const theme = extendTheme({
-  config,
+  initialColorMode: 'dark',
+  useSystemColorMode: true,
+  //config,
   fontSizes: {
     md: "11px",
     sm: "9px",

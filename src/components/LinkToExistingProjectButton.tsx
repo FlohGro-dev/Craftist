@@ -11,7 +11,7 @@ const LinkToExistingProjectButton: React.FC = () => {
   // const projectList = useRecoilValue(States.projects);
   const toast = useToast();
   const projectList = useRecoilValue(TodoistWrapper.projects);
-  const onClick = async (projectName: string, projectId: number, projectUrl: string) => {
+  const onClick = async (projectName: string, projectId: string, projectUrl: string) => {
     let blocksToAdd: CraftBlockInsert[] = [];
     const getPageResult = await craft.dataApi.getCurrentPage();
 

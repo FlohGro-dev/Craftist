@@ -2,7 +2,7 @@ import { Button } from "@chakra-ui/button";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { Box, Center } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
-import { CraftBlock, CraftTextBlock, CraftTextRun } from "@craftdocs/craft-extension-api";
+import { CraftBlock, CraftTextBlock, CraftTextRun, CraftBlockInsert } from "@craftdocs/craft-extension-api";
 import React from "react";
 import { useRecoilValue } from "recoil";
 import * as CraftBlockInteractor from "../craftBlockInteractor";
@@ -18,7 +18,7 @@ const CreateTasksFromSelectionButton: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const onClick = async () => {
     setIsLoading(true);
-
+    
     // check if document is linked to a todoist project
     let foundProjectIDs: string[] = [];
     let linkedProjectId: number;
@@ -118,13 +118,14 @@ const CreateTasksFromSelectionButton: React.FC = () => {
               if (CraftBlockInteractor.blockContainsString("Todoist Task", block)) {
                 // nothing to be done - task is already linked
               } else {
-
-                add({
-                  description: documentTitle,
-                  content: mdContentWithLink,
-                  projectId: linkedProjectId,
-                  due_date: documentDate
-                })
+                
+                  add({
+                    description: documentTitle,
+                    content: mdContentWithLink,
+                    projectId: (linkedProjectId? String(linkedProjectId) : undefined),
+                    due_date: documentDate
+                  })
+      
                   .then(async function (task) {
                     // append task link to block
 

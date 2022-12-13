@@ -7,7 +7,7 @@
     "jsx": "react",
     "module": "amd",
     "target": "es6",
-    "strict": true,
+    "strict": false,
     "moduleResolution": "node",
     "importHelpers": true,
     "lib": [

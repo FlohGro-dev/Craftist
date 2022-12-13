@@ -480,40 +480,40 @@ const SettingsMenu: React.FC = () => {
         <Stack spacing={1} direction={['column']} divider={<StackDivider borderColor='gray.200' />}>
           <CheckboxGroup colorScheme='red' defaultValue={taskLinkSettingsValues}> Task Links
             <Stack spacing={[1, 2]} direction={['column', 'row']}>
-              <Checkbox value='mobile' onChange={(value) => onChangeMobileUrls(value.target.checked)}>mobile</Checkbox>
-              <Checkbox value='web' onChange={(value) => onChangeWebUrls(value.target.checked)}>web</Checkbox>
+              <Checkbox value='mobile' onChange={(value:any) => onChangeMobileUrls(value.target.checked)}>mobile</Checkbox>
+              <Checkbox value='web' onChange={(value:any) => onChangeWebUrls(value.target.checked)}>web</Checkbox>
             </Stack>
           </CheckboxGroup>
           <CheckboxGroup colorScheme='red' defaultValue={taskMetadataSettingsValues}> task metadata import
             <Stack spacing={[1, 2]} direction={['column', 'row']}>
-              <Checkbox value='dueDates' onChange={(value) => onChangeDueDates(value.target.checked)}>due dates</Checkbox> setTaskMetadataOptions
-              <Checkbox value='labels' onChange={(value) => onChangeLabels(value.target.checked)}>labels</Checkbox>
-              <Checkbox value='description' onChange={(value) => onChangeDescriptions(value.target.checked)}>description</Checkbox>
-              <Checkbox value='priorities' onChange={(value) => onChangePriorities(value.target.checked)}>priorities</Checkbox>
+              <Checkbox value='dueDates' onChange={(value:any) => onChangeDueDates(value.target.checked)}>due dates</Checkbox> setTaskMetadataOptions
+              <Checkbox value='labels' onChange={(value:any) => onChangeLabels(value.target.checked)}>labels</Checkbox>
+              <Checkbox value='description' onChange={(value:any) => onChangeDescriptions(value.target.checked)}>description</Checkbox>
+              <Checkbox value='priorities' onChange={(value:any) => onChangePriorities(value.target.checked)}>priorities</Checkbox>
             </Stack>
           </CheckboxGroup>
           <CheckboxGroup colorScheme='red' defaultValue={taskGroupingTodayValues}> import todays tasks grouping
             <Stack spacing={[1, 2]} direction={['column', 'row']}>
-              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingTodayProjects(value.target.checked)}>projects</Checkbox>
-              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingTodaySections(value.target.checked)}>sections</Checkbox>
+              <Checkbox value='projects' onChange={(value:any) => onChangeTaskGroupingTodayProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value:any) => onChangeTaskGroupingTodaySections(value.target.checked)}>sections</Checkbox>
             </Stack>
           </CheckboxGroup>
           <CheckboxGroup colorScheme='red' defaultValue={taskGroupingProjectValues}> import project tasks grouping
             <Stack spacing={[1, 2]} direction={['column', 'row']}>
-              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingProjectImportProjects(value.target.checked)}>projects</Checkbox>
-              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingProjectImportSections(value.target.checked)}>sections</Checkbox>
+              <Checkbox value='projects' onChange={(value:any) => onChangeTaskGroupingProjectImportProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value:any) => onChangeTaskGroupingProjectImportSections(value.target.checked)}>sections</Checkbox>
             </Stack>
           </CheckboxGroup>
           <CheckboxGroup colorScheme='red' defaultValue={taskGroupingAllValues}> import all tasks grouping
             <Stack spacing={[1, 2]} direction={['column', 'row']}>
-              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingAllProjects(value.target.checked)}>projects</Checkbox>
-              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingAllSections(value.target.checked)}>sections</Checkbox>
+              <Checkbox value='projects' onChange={(value:any) => onChangeTaskGroupingAllProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value:any) => onChangeTaskGroupingAllSections(value.target.checked)}>sections</Checkbox>
             </Stack>
           </CheckboxGroup>
           <CheckboxGroup colorScheme='red' defaultValue={taskGroupingLabelValues}> import label tasks grouping
             <Stack spacing={[1, 2]} direction={['column', 'row']}>
-              <Checkbox value='projects' onChange={(value) => onChangeTaskGroupingLabelProjects(value.target.checked)}>projects</Checkbox>
-              <Checkbox value='sections' onChange={(value) => onChangeTaskGroupingLabelSections(value.target.checked)}>sections</Checkbox>
+              <Checkbox value='projects' onChange={(value:any) => onChangeTaskGroupingLabelProjects(value.target.checked)}>projects</Checkbox>
+              <Checkbox value='sections' onChange={(value:any) => onChangeTaskGroupingLabelSections(value.target.checked)}>sections</Checkbox>
             </Stack>
           </CheckboxGroup>
           <RadioGroup colorScheme='red' defaultValue={taskImportAfterSelectedBlock}> import tasks after selected blocks

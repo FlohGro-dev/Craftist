@@ -88,7 +88,7 @@ export const readStoredApiTokenToVariable = () => {
 export const useAddTask = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
     return async (params: {
-      projectId?: number;
+      projectId?: string;
       content: string;
       description?: string;
       due_date?: string
@@ -107,14 +107,14 @@ export const useAddTask = () => {
 export const useCheckIfTaskIsCompleted = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
     return async (params: {
-      id: number
+      id: string
     }) => {
       const cli = await snapshot.getPromise(client);
       if (!cli) {
         throw new Error("No client");
       }
       const response = await cli.getTask(params.id);
-      return response.completed
+      return response.isCompleted
     };
 
   });
@@ -124,14 +124,14 @@ export const useCheckIfTaskIsCompleted = () => {
 export const useCheckIfTaskIsRecurring = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
     return async (params: {
-      id: number
+      id: string
     }) => {
       const cli = await snapshot.getPromise(client);
       if (!cli) {
         throw new Error("No client");
       }
       const response = await cli.getTask(params.id);
-      if (response.due?.recurring == true) {
+      if (response.due?.isRecurring == true) {
         return true;
       }
       else {
@@ -146,7 +146,7 @@ export const useCheckIfTaskIsRecurring = () => {
 export const useSetTaskComplete = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
     return async (params: {
-      id: number
+      id: string
     }) => {
       const cli = await snapshot.getPromise(client);
       if (!cli) {
@@ -190,7 +190,7 @@ export const useGetAllTasks = () => {
 export const useGetTasksFromProject = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
     return async (params: {
-      projectId: number
+      projectId: string
     }) => {
       const cli = await snapshot.getPromise(client);
       if (!cli) {
@@ -311,7 +311,7 @@ interface ProjectSectionTaskNest {
   tasks?: NestedTask[]
 }
 
-function getParentTask(nestedTask: NestedTask, parentTaskId: number): NestedTask | undefined {
+function getParentTask(nestedTask: NestedTask, parentTaskId: string): NestedTask | undefined {
   if (nestedTask.task.id == parentTaskId) {
     return nestedTask;
   } else if (nestedTask.children != undefined) {
@@ -453,7 +453,7 @@ export function createTaskMdString(task: Task, mdPrefix: string = "- [ ] ", labe
   return mdString;
 }
 
-export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], labelList: Label[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: number[] = [], taskGrouping: taskGroupingOptions, sortBy: tasksSortByOptions = tasksSortByOptions.order): Promise<CraftBlockInsert[]> {
+export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[], sectionList: Section[], labelList: Label[], flatTaskArray: Task[], ignoreExistingTasks = false, existingTaskIds: string[] = [], taskGrouping: taskGroupingOptions, sortBy: tasksSortByOptions = tasksSortByOptions.order): Promise<CraftBlockInsert[]> {
 
   let blocksToAdd: CraftBlockInsert[] = [];
 
@@ -501,9 +501,9 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
 
   let unnestedChildTasks: Task[] = [];
 
-  let projectIds: Set<number> = new Set([]);
-  let sectionIds: Set<number> = new Set([]);
-  let labelIds: Set<number> = new Set([]);
+  let projectIds: Set<string> = new Set([]);
+  let sectionIds: Set<string> = new Set([]);
+  let labelNames: Set<string> = new Set([]);
 
   // if existing tasks shall be ignored - remove the tasks from the flat array so they don't will be processed
   if (ignoreExistingTasks) {
@@ -525,8 +525,10 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
 
   flatTaskArray.map(task => {
     projectIds.add(task.projectId);
-    sectionIds.add(task.sectionId);
-    task.labelIds.map((labelId) => { labelIds.add(labelId) })
+    if(task.sectionId){
+      sectionIds.add(task.sectionId);
+    }
+    task.labels.map((labelId) => { labelNames.add(labelId) })
     if (task.parentId == undefined) {
       // task has no parentId and therefore is a parent task
       nestedTasks.push({ task: task });
@@ -549,7 +551,7 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
       .map(section => sections.push(section))
   })
 
-  Array.from(labelIds.values()).map(labelId => {
+  Array.from(labelNames.values()).map(labelId => {
     labelList.filter(label => label.id == labelId)
       .map(label => labels.push(label))
   })
@@ -592,7 +594,7 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
   let tasksToMap = nestedTasks;
   let tasksWithoutSection: NestedTask[] = [];
   tasksToMap.map(curTask => {
-    if (curTask.task.sectionId != 0) {
+    if (curTask.task.sectionId) {
       // section is existing - map to secTaskNest
       let curTasksSection = secTaskNest.find(section => section.section.id == curTask.task.sectionId)
       if (curTasksSection) {
@@ -698,7 +700,7 @@ export async function createGroupedBlocksFromFlatTaskArray(projectList: Project[
 export const useGetTask = () => {
   return Recoil.useRecoilCallback(({ snapshot }) => {
     return async (params: {
-      taskId: number;
+      taskId: string;
     }
 
     ) => {
@@ -731,15 +733,15 @@ export function getTaskMetadataInMarkdownFormat(task: Task, labelsList: Label[])
         }
         mdString = mdString + " " + dueString;
 
-        if (task.due.recurring) {
+        if (task.due.isRecurring) {
           mdString = mdString + " *(recurring)*"
         }
       }
     }
 
     if (taskMetadataSettingsValues.includes("labels")) {
-      if (task.labelIds.length > 0) {
-        task.labelIds.forEach((labelId) => {
+      if (task.labels.length > 0) {
+        task.labels.forEach((labelId) => {
           labelsList.filter((label) => label.id == labelId)
             .map((label) => { mdString = mdString + " ::@" + label.name + "::"; })
         })
@@ -880,7 +882,7 @@ export function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): Craft
           })
         }
 
-        if (task.due.recurring) {
+        if (task.due.isRecurring) {
           result.push({
             text: " (recurring - " + task.due.string + ")",
             isItalic: true
@@ -909,9 +911,9 @@ export function getTaskMetadataAsTextRun(task: Task, labelsList: Label[]): Craft
     }
 
     if (taskMetadataSettingsValues.includes("labels")) {
-      if (task.labelIds.length > 0) {
-        task.labelIds.forEach((labelId) => {
-          labelsList.filter((label) => label.id == labelId)
+      if (task.labels.length > 0) {
+        task.labels.forEach((labelId) => {
+          labelsList.filter((label) => label.name == labelId)
             .map((label) => {
               result.push({
                 text: " "

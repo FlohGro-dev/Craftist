@@ -54,7 +54,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
           if (foundProjectIDs.every((val, _i, arr) => val === arr[0])) {
             // all ids are equal - thats valid
             linkedProjectId = parseInt(foundProjectIDs[0]);
-            let p = projectList.filter((project) => { if (project.id == linkedProjectId) { return project } })
+            let p = projectList.filter((project) => { if (project.id == String(linkedProjectId)) { return project } })
             let filterStr = "##" + p[0].name
             if (taskImportPersonalTasksOnly) {
               filterStr = filterStr + " & (assigned to: me | !assigned)"
@@ -67,7 +67,7 @@ const ImportTasksFromLinkedProjectButton: React.FC = () => {
 
 
               taskList.sort((task) => task.order)
-              taskList = taskList.filter((task) => !task.completed)
+              taskList = taskList.filter((task) => !task.isCompleted)
 
               let existingTaskIds = await CraftBlockInteractor.getCurrentTodoistTaskIdsOfTasksOnPage();
 
