@@ -122,7 +122,7 @@ If you ever want to logout from your todoist account - use the "Login/Logout" bu
 1. Enable Craft eXtensions.
     - Mac: At the top left of the app, click your avatar, select Preferences, click 'Advanced'. Under Craft eXtensions, click the dropdown, and select 'Enabled'.
     - Web: At the top left of the web app, click your avatar, select Craft eXtensions, toggle 'Craft eXtensions' on.
-2. Download the `.craftx` file from the latest [release](https://github.com/FlohGro-dev/Craftist/releases/tag/0.8.1)
+2. Download the `.craftx` file from the latest [release](https://github.com/FlohGro-dev/Craftist/releases/tag/0.9)
 3. Install the extension.
     - At the bottom of the right side bar, the eXtensions logo is now visible. Click the '+' sign, select the file you downloaded from the previous step, then click open.
 4. Done - you can now use the eXtension
@@ -142,6 +142,10 @@ Thanks to [@DharamKapila](https://twitter.com/DharamKapila) for the inspiration 
 Thanks to every user who provides valuable feedback for the further development and the gratefulness i received.
 
 ## Changelog
+
+### v0.9
+
+**fixed:** Support for new Todoist API version
 
 ### v0.8.1
 
