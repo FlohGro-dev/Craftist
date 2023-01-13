@@ -14,6 +14,12 @@ If this eXtension is valuable for and you like to thank me you can support me on
 
 If you want to have a look to other things I'm working, check out my website at [flohgro.com](https://flohgro.com).
 
+---
+
+> **IMPORTANT NOTE:** Due to the stopped development of the Craft API (no updates since more than a year) and my personal switch away from Craft I will not bring new features to this eXtension. I develop this stuff in my free time and also for my personal use. If you have **major** problems and issues I will have a look and check if I can fix them, but new features won't come to the eXtension in the future. If you want to add features by yourself - you can do that by creating a PR so I can test them. I'm happy to add and mention you as contributor if you do so.
+
+---
+
 ## Demo Videos
 
 Here are some demo videos of Craftist from myself or other creators:
