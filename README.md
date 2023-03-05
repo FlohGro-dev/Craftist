@@ -4,7 +4,7 @@ Welcome to the repository of my Todoist eXtension for Craft.
 Please read through the instructions, especially the [installation](#installation) and [login](#login) chapter.
 Also make sure to check out the latest changes in the [changelog](#changelog) which will contain the latest feature updates
 
-If you want to follow me for updates or get in touch you can follow me on [Twitter](https://twitter.com/FlohGro) or choose anything else to contact on my [website](https://flohgro.com/contactme/). Feel free to create issues in the repository for bugs you notice or features you'd like to see.
+If you want to follow me for updates or get in touch you can follow me on [Mastodon](https://social.lol/@flohgro) or choose anything else to contact on my [website](https://flohgro.com/contactme/). Feel free to create issues in the repository for bugs you notice or features you'd like to see.
 
 If this eXtension is valuable for and you like to thank me you can support me on
 
