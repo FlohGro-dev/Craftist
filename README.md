@@ -1,5 +1,9 @@
 # Craftist
 
+> **NOTE** Since Craft has announced a new API and completely different way to interact with the content (way better now) - I am archiving this project. Thanks to all the users in the time of Craft eXtensions :)
+
+---
+
 Welcome to the repository of my Todoist eXtension for Craft.
 Please read through the instructions, especially the [installation](#installation) and [login](#login) chapter.
 Also make sure to check out the latest changes in the [changelog](#changelog) which will contain the latest feature updates
@@ -13,10 +17,6 @@ If this eXtension is valuable for and you like to thank me you can support me on
 <a href="https://www.patreon.com/flohgro" target="_blank"><img src="https://user-images.githubusercontent.com/13785667/162812708-55b96cdc-8c32-4433-a340-6dd4c1f7326d.jpg" alt="Become A patreon" style="height: 110px !important;width: 220px !important;" ></a>
 
 If you want to have a look to other things I'm working, check out my website at [flohgro.com](https://flohgro.com).
-
----
-
-> **IMPORTANT NOTE:** Due to the stopped development of the Craft API (no updates since more than a year) and my personal switch away from Craft I will not bring new features to this eXtension. I develop this stuff in my free time and also for my personal use. If you have **major** problems and issues I will have a look and check if I can fix them, but new features won't come to the eXtension in the future. If you want to add features by yourself - you can do that by creating a PR so I can test them. I'm happy to add and mention you as contributor if you do so.
 
 ---
 
